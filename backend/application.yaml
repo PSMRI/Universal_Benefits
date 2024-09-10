@@ -1,0 +1,227 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: Application-Service
+  description: 'This service/registry will store the registration details'
+servers:
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API to perform application registration
+    url: https://uba.digit.org/application
+
+tags:
+  - name: Application
+
+paths:
+  /v1/_create:
+    post:
+      tags:
+        - Application
+      summary: 'Create an Application'
+      description: 'Create a Application in the system with relevant details'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApplicationRequest'
+        description: Request object to create Application in the system
+        required: true
+      responses:
+        '202':
+          description: Successful created Application
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ApplicationResponse'
+        '400':
+          description: Invalid input.
+          content:
+            '*/*':
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-OSS/master/core-services/docs/common-contract_v1-1.yml#/components/schemas/ErrorRes'
+  /v1/_update:
+    post:
+      tags:
+        - Application
+      summary: 'Update an Application'
+      description: 'Submit Application with the head details to update Applications in the system'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApplicationRequest'
+        description: Request object to create Application in the system
+        required: true
+      responses:
+        '202':
+          description: Successful created Application
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ApplicationResponse'
+        '400':
+          description: Invalid input.
+          content:
+            '*/*':
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-OSS/master/core-services/docs/common-contract_v1-1.yml#/components/schemas/ErrorRes'
+
+  /v1/_search:
+    post:
+      tags:
+        - Application
+      summary: 'Search an Application'
+      description: 'Submit Application search request to get Application list from the system'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApplicationSearchRequest'
+        description: Request object to search Application in the system
+        required: true
+      responses:
+        '202':
+          description: Successful search Application
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ApplicationResponse'
+        '400':
+          description: Invalid input.
+          content:
+            '*/*':
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-OSS/master/core-services/docs/common-contract_v1-1.yml#/components/schemas/ErrorRes'
+
+
+
+components:
+  schemas:
+    Application:
+      type: object
+      properties:
+        id:
+          type: string
+          description: 'Unique identifier of the Application'
+          format: uuid
+          example: '251c51eb-e970-4e01-a99a-70136c47a934'
+          minLength: 2
+          maxLength: 64
+          readOnly: true
+        tenantId:
+          type: string
+          description: 'Unique identifier of the tenant'
+          minLength: 2
+          maxLength: 64
+          example: 'pb'
+        applicationNumber:
+          type: string
+          description: 'The unique formatted identifier or code of the Application'
+          example: 'LD-00001'
+          minLength: 4
+          maxLength: 64
+          readOnly: true
+        individualId:
+          type: string
+          description: 'Applicent UUID'
+          format: uuid
+          example: '251c51eb-e970-4e01-a99a-70136c47a934'
+          minLength: 2
+          maxLength: 64
+        programCode:
+          type: string
+          description: Program/Scheme code for which application is submitted
+          example: PG/001
+          minLength: 2
+          maxLength: 64
+          readOnly: true
+        description:
+          type: string
+          description: 'User Input Field. Max Characters can be 240.'
+          minLength: 2
+          maxLength: 240
+          pattern: '^[A-Za-z0-9\/ . _$@#]*$'
+        status:
+          type: string
+          description: Flag to soft delete
+          enum:
+            - ACTIVE
+            - INACTIVE
+            - ARCHIVED
+        wfStatus:
+          type: string
+          description: The status of the application derived from Workflow
+          minLength: 2
+          maxLength: 64
+        documents:
+          type: array
+          description: Any attachments of the application.
+          items:
+            $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-OSS/master/core-services/docs/common-contract_v1-1.yml#/components/schemas/Document'
+        auditDetails:
+          $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-OSS/master/core-services/docs/common-contract_v1-1.yml#/components/schemas/AuditDetails'
+        additionalDetails:
+          type: object
+          description: 'Any additional information that needs to be attached to the Application. For attachments, fileStoreIds will also be stored here.'
+      required: [tenantId, applicationNumber, status, programCode, individualId, documents]
+
+    ApplicationRequest:
+      type: object
+      description: Request for Application _create and _update api's
+      properties:
+        RequestInfo:
+          $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-OSS/master/core-services/docs/common-contract_v1-1.yml#/components/schemas/RequestInfo'
+        Application:
+          type: object
+          $ref: '#/components/schemas/Application'
+      required:
+        - RequestInfo
+        - Application
+
+    ApplicationSearchRequest:
+      type: object
+      description: Request for Application _create and _update api's
+      properties:
+        RequestInfo:
+          $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-OSS/master/core-services/docs/common-contract_v1-1.yml#/components/schemas/RequestInfo'
+        criteria:
+          $ref: '#/components/schemas/ApplicationSearchCriteria'
+        pagination:
+          $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-OSS/master/core-services/docs/common-contract_v1-1.yml#/components/schemas/Pagination'
+      required:
+        - requestInfo
+        - criteria
+        - pagination
+
+    ApplicationSearchCriteria:
+      type: object
+      description: Request for Application _searcrh
+      properties:
+        ids:
+          type: array
+          items:
+            type: string
+        tenantId:
+          type: string
+        individualId:
+          type: string
+        applicationNumbers:
+          type: array
+          items:
+            type: string
+        programCode:
+          type: string
+
+
+    ApplicationResponse:
+      type: object
+      description: Response for the Application _create, _update and _search api's
+      properties:
+        ResponseInfo:
+          $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-OSS/master/core-services/docs/common-contract_v1-1.yml#/components/schemas/RequestInfo'
+        Applications:
+          type: array
+          items:
+            $ref: '#/components/schemas/Application'
+      required:
+        - ResponseInfo
+        - Applications
