@@ -1,11 +1,8 @@
-package digit.disbursal.kafka;
+package digit.verification.kafka;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import digit.disbursal.service.DisbursalService;
-import digit.disbursal.web.models.Application;
-import digit.disbursal.web.models.ApplicationRequest;
-import digit.disbursal.web.models.Disbursal;
-import digit.disbursal.web.models.DisbursalRequest;
+import digit.verification.service.VerificationService;
+import digit.verification.web.models.ApplicationRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,34 +17,26 @@ public class Consumer {
 
     private final ObjectMapper mapper;
 
-    private final DisbursalService disbursalService;
+    private final VerificationService verificationService;
 
     @Autowired
-    public Consumer(ObjectMapper mapper, DisbursalService disbursalService) {
+    public Consumer(ObjectMapper mapper, VerificationService verificationService) {
         this.mapper = mapper;
-        this.disbursalService = disbursalService;
+        this.verificationService = verificationService;
     }
 
     /*
      * Uncomment the below line to start consuming record from kafka.topics.consumer
      * Value of the variable kafka.topics.consumer should be overwritten in application.properties
      */
-    @KafkaListener(topics = {"kafka.topic.application.update"})
+    @KafkaListener(topics = {"kafka.topic.application.create", "kafka.topic.application.update"})
     public void listen(final String message, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
 
         log.info("Consumer::listen");
         try {
             ApplicationRequest applicationRequest = mapper.readValue(message, ApplicationRequest.class);
             if (applicationRequest != null && applicationRequest.getApplication() != null && applicationRequest.getRequestInfo() != null) {
-                Application application = applicationRequest.getApplication();
-                if (application.getWfStatus().equals("APPROVED")) {
-                    log.info("Workflow status is approved for the received message : " + message);
-                    Disbursal disbursal = Disbursal.builder().tenantId(application.getTenantId()).referenceId(application.getId()).build();
-                    DisbursalRequest  disbursalRequest = DisbursalRequest.builder().requestInfo(applicationRequest.getRequestInfo()).disbursal(disbursal).build();
-                    disbursalService.create(disbursalRequest);
-                } else {
-                    log.info("Workflow status is not approved for the received message : " + message);
-                }
+                verificationService.verifyApplication(applicationRequest);
             } else {
                 log.info("No application request found for the received message : " + message);
             }
