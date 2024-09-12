@@ -25,7 +25,7 @@ module.exports = {
   app: {
     port: parseInt(process.env.APP_PORT) || 8080,
     host: HOST,
-    contextPath: process.env.CONTEXT_PATH || "/ubp-bff",
+    contextPath: process.env.CONTEXT_PATH || "/ubp-bff-service",
   },
   host: {
     mdms: process.env.EGOV_MDMS_HOST || 'http://localhost:8083',

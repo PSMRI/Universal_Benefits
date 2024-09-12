@@ -102,10 +102,16 @@ let getCSVData = (disbursals, disbursalApplicationMap, applicationIndividualMap,
         let appId = disbursalApplicationMap[disbursal['id']]
         let aplicationNumber = applicationIdMap[appId]['applicationNumber'];
         let individualId = applicationIdMap[appId]['individualId']
+        let aadhaarNumber = null
+        individualIDMap[individualId].identifiers.forEach(identifier => {    
+            if (identifier.identifierType =='AADHAAR')
+                aadhaarNumber = identifier.identifierId
+        })
         let rec = {
             'disbursalNumber': disbursal['disbursalNumber'],
             'applicationNumber': aplicationNumber,
             'individualName': individualIDMap[individualId]['name']['givenName'],
+            'aadhaarNumber': aadhaarNumber,
             'bankAccountNumber': bankAccountDetailIndividualIDMap[individualId]['bankAccountDetails'][0]['accountNumber'],
             'bankBranchIdentifier': bankAccountDetailIndividualIDMap[individualId]['bankAccountDetails'][0]['bankBranchIdentifier']['code'],
             'bankAccountHolderName': bankAccountDetailIndividualIDMap[individualId]['bankAccountDetails'][0]['accountHolderName'],
@@ -119,6 +125,7 @@ let getCSVData = (disbursals, disbursalApplicationMap, applicationIndividualMap,
         {value: 'disbursalNumber', label: 'Disbursal Number'},
         {value: 'applicationNumber', label: 'Application Number'},
         {value: 'individualName', label: 'Student Name'},
+        {value: 'aadhaarNumber', label: 'Aadhaar Number'},
         {value: 'bankAccountNumber', label: 'Account Number'},
         {value: 'bankBranchIdentifier', label: 'IFSC'},
         {value: 'bankAccountHolderName', label: 'Account Holder Name'},

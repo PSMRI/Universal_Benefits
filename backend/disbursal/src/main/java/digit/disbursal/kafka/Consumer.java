@@ -32,7 +32,7 @@ public class Consumer {
      * Uncomment the below line to start consuming record from kafka.topics.consumer
      * Value of the variable kafka.topics.consumer should be overwritten in application.properties
      */
-    @KafkaListener(topics = {"kafka.topic.application.update"})
+    @KafkaListener(topics = {"${kafka.topic.application.update}"})
     public void listen(final String message, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
 
         log.info("Consumer::listen");
