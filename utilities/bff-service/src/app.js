@@ -6,6 +6,7 @@ var logger = require("morgan");
 var config = require("./config");
 
 var groupBills = require("./routes/groupBill");
+var submitApplication = require("./routes/submitApplication");
 
 // var {listenConsumer} = require("./consumer")
 
@@ -25,6 +26,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use(config.app.contextPath + "/payment", groupBills);
+app.use(config.app.contextPath + "/benefit/_apply", submitApplication);
 
 
 

@@ -1,37 +1,49 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-import LabelFieldPair from '../atoms/LabelFieldPair'
-import CardLabel from '../atoms/CardLabel'
-import CardLabelError from '../atoms/CardLabelError'
-import CitizenInfoLabel from '../atoms/CitizenInfoLabel'
-import Header from '../atoms/Header'
-import { Loader } from '../atoms/Loader'
-import MultiUploadWrapper from '../molecules/MultiUploadWrapper'
-import TextInput from '../atoms/TextInput'
+import { 
+  LabelFieldPair, 
+  CardLabel, 
+  CardLabelError, 
+  CitizenInfoLabel, 
+  Header, 
+  TextInput 
+} from '@egovernments/digit-ui-react-components'
 
-const UploadFileComposer = ({module, config, Controller, control, register, formData, errors, localePrefix, customClass, customErrorMsg,mdmsModuleName='works'}) => {
+import { Loader } from "@egovernments/digit-ui-react-components";
+import MultiUploadWrapper from './MultiUploadWrapper';
+import {  Controller } from "react-hook-form";
+
+
+
+
+const CustomUploadFileComposer = ({module, config,  control, register, formData, errors, localePrefix, customClass, customErrorMsg,mdmsModuleName='works'}) => {
+  console.log("RENDERED ========== CustomUploadFileComposer")
   const { t } = useTranslation()
   
   //fetch mdms config based on module name
-  const tenant = Digit.ULBService.getStateId();
-  const { isLoading, data } = Digit.Hooks.useCustomMDMS(
-      tenant,
-      mdmsModuleName,
-      [
-          {
-              "name": "DocumentConfig",
-              "filter": `[?(@.module=='${module}')]`
-          }
-      ]
-  );
+  // const tenant = Digit.ULBService.getStateId();
+  // const { isLoading, data } = Digit.Hooks.useCustomMDMS(
+  //     tenant,
+  //     mdmsModuleName,
+  //     [
+  //         {
+  //             "name": "DocumentConfig",
+  //             "filter": `[?(@.module=='${module == null || module == undefined ? config?.module : module}')]`
+  //         }
+  //     ]
+  // );
+
+
+  // console.log('isLoading : ', isLoading)
+  // console.log('data : ', data)
+
+  let docConfig =  {}
+  if (config?.DocumentConfig) {
+    docConfig = config?.DocumentConfig
+  } else if (data?.[mdmsModuleName]?.DocumentConfig?.[0]) {
+    docConfig = data?.[mdmsModuleName]?.DocumentConfig?.[0]
+  }
   
-  console.log("isLoading : ", isLoading)
-  console.log("data : ", data)
-
-
-  const docConfig = data?.[mdmsModuleName]?.DocumentConfig?.[0]
-
-
   let documentFileTypeMappings = {
     docx : "vnd.openxmlformats-officedocument.wordprocessingml.document",
     doc : "application/msword",
@@ -70,13 +82,15 @@ const UploadFileComposer = ({module, config, Controller, control, register, form
   }
 
   // if(isLoading) return <Loader />
+  // if(true) return <h1>Hello</h1>
   return (
     <React.Fragment>
+
       <Header styles={{fontSize: "24px", marginTop : "40px"}}>{t('WORKS_RELEVANT_DOCUMENTS')}</Header>
       <CitizenInfoLabel info={t("ES_COMMON_INFO")} text={t(docConfig?.bannerLabel)} className="doc-banner"></CitizenInfoLabel>
       {
         docConfig?.documents?.map((item, index) => {
-          if(!item?.active) return
+          if(item?.active)
           return ( 
             <LabelFieldPair key={index} style={{ alignItems: item?.showTextInput? "flex-start":"center"}}>
               { item.code && (
@@ -84,7 +98,7 @@ const UploadFileComposer = ({module, config, Controller, control, register, form
                   className="bolder"
                   style={{ marginTop: item?.showTextInput? "10px":"" }}
                 >
-                  { t(`${localePrefix}_${item?.code}`)} { item?.isMandatory ? " * " : null }
+                  { t(`${config?.populators?.localePrefix}_${item?.code}`)} { item?.isMandatory ? " * " : null }
                 </CardLabel>) 
               }
             
@@ -149,9 +163,11 @@ const UploadFileComposer = ({module, config, Controller, control, register, form
             </LabelFieldPair>
           )
         })
+          
       }   
+    
     </React.Fragment>
   )
 }
 
-export default UploadFileComposer
+export default CustomUploadFileComposer

@@ -47,8 +47,11 @@ module.exports = {
     mdms_get: "/egov-mdms-service/v1/_get",
     disbursal_search: "/disbursal/v1/_search",
     bankaccount_search: "/bankaccount-service/bankaccount/v1/_search",
+    bankaccount_create: "/bankaccount-service/bankaccount/v1/_create",
     localization_search: "/localization/messages/v1/_search",
     application_search: "/application/v1/_search",
-    individual_search: "/individual/v1/_search"
+    application_create: "/application/v1/_create",
+    individual_search: "/individual/v1/_search",
+    individual_create: "/individual/v1/_create"
   }
 };

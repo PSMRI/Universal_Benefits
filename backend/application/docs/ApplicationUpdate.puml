@@ -1,0 +1,68 @@
+@startuml
+title Update Application
+actor user as "User" order 0 #ddff41
+participant APPLICATION as "Application" order 1 #4Ff2AF
+participant INDIVIDUAL as "Individual" order 2 #4Ff2AF
+participant MDMS as "MDMS" order 3 #4Ff2AF
+'participant ID_GEN as "ID Generator" order 4 #4Ff2AF
+participant WORKFLOW as "Workflow" order 5 #4Ff2AF
+participant PERSISTER as "Persister Service" order 6 #4Ff2AF
+queue KAFKA as "KAFKA" order 6 #4Ff2AF
+database REDIS as "Redis" order 8 #4Ff2AF
+database DB as "PostgreSQL" order 8 #4Ff2AF
+
+user -> APPLICATION: Call _update API
+activate user #Fafd30
+note top: Enter Individual Id,\nProgram code, Document ids
+activate APPLICATION #00fff0
+APPLICATION -> APPLICATION: Validate request
+note right: Vaidate required fields \nto create bank account
+alt if: Request is not valid
+    user <-[#ff0000]- APPLICATION: [400]: Error response\n with invalid field values
+end
+
+group #fffff1 Validate Program Code is valid:
+        APPLICATION -> MDMS: Call _search API
+        note right: Get Program Details
+        activate MDMS #908390
+        APPLICATION <-- MDMS: Program Details
+        deactivate MDMS
+    alt if: Program details not found
+        user <-[#ff0000]- APPLICATION: [400]: Error response\n with invalid reference error
+    end
+end
+
+group #fffffa Validate Individual is registered:
+    APPLICATION -> INDIVIDUAL: Call _search API
+    note right: Get Individual Details
+    activate INDIVIDUAL #008390
+    APPLICATION <-- INDIVIDUAL: Individual Details
+    deactivate INDIVIDUAL
+    alt if: Individual details not found
+        user <-[#ff0000]- APPLICATION: [400]: Error response\n with invalid reference error
+    end
+end
+
+APPLICATION -> APPLICATION: Enrich request
+note right: Enrich request with \nUUID, audit details
+
+APPLICATION -> WORKFLOW: Call _transition API\nSend business service, ID and current state
+activate WORKFLOW #FFf0aF
+APPLICATION <-- WORKFLOW: Return response
+deactivate WORKFLOW
+
+APPLICATION -> REDIS: Save data in redis by key <b>APPLICATIION_{APPLICAITION.ID}
+
+APPLICATION -> KAFKA: Send request to <b>ubp-application-update</b> topic for persister
+
+user <-[#00a00b]- APPLICATION: Success response
+note right: Return updated Application Details
+deactivate APPLICATION
+deactivate user
+
+KAFKA <- PERSISTER: Listen \n<b>ubp-application-update</b> topic
+activate PERSISTER #aFa00b
+PERSISTER -> DB: Persist application details in tables\neg_ubp_application\neg_ubp_application_documents
+deactivate PERSISTER
+
+@enduml

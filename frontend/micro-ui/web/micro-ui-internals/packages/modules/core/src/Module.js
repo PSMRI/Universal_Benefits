@@ -9,6 +9,7 @@ import { DigitApp } from "./App";
 import { useState } from "react";
 import ErrorBoundary from "./components/ErrorBoundaries";
 import getStore from "./redux/store";
+import CustomUploadFileComposer from "./pages/individual/components/CustomUploadFileComposer";
 
 const DigitUIWrapper = ({ stateCode, enabledModules, moduleReducers, defaultLanding }) => {
   const { isLoading, data: initData={} } = Digit.Hooks.useInitStore(stateCode, enabledModules);
@@ -108,3 +109,15 @@ export const DigitUI = ({ stateCode, registry, enabledModules, moduleReducers, d
   );
 };
 
+
+const componentsToRegister = {
+  CustomUploadFileComposer: CustomUploadFileComposer
+};
+
+export const initSampleComponents = () => {
+  // overrideHooks();
+  // updateCustomConfigs();
+  Object.entries(componentsToRegister).forEach(([key, value]) => {
+    Digit.ComponentRegistryService.setComponent(key, value);
+  });
+};

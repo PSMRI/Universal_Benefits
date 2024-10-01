@@ -1,5 +1,5 @@
 @startuml
-title Update Bank Account
+title Search Bank Account
 actor user as "User" order 0 #ddff41
 participant BANK_ACCOUNT as "Bank Account" order 1 #4Ff2A0
 participant ENC_CLIENT as "Encryption Service" order 2 #4Ff2A0

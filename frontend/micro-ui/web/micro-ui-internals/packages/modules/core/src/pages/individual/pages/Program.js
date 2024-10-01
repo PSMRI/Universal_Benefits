@@ -39,7 +39,7 @@ const Program = ({}) => {
         <TextBlock
           caption=""
           captionClassName=""
-          header="Scheme"
+          header=""
           headerClasName=""
           subHeader={data?.[0]?.id}
           subHeaderClasName=""
@@ -52,9 +52,9 @@ const Program = ({}) => {
             <div className="program-list" key={prog?.id}>
               <Card type={"secondary"}>
                 <TextBlock
-                  caption={prog?.id}
+                  caption={prog?.schemeContent?.briefDescription}
                   captionClassName=""
-                  header={prog?.schemeContent?.briefDescription}
+                  header={prog?.basicDetails?.schemeName}
                   headerClasName=""
                   subHeader={prog?.schemeContent?.detailedDescription?.[0]?.children?.[0]?.children?.[0]?.text}
                   subHeaderClasName=""

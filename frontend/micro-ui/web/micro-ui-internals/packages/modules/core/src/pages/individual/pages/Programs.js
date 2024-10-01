@@ -39,7 +39,7 @@ const Programs = ({}) => {
           headerClasName=""
           subHeader=""
           subHeaderClasName=""
-          body="find all the schemes avallible here"
+          body="Find all the schemes avallible here"
           bodyClasName=""
         ></TextBlock>
 
@@ -56,7 +56,7 @@ const Programs = ({}) => {
                 <TextBlock
                   caption={prog?.id}
                   captionClassName=""
-                  header={prog?.schemeContent?.briefDescription}
+                  header={prog?.basicDetails?.schemeName}
                   headerClasName=""
                   subHeader={prog?.schemeContent?.detailedDescription?.[0]?.children?.[0]?.children?.[0]?.text}
                   subHeaderClasName=""

@@ -46,6 +46,14 @@ export const newConfig = [
         disable: false,
         populators: { name: "mobileNumber", error: "Required", validation: { min: 0, max: 9999999999 } },
       },
+      {
+        label: "Aadhaar number",
+        isMandatory: true,
+        key: "aadhaarNumber",
+        type: "number",
+        disable: false,
+        populators: { name: "aadhaarNumber", error: "Required", validation: { min: 0, max: 9999999999 } },
+      },
     ],
   },
   {
@@ -72,42 +80,81 @@ export const newConfig = [
       },
     ],
   },
-  // {
-  //   head: "Sample Details",
-  //   key: "sampleDetails",
-  //   body: [
-  //     {
-  //       isMandatory: false,
-  //       key: "sampleDetails",
-  //       type: "component", // for custom component
-  //       component: "SampleMultiComponent", // name of the component as per component registry
-  //       withoutLabel: true,
-  //       disable: false,
-  //       customProps: {},
-  //       populators: {
-  //         name: "sampleDetails",
-  //         required: true,
-  //       },
-  //     },
-  //   ],
-  // },
-  // {
-  //   head: "Additional Details",
-  //   key: "additionalDetails",
-  //   body: [
-  //     {
-  //       isMandatory: false,
-  //       key: "additionalDetails",
-  //       type: "component", // for custom component
-  //       component: "SampleAdditionalComponent", // name of the component as per component registry
-  //       withoutLabel: true,
-  //       disable: false,
-  //       customProps: {},
-  //       populators: {
-  //         name: "additionalDetails",
-  //         required: true,
-  //       },
-  //     },
-  //   ],
-  // },
+  {
+    head: "DOCUMENT_UPLOAD",
+    body: [
+      {
+        isMandatory: false,
+        key: "documents",
+        type: "component", // for custom component
+        component: "CustomUploadFileComposer", // name of the component as per component registry
+        withoutLabel: true,
+        disable: false,
+        customProps: {},
+        module: "Application",
+        populators: {
+          name: "documents",
+          required: true,
+          localePrefix: "APPLICATION_UPLOAD_",
+        },
+      }
+    ],
+  },
+  {
+    head: "Bank Account Details",
+    body: [
+      {
+        inline: true,
+        label: "Account Holder Name",
+        isMandatory: true,
+        key: "accountHolderName",
+        type: "text",
+        disable: false,
+        populators: { 
+          name: "accountHolderName", 
+          error: " Required ", 
+          validation:  { pattern: "^[a-zA-Z0-9 .\\-_@\\']*$", minlength : 2, maxlength: 64 } 
+        },
+      },
+      {
+        inline: true,
+        label: "Account Number",
+        isMandatory: true,
+        key: "accountNumber",
+        type: "text",
+        disable: false,
+        populators: { 
+          name: "accountNumber", 
+          error: " Required ", 
+          validation: {pattern: "^[0-9]{9,18}$", minlength : 9, maxlength: 18} 
+        },
+      },
+      {
+        isMandatory: true,
+        key: "accountType",
+        type: "dropdown",
+        label: "Enter Account Type",
+        disable: false,
+        populators: {
+          name: "accountType",
+          optionsKey: "name",
+          error: "required ",
+          mdmsConfig: {
+            masterName: "BankAccType",
+            moduleName: "ubp",
+            localePrefix: "MASTERS",
+          },
+        },
+      },
+      {
+        inline: true,
+        label: "IFSC Code",
+        isMandatory: true,
+        key: "ifscCode",
+        type: "text",
+        disable: false,
+        populators: { name: "ifscCode", error: " Required", validation: { pattern: /^[a-zA-Z0-9_]+$/i } },
+      },
+    ],
+  },
 ];

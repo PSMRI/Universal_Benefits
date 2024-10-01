@@ -139,6 +139,20 @@ function search_application(request, limit, offset) {
   })
 }
 
+function create_application(request) {
+  return new Promise((resolve, reject) => {
+    let newRequest = JSON.parse(JSON.stringify(request))
+    let promise = new axios({
+      method: "POST",
+      url: url.resolve(config.host.application, config.paths.application_create),
+      data: newRequest,
+    });
+    promise.then((data) => {
+      resolve(data.data)
+    }).catch((err) => reject(err))
+  })
+}
+
 function search_individual(request, tenantId, limit, offset) {
   return new Promise((resolve, reject) => {
     let params = encodeQueryData({tenantId, offset, limit})
@@ -155,6 +169,22 @@ function search_individual(request, tenantId, limit, offset) {
   })
 }
 
+function create_individual(request) {
+  return new Promise((resolve, reject) => {
+    let newRequest = JSON.parse(JSON.stringify(request))
+    let createUrl = url.resolve(config.host.individual, config.paths.individual_create)
+    let promise = new axios({
+      method: "POST",
+      url: createUrl,
+      data: newRequest,
+    });
+    promise.then((data) => {
+      resolve(data.data)
+    }).catch((err) => reject(err))
+  })
+}
+
+
 function encodeQueryData(data) {
   const ret = [];
   for (let d in data)
@@ -169,6 +199,20 @@ function search_bank_account_details(request) {
     let promise = new axios({
       method: "POST",
       url: url.resolve(config.host.bankaccount, config.paths.bankaccount_search),
+      data: newRequest,
+    });
+    promise.then((data) => {
+      resolve(data.data)
+    }).catch((err) => reject(err))
+  })
+}
+
+function create_bank_account_details(request) {
+  return new Promise((resolve, reject) => {
+    let newRequest = JSON.parse(JSON.stringify(request))
+    let promise = new axios({
+      method: "POST",
+      url: url.resolve(config.host.bankaccount, config.paths.bankaccount_create),
       data: newRequest,
     });
     promise.then((data) => {
@@ -249,8 +293,11 @@ module.exports = {
   search_localization,
   search_disbursal,
   search_application,
+  create_application,
   search_bank_account_details,
+  create_bank_account_details,
   search_individual,
+  create_individual,
   upload_file_using_filestore,
   create_eg_payments_excel,
   reset_eg_payments_excel,

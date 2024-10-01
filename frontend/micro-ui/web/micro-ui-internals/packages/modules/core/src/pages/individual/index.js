@@ -34,6 +34,7 @@ const IndividualApp = ({
   const { path } = useRouteMatch();
   const history = useHistory();
   const [formData, setFormData] = React.useState("en");
+  
   return (
     <div className={"employee"}>
       <ErrorBoundary initData={initData}>
@@ -43,7 +44,12 @@ const IndividualApp = ({
               className={"loginContainer"}
               style={{ "--banner-url": `url(${window?.globalConfigs?.getConfig?.("HOME_BACKGROUND")})`, padding: "0px" }}
             >
-              <div className="banner banner-container">
+              <div className="program-container banner-container" style={{
+                'display': 'flex', 
+                'paddingTop': '90px', 
+                'paddingBottom': '30px', 
+                'background': 'linear-gradient(rgba(11, 75, 102, 0.8), rgba(11, 75, 102, 0.8)), var(--banner-url) center center',
+                }}>
                 <TopBar
                   className=""
                   img=""
@@ -79,7 +85,7 @@ const IndividualApp = ({
           </Route>
         </Switch>
       </ErrorBoundary>
-     <GoogleTranslateComponent pageLanguage= {formData}></GoogleTranslateComponent>
+     {/* <GoogleTranslateComponent pageLanguage= {formData}></GoogleTranslateComponent> */}
       <div className="employee-login-home-footer" style={{ backgroundColor: "unset" }}>
         <img
           alt="Powered by DIGIT"
