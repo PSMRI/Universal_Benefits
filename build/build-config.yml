@@ -1,0 +1,55 @@
+#
+# config:
+# -   name: < Name of the job, foo/bar would create job named bar inside folder foo >
+#     build:
+#     - work-dir: < Working directory of the app to be built >
+#       dockerfile: < Path to the dockerfile, optional, assumes dockerfile in working directory if not provided >
+#       image-name: < Docker image name  >
+# -
+# -
+#
+# config:
+# -   name: < Name of the job, foo/bar would create job named bar inside folder foo >
+#     build:
+#     - work-dir: < Working directory of the app to be built >
+#       dockerfile: < Path to the dockerfile, optional, assumes dockerfile in working directory if not provided >
+#       image-name: < Docker image name  >
+# -
+# -
+config:
+
+# backend
+  - name: "builds/uba/backend/application"
+    build:
+      - work-dir: "backend/application"
+        dockerfile: "build/maven-java17/Dockerfile"
+        image-name: "application"
+      - work-dir: "backend/application/src/main/resources/db"
+        image-name: "application-db"
+
+  - name: "builds/uba/backend/verification"
+    build:
+      - work-dir: "backend/verification"
+        dockerfile: "build/maven-java17/Dockerfile"
+        image-name: "verification"
+
+  - name: "builds/uba/backend/disbursal"
+    build:
+      - work-dir: "backend/disbursal"
+        dockerfile: "build/maven-java17/Dockerfile"
+        image-name: "disbursal"
+      - work-dir: "backend/disbursal/src/main/resources/db"
+        image-name: "disbursal-db"
+
+  # utilities
+  - name: "builds/uba/utilities/uba-bff-service"
+    build:
+      - work-dir: "utilities/bff-service"
+        image-name: "uba-bff-service"
+  
+# frontend
+  - name: builds/digit-works/frontend/micro-ui/uba-ui
+    build:
+      - work-dir: frontend/micro-ui/
+        dockerfile: frontend/micro-ui/web/docker/Dockerfile
+        image-name: uba-ui
