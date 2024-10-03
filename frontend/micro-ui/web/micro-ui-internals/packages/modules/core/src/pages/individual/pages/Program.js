@@ -1,13 +1,18 @@
-import React from "react";
+import React, { useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { Loader } from "@egovernments/digit-ui-react-components";
 import { Card, TextBlock, Button, ViewCardFieldPair, Tag } from "@egovernments/digit-ui-components";
 import { SCHEME } from "../configs/schemeConfigs";
 import { useParams, useHistory } from "react-router-dom";
+import {QRCodeSVG} from 'qrcode.react';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';  
 
 const Program = ({}) => {
   // const Program=[]
   const history = useHistory();
+
+  const qrRef = useRef();
 
   const { id } = useParams();
 
@@ -28,6 +33,21 @@ const Program = ({}) => {
     },
   };
   const { isLoading, data } = Digit.Hooks.useCustomAPIHook(reqCriteria);
+
+  const downloadPDF = (prog) => {
+    const qrElement = document.getElementById('program_details_qr_container');
+
+    // Use html2canvas to capture the SVG as an image
+    html2canvas(qrElement).then(canvas => {
+      const qrCodeDataURL = canvas.toDataURL('image/png');
+
+      const pdf = new jsPDF();
+      pdf.setFontSize(20);
+      pdf.text(prog?.basicDetails?.schemeName, 20, 20);
+      pdf.addImage(qrCodeDataURL, 'PNG', 15, 40, 200, 215); // Adjust position and size as needed
+      pdf.save(`${prog?.basicDetails?.schemeName || ""} QRCODE.pdf`);
+    });
+  };
 
   if (isLoading) {
     return <Loader />;
@@ -51,6 +71,7 @@ const Program = ({}) => {
           return (
             <div className="program-list" key={prog?.id}>
               <Card type={"secondary"}>
+                
                 <TextBlock
                   caption={prog?.schemeContent?.briefDescription}
                   captionClassName=""
@@ -117,6 +138,29 @@ const Program = ({}) => {
                     style={{}}
                     title=""
                   />
+                </div>
+                <div style={{ height: "auto", width: "100%" }}>
+                  <Button
+                      className="custom-class"
+                      icon="ArrowForward"
+                      iconFill=""
+                      isSuffix
+                      label="Download QR"
+                      onClick={() => {
+                        downloadPDF(prog);
+                      }}
+                      options={[]}
+                      optionsKey=""
+                      size=""
+                      style={{}}
+                      title=""
+                  />
+                  <div id="program_details_qr_container" style={{ height: '200px', width: '200px' }}>
+                    <QRCodeSVG 
+                      value={window.location.href}
+                      size={200} 
+                    />
+                  </div>
                 </div>
               </Card>
             </div>

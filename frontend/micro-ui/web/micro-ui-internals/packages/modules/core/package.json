@@ -16,6 +16,9 @@
   "dependencies": {
     "@egovernments/digit-ui-components": "0.0.2-beta.38",
     "@egovernments/digit-ui-react-components": "1.8.2-beta.12",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^2.5.2",
+    "qrcode.react": "^4.0.1",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-i18next": "11.16.2",

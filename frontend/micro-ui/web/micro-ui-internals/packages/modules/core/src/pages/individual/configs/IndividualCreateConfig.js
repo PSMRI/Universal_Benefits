@@ -52,7 +52,7 @@ export const newConfig = [
         key: "aadhaarNumber",
         type: "number",
         disable: false,
-        populators: { name: "aadhaarNumber", error: "Required", validation: { min: 0, max: 9999999999 } },
+        populators: { name: "aadhaarNumber", error: "Required", validation: { min: 100000000000, max: 999999999999 } },
       },
     ],
   },

@@ -14,7 +14,7 @@ const IndividualCreate = () => {
   const { t } = useTranslation();
   const history = useHistory();
   const reqCreate = {
-    url: `/individual/v1/_create`,
+    url: `/ubp-bff-service/benefit/_apply`,
     params: {},
     body: {},
     config: {
@@ -102,10 +102,12 @@ const IndividualCreate = () => {
 
   const mutation = Digit.Hooks.useCustomAPIMutationHook(reqCreate);
   const onError = (resp) => {
+    // debugger
     history.push(`/${window.contextPath}/individual/enroll-response?isSuccess=${false}`, { message: "SUBMISSION_CREATION_FAILED" });
   };
 
   const onSuccess = (resp) => {
+    // debugger
     history.push(`/${window.contextPath}/individual/enroll-response?appNo=${"NEW-NO-1"}&isSuccess=${true}`, {
       message: "SUBMISSION_CREATION_SUCCESS",
       showID: true,
@@ -117,7 +119,7 @@ const IndividualCreate = () => {
       {
         url: `/ubp-bff-service/benefit/_apply`,
         params: { tenantId },
-        body: transformCreateData(formData),
+        body: transformCreateData(programData, formData),
         config: {
           enable: true,
         },
@@ -166,6 +168,7 @@ const IndividualCreate = () => {
         <ValidateOTP
           formData={formData}
           onSuccess={(succeded = true) => {
+            // debugger;
             setShowPopUp(false);
             succeded && submitApplication();
           }}
