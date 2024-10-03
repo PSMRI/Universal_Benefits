@@ -11,7 +11,7 @@ RUN ls -lah
 
 #RUN node web/envs.js
 RUN cd web/ \
-    &&  chmod 777 ./install-deps.sh \
+    && chmod 777 ./install-deps.sh \
     &&  ./install-deps.sh \
     && yarn install \
     && yarn build:webpack 
