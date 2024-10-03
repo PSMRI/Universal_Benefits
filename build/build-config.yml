@@ -48,7 +48,7 @@ config:
         image-name: "uba-bff-service"
   
 # frontend
-  - name: builds/digit-works/frontend/micro-ui/uba-ui
+  - name: builds/uba/frontend/micro-ui/uba-ui
     build:
       - work-dir: frontend/micro-ui/
         dockerfile: frontend/micro-ui/web/docker/Dockerfile
