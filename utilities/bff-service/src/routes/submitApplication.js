@@ -86,7 +86,7 @@ router.post('/',
            }
            res.send(response)
         } catch (error) {
-            logger.error(error.stack || err);
+            logger.error(error.stack || error);
             return renderError(res, `Failed to register application.`);
         }
 
@@ -225,9 +225,7 @@ let getRequestInfo = () => {
                     "tenantId": "pg.citya"
                 }
             ],
-            "active": true,
-            "tenantId": "pg.citya",
-            "permanentCity": null
+            "tenantId": "pg"
         },
         "msgId": "1700205653156|en_IN",
         "plainAccessRequest": {}
