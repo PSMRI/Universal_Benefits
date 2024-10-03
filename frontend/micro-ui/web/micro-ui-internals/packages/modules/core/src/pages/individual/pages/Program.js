@@ -142,7 +142,6 @@ const Program = ({}) => {
                 <div style={{ height: "auto", width: "100%" }}>
                   <Button
                       className="custom-class"
-                      icon="ArrowForward"
                       iconFill=""
                       isSuffix
                       label="Download QR"
@@ -154,6 +153,7 @@ const Program = ({}) => {
                       size=""
                       style={{}}
                       title=""
+                      variation="secondary"
                   />
                   <div id="program_details_qr_container" style={{ height: '200px', width: '200px' }}>
                     <QRCodeSVG 

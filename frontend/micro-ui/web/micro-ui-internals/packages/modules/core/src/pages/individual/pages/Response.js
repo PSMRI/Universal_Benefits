@@ -17,6 +17,9 @@ const Response = () => {
   const [isResponseSuccess, setIsResponseSuccess] = useState(
     queryStrings?.isSuccess === "true" ? true : queryStrings?.isSuccess === "false" ? false : true
   );
+  
+  const [appNumber, setAppNumber] = useState(queryStrings?.appNo ? queryStrings?.appNo : "");
+  
   const { state } = useLocation();
 
   const navigate = (page) => {
@@ -41,7 +44,7 @@ const Response = () => {
       <PanelCard
         type={isResponseSuccess ? "success" : "error"}
         message={t(state?.message || "SUCCESS")}
-        response={`${state?.showID ? t("CONTRACTS_WO_ID") : ""}`}
+        response={`${state?.showID ? appNumber : ""}`}
         footerChildren={[]}
         children={children}
       />

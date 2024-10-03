@@ -84,7 +84,7 @@ export const transformCreateData = (programData, formData) => {
     Application: {
       "tenantId": Digit.ULBService.getStateId(),
       "individualId": null,
-      "programCode": programData?.data?.id,
+      "programCode": programData?.[0]?.id,
       "documents": documents
     },
     BankAccount: {

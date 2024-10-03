@@ -14,7 +14,7 @@ const IndividualCreate = () => {
   const { t } = useTranslation();
   const history = useHistory();
   const reqCreate = {
-    url: `/ubp-bff-service/benefit/_apply`,
+    url: `/uba-bff-service/benefit/_apply`,
     params: {},
     body: {},
     config: {
@@ -102,13 +102,13 @@ const IndividualCreate = () => {
 
   const mutation = Digit.Hooks.useCustomAPIMutationHook(reqCreate);
   const onError = (resp) => {
-    // debugger
+    // debugger;
     history.push(`/${window.contextPath}/individual/enroll-response?isSuccess=${false}`, { message: "SUBMISSION_CREATION_FAILED" });
   };
 
   const onSuccess = (resp) => {
     // debugger
-    history.push(`/${window.contextPath}/individual/enroll-response?appNo=${"NEW-NO-1"}&isSuccess=${true}`, {
+    history.push(`/${window.contextPath}/individual/enroll-response?appNo=${resp.Application.applicationNumber}&isSuccess=${true}`, {
       message: "SUBMISSION_CREATION_SUCCESS",
       showID: true,
       label: "SUBMISSION_ID",
@@ -117,8 +117,7 @@ const IndividualCreate = () => {
   const submitApplication = async () => {
     await mutation.mutate(
       {
-        url: `/ubp-bff-service/benefit/_apply`,
-        params: { tenantId },
+        url: `/uba-bff-service/benefit/_apply`,
         body: transformCreateData(programData, formData),
         config: {
           enable: true,
