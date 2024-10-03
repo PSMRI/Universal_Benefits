@@ -90,10 +90,10 @@ public class IBoundaryValidator implements Validator<IndividualBulkRequest, Indi
                             BoundaryResponse.class
                     );
                     log.debug("Boundary details fetched successfully for tenantId: {}", tenantId);
-                    // TODO: Remove this after boundary fix
-                    if (true) {
-                        return;
-                    }
+//                    // TODO: Remove this after boundary fix
+//                    if (true) {
+//                        return;
+//                    }
                     List<String> invalidBoundaryCodes = new ArrayList<>(boundaries);
                     invalidBoundaryCodes.removeAll(boundarySearchResponse.getBoundary().stream()
                             .map(Boundary::getCode)
