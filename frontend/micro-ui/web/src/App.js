@@ -1,6 +1,7 @@
 import React from "react";
 import { initLibraries } from "@egovernments/digit-ui-libraries";
-
+import { initCoreComponents } from "@egovernments/digit-ui-module-core";
+import { initSampleComponents } from "@egovernments/digit-ui-module-core";
 import { DigitUI } from "@egovernments/digit-ui-module-core";
 
 
@@ -17,7 +18,8 @@ const enabledModules = [
   "HRMS",
   "Engagement",
   // "Workbench",
-  "PGR"
+  "PGR",
+  "Sample",
 ];
 
 const moduleReducers = (initData) => ({
@@ -29,8 +31,8 @@ const initDigitUI = () => {
    
   });
 
-  // initCoreComponents();
- 
+  initCoreComponents();
+  initSampleComponents()
 
   window.Digit.Customizations = {
     PGR: {},

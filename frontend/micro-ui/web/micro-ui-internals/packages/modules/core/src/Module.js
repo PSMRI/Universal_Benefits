@@ -121,3 +121,19 @@ export const initSampleComponents = () => {
     Digit.ComponentRegistryService.setComponent(key, value);
   });
 };
+
+export const initIndividualComponents = () => {
+  // overrideHooks();
+  // updateCustomConfigs();
+  Object.entries(componentsToRegister).forEach(([key, value]) => {
+    Digit.ComponentRegistryService.setComponent(key, value);
+  });
+};
+
+export const initCoreComponents = () => {
+  // overrideHooks();
+  // updateCustomConfigs();
+  Object.entries(componentsToRegister).forEach(([key, value]) => {
+    Digit.ComponentRegistryService.setComponent(key, value);
+  });
+};

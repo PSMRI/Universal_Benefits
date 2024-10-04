@@ -3,10 +3,14 @@ import ReactDOM from 'react-dom';
 import { initLibraries } from "@egovernments/digit-ui-libraries";
 import "./index.css";
 import App from './App';
+import { initCoreComponents } from "@egovernments/digit-ui-module-core";
+import { initSampleComponents } from "@egovernments/digit-ui-module-core";
 import { TLCustomisations } from './Customisations/tl/TLCustomisation';
 
 
 initLibraries();
+initCoreComponents();
+initSampleComponents();
 
 
 window.Digit.Customizations = { PGR: {} ,TL:TLCustomisations};
