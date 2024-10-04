@@ -9,7 +9,12 @@ export const newConfig = [
         key: "applicantname",
         type: "text",
         disable: false,
-        populators: { name: "applicantname", error: "Required", validation: { pattern: /^[A-Za-z]+$/i } },
+        populators: { name: "applicantname", error: "Required", validation: {
+            "pattern": "^[a-zA-Z0-9 .\\-_@\\']*$",
+            "minlength": 2,
+            "maxlength": 128
+          } 
+        },
       },
       {
         inline: true,
@@ -44,7 +49,11 @@ export const newConfig = [
         key: "mobileNumber",
         type: "number",
         disable: false,
-        populators: { name: "mobileNumber", error: "Required", validation: { min: 0, max: 9999999999 } },
+        populators: { name: "mobileNumber", error: "Required", validation: {
+            "min": 5999999999,
+            "max": 9999999999
+          } 
+        },
       },
       {
         label: "Aadhaar number",
@@ -66,7 +75,11 @@ export const newConfig = [
         key: "city",
         type: "text",
         disable: false,
-        populators: { name: "city", error: " Required ", validation: { pattern: /^[A-Za-z]+$/i } },
+        populators: { name: "city", error: " Required ", validation: { 
+            "pattern": "^[a-zA-Z0-9 .\\-_@\\']*$",
+            "minlength": 2,
+            "maxlength": 128
+         } },
       },
 
       {
@@ -76,7 +89,11 @@ export const newConfig = [
         key: "landmark",
         type: "text",
         disable: false,
-        populators: { name: "landmark", error: " Required", validation: { pattern: /^[A-Za-z]+$/i } },
+        populators: { name: "landmark", error: " Required", validation: { 
+            "pattern": "^[a-zA-Z0-9 .\\-_@\\']*$",
+            "minlength": 2,
+            "maxlength": 128
+         } },
       },
     ],
   },
@@ -113,7 +130,11 @@ export const newConfig = [
         populators: { 
           name: "accountHolderName", 
           error: " Required ", 
-          validation:  { pattern: "^[a-zA-Z0-9 .\\-_@\\']*$", minlength : 2, maxlength: 64 } 
+          validation:  { 
+              "pattern": "^[a-zA-Z0-9 .\\-_@\\']*$",
+              "minlength": 2,
+              "maxlength": 64
+           } 
         },
       },
       {
@@ -126,7 +147,11 @@ export const newConfig = [
         populators: { 
           name: "accountNumber", 
           error: " Required ", 
-          validation: {pattern: "^[0-9]{9,18}$", minlength : 9, maxlength: 18} 
+          validation: {
+            "pattern": "^[0-9]{9,18}$",
+            "minlength": 9,
+            "maxlength": 18
+          } 
         },
       },
       {
@@ -153,7 +178,9 @@ export const newConfig = [
         key: "ifscCode",
         type: "text",
         disable: false,
-        populators: { name: "ifscCode", error: " Required", validation: { pattern: /^[a-zA-Z0-9_]+$/i } },
+        populators: { name: "ifscCode", error: " Required", validation: {
+          "pattern": "^[a-zA-Z]{4}0[a-zA-Z0-9]{6}$"
+        } },
       },
     ],
   },
