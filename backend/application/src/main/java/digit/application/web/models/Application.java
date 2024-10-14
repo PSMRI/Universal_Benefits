@@ -9,7 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.egov.common.contract.models.Address;
 import org.egov.common.contract.models.AuditDetails;
+import org.hibernate.validator.constraints.Length;
 import org.springframework.validation.annotation.Validated;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
@@ -28,14 +30,13 @@ import lombok.Builder;
 @NoArgsConstructor
 @Builder
 public class Application {
-    @JsonProperty("id")
 
-    @Valid
+    @JsonProperty("id")
     private String id = null;
 
     @JsonProperty("tenantId")
     @NotNull
-
+    @NotBlank
     @Size(min = 2, max = 64)
     private String tenantId = null;
 
@@ -62,6 +63,7 @@ public class Application {
         INACTIVE("INACTIVE"),
 
         ARCHIVED("ARCHIVED");
+
 
         private String value;
 
@@ -90,8 +92,7 @@ public class Application {
     private StatusEnum status = null;
 
     @JsonProperty("wfStatus")
-    @Size(min = 2, max = 64)
-    private String wfStatus = null;
+    private WFStatusEnum wfStatus = null;
 
     @JsonProperty("documents")
     @NotNull
@@ -99,19 +100,52 @@ public class Application {
     private List<Document> documents = new ArrayList<>();
 
     @JsonProperty("auditDetails")
-
     @Valid
     private AuditDetails auditDetails = null;
 
     @JsonProperty("additionalDetails")
-
     private Object additionalDetails = null;
 
+    @JsonProperty("applicant")
+    @NotNull
+    @Valid
+    private Applicant applicant;
 
     public Application addDocumentsItem(Document documentsItem) {
         this.documents = new ArrayList<>(this.documents);
         this.documents.add(documentsItem);
         return this;
+    }
+
+    public enum WFStatusEnum {
+        APPROVED("APPROVED"),
+
+        VERIFIED("VERIFIED"),
+
+        REJECTED("REJECTED");
+
+
+        private String value;
+
+        WFStatusEnum(String value) {
+            this.value = value;
+        }
+
+        @Override
+        @JsonValue
+        public String toString() {
+            return String.valueOf(value);
+        }
+
+        @JsonCreator
+        public static WFStatusEnum fromValue(String text) {
+            for (WFStatusEnum b : WFStatusEnum.values()) {
+                if (String.valueOf(b.value).equals(text)) {
+                    return b;
+                }
+            }
+            return null;
+        }
     }
 
 }

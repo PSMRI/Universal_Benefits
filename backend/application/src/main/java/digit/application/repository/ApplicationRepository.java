@@ -26,10 +26,8 @@ public class ApplicationRepository {
     }
 
     public List<Application> search(ApplicationSearchRequest applicationSearchRequest){
-
         List<Object> preparedStatementValues = new ArrayList<>();
         String queryStr = applicationQueryBuilder.getApplicationQuery(applicationSearchRequest, preparedStatementValues);
         return jdbcTemplate.query(queryStr, preparedStatementValues.toArray(), searchApplicationRowMapper);
     }
-
 }

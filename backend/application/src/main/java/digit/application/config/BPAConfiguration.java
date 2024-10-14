@@ -1,4 +1,4 @@
-package digit.application.config;
+package digit.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.*;
@@ -11,7 +11,6 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.stereotype.Component;
 
 import jakarta.annotation.PostConstruct;
-
 import java.util.TimeZone;
 
 @Component
@@ -21,7 +20,39 @@ import java.util.TimeZone;
 @AllArgsConstructor
 @Setter
 @Getter
-public class Configuration {
+public class BPAConfiguration {
+    @Value("${app.timezone}")
+    private String timeZone;
+
+    @PostConstruct
+    public void initialize() {
+        TimeZone.setDefault(TimeZone.getTimeZone(timeZone));
+    }
+
+    @Bean
+    @Autowired
+    public MappingJackson2HttpMessageConverter jacksonConverter(ObjectMapper objectMapper) {
+        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
+        converter.setObjectMapper(objectMapper);
+        return converter;
+    }
+
+    // User Config
+    @Value("${egov.user.host}")
+    private String userHost;
+
+    @Value("${egov.user.context.path}")
+    private String userContextPath;
+
+    @Value("${egov.user.create.path}")
+    private String userCreateEndpoint;
+
+    @Value("${egov.user.search.path}")
+    private String userSearchEndpoint;
+
+    @Value("${egov.user.update.path}")
+    private String userUpdateEndpoint;
+
     //Idgen Config
     @Value("${egov.idgen.host}")
     private String idGenHost;
@@ -29,16 +60,9 @@ public class Configuration {
     @Value("${egov.idgen.path}")
     private String idGenPath;
 
-    @Value("${egov.idgen.application.format}")
-    private String idGenApplicationFormat;
-
-
     //Workflow Config
     @Value("${egov.workflow.host}")
     private String wfHost;
-
-    @Value("${is.workflow.enabled}")
-    private Boolean isWorkflowEnabled;
 
     @Value("${egov.workflow.transition.path}")
     private String wfTransitionPath;
@@ -49,10 +73,26 @@ public class Configuration {
     @Value("${egov.workflow.processinstance.search.path}")
     private String wfProcessInstanceSearchPath;
 
-    @Value("${egov.workflow.application.module.name}")
-    private String wfApplicationModuleName;
-    @Value("${egov.workflow.application.business_service}")
-    private String wfApplicationBusinessService;
+    @Value("${is.workflow.enabled}")
+    private Boolean isWorkflowEnabled;
+
+
+    // BTR Variables
+
+    @Value("${btr.kafka.create.topic}")
+    private String createTopic;
+
+    @Value("${btr.kafka.update.topic}")
+    private String updateTopic;
+
+    @Value("${btr.default.offset}")
+    private Integer defaultOffset;
+
+    @Value("${btr.default.limit}")
+    private Integer defaultLimit;
+
+    @Value("${btr.search.max.limit}")
+    private Integer maxLimit;
 
 
     //MDMS
@@ -62,32 +102,19 @@ public class Configuration {
     @Value("${egov.mdms.search.endpoint}")
     private String mdmsEndPoint;
 
-    //URLShortening
+    //HRMS
+    @Value("${egov.hrms.host}")
+    private String hrmsHost;
+
+    @Value("${egov.hrms.search.endpoint}")
+    private String hrmsEndPoint;
+
     @Value("${egov.url.shortner.host}")
     private String urlShortnerHost;
 
     @Value("${egov.url.shortner.endpoint}")
     private String urlShortnerEndpoint;
 
-
-    //SMSNotification
     @Value("${egov.sms.notification.topic}")
     private String smsNotificationTopic;
-
-    // KAFKA Topics
-    @Value("${kafka.topic.application.create}")
-    private String kafkaTopicApplicationCreate;
-
-    @Value("${kafka.topic.application.update}")
-    private String kafkaTopicApplicationUpdate;
-
-    // application search configs
-    @Value("${application.search.default.limit}")
-    private Integer defaultLimit;
-
-    @Value("${application.search.default.offset}")
-    private Integer defaultOffset;
-
-    @Value("${application.search.max.limit}")
-    private Integer maxSearchLimit;
 }

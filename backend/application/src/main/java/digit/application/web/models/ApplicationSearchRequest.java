@@ -35,9 +35,6 @@ public class ApplicationSearchRequest {
 
     @JsonProperty("pagination")
     @NotNull
-
     @Valid
     private Pagination pagination = null;
-
-
 }

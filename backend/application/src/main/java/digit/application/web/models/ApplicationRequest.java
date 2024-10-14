@@ -25,18 +25,14 @@ import lombok.Builder;
 public class ApplicationRequest {
     @JsonProperty("RequestInfo")
     @NotNull
-
     @Valid
     private RequestInfo requestInfo = null;
 
     @JsonProperty("Application")
     @NotNull
-
     @Valid
     private Application application = null;
 
-
     @JsonProperty("workflow")
     private Workflow workflow;
-
 }

@@ -48,7 +48,7 @@ public class SearchApplicationRowMapper implements ResultSetExtractor<List<Appli
 
                 application = Application.builder()
                         .status(Application.StatusEnum.fromValue(rs.getString("a_status")))
-                        .wfStatus(rs.getString("a_wf_status"))
+                        .wfStatus(Application.WFStatusEnum.fromValue(rs.getString("a_wf_status")))
                         .additionalDetails(getadditionalDetail(rs, "a_additional_details"))
                         .programCode(rs.getString("a_program_code"))
                         .applicationNumber(rs.getString("a_application_number"))
@@ -102,7 +102,7 @@ public class SearchApplicationRowMapper implements ResultSetExtractor<List<Appli
 
         return Document.builder()
                 .status(Document.StatusEnum.fromValue(rs.getString("d_status")))
-                .fileStore(rs.getString("d_filestore_id"))
+                .fileStoreId(rs.getString("d_filestore_id"))
                 .documentType(rs.getString("d_document_type"))
                 .documentUid(rs.getString("d_document_uid"))
                 .additionalDetails(getadditionalDetail(rs, "d_additional_details"))

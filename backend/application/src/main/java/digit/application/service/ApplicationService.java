@@ -6,6 +6,7 @@ import digit.application.repository.ApplicationRepository;
 import digit.application.util.EnrichmentUtil;
 import digit.application.util.ResponseInfoFactory;
 import digit.application.util.WorkflowUtil;
+import digit.application.validators.BPApplicationValidator;
 import digit.application.web.models.*;
 import lombok.extern.slf4j.Slf4j;
 import org.egov.common.contract.response.ResponseInfo;
@@ -27,15 +28,17 @@ public class ApplicationService {
     private final Producer producer;
     private final ResponseInfoFactory responseInfoFactory;
     private final ApplicationRepository applicationRepository;
+    private final BPApplicationValidator applicationValidator;
 
     @Autowired
-    public ApplicationService(EnrichmentUtil enrichmentUtil, WorkflowUtil workflowUtil, Configuration configuration, Producer producer, ResponseInfoFactory responseInfoFactory, ApplicationRepository applicationRepository) {
+    public ApplicationService(EnrichmentUtil enrichmentUtil, WorkflowUtil workflowUtil, Configuration configuration, Producer producer, ResponseInfoFactory responseInfoFactory, ApplicationRepository applicationRepository,BPApplicationValidator applicationValidator) {
         this.enrichmentUtil = enrichmentUtil;
         this.workflowUtil = workflowUtil;
         this.configuration = configuration;
         this.producer = producer;
         this.responseInfoFactory = responseInfoFactory;
         this.applicationRepository = applicationRepository;
+        this.applicationValidator = applicationValidator;
     }
 
     public ApplicationResponse create(ApplicationRequest applicationRequest) {
@@ -44,19 +47,22 @@ public class ApplicationService {
 
         // TODO: Do custom validations here
         // For example: programCode, individualId, filestoreIds should be valid
+
+        applicationValidator.validateBPApplication(applicationRequest);
         this.enrichmentUtil.enrichApplicationForCreation(applicationRequest);
 
         log.info("Creating Application: " + application);
 
-        log.info("Application created successfully: " + application);
         if (this.configuration.getIsWorkflowEnabled()) {
             State wfState = workflowUtil.callWorkFlow(workflowUtil.prepareWorkflowRequestForApplication(applicationRequest));
-            application.setWfStatus(wfState.getApplicationStatus());
+            application.setWfStatus(Application.WFStatusEnum.APPROVED);
         }
-        application.setStatus(Application.StatusEnum.ACTIVE);
+        application.setStatus(Application.StatusEnum.ARCHIVED);
+        application.setWfStatus(Application.WFStatusEnum.APPROVED);
         // TODO: Remove after creating the workflow
-        application.setWfStatus("PENDING_FOR_VERIFICATION");
+//        application.setWfStatus("PENDING_FOR_VERIFICATION"); //
         producer.push(configuration.getKafkaTopicApplicationCreate(), applicationRequest);
+        log.info("Application pushed successfully: " + application);
         response = ApplicationResponse.builder()
                 .applications(Arrays.asList(applicationRequest.getApplication()))
                 .responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(applicationRequest.getRequestInfo(), true))
@@ -110,5 +116,4 @@ public class ApplicationService {
                 .responseInfo(responseInfo)
                 .build();
     }
-
 }

@@ -2,6 +2,7 @@ package digit.application.util;
 
 import digit.application.config.Configuration;
 import digit.application.web.models.*;
+import org.apache.commons.lang3.ObjectUtils;
 import org.egov.common.contract.models.AuditDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -36,7 +37,6 @@ public class EnrichmentUtil {
         for (Document document : application.getDocuments()) {
             document.setId(UUID.randomUUID().toString());
         }
-
     }
 
 
