@@ -2,37 +2,23 @@ package digit.application.web.controllers;
 
 
 import digit.application.service.ApplicationService;
-import digit.application.web.models.ApplicationRequest;
-import digit.application.web.models.ApplicationResponse;
-import digit.application.web.models.ApplicationSearchRequest;
-import digit.application.web.models.ErrorRes;
+import digit.application.web.models.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.io.IOException;
 import java.util.*;
 
-import jakarta.validation.constraints.*;
 import jakarta.validation.Valid;
 import jakarta.servlet.http.HttpServletRequest;
-
-import java.util.Optional;
 
 @jakarta.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2024-09-09T14:51:43.484446283+05:30[Asia/Calcutta]")
 @Controller
@@ -45,11 +31,13 @@ public class V1ApiController {
 
     private final ApplicationService applicationService;
 
+
     @Autowired
     public V1ApiController(ObjectMapper objectMapper, HttpServletRequest request, ApplicationService applicationService) {
         this.objectMapper = objectMapper;
         this.request = request;
         this.applicationService = applicationService;
+
     }
 
     @RequestMapping(value = "/_create", method = RequestMethod.POST)
@@ -71,4 +59,41 @@ public class V1ApiController {
         return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
     }
 
+    @RequestMapping(value = "/_appstat", method = RequestMethod.GET)
+    public ResponseEntity<List<AppStatResponse>> getAppStat()
+    {
+        List<AppStatResponse> response=applicationService.GetAppStat();
+        return  new ResponseEntity<>(response,HttpStatus.ACCEPTED);
+    }
+
+    @RequestMapping(value = "/_fundsstat", method = RequestMethod.GET)
+    public ResponseEntity<List<ProviderFundStat>> getFundsStat()
+    {
+        List<ProviderFundStat> response=applicationService.getProviderFundStats();
+        return  new ResponseEntity<>(response,HttpStatus.ACCEPTED);
+    }
+    @RequestMapping(value = "/scholarships/top-3", method = RequestMethod.GET)
+    public ResponseEntity<List<ScholarshipStat>> getScholarshipStat()
+    {
+        List<ScholarshipStat> response=applicationService.getScholarshipStats();
+        return  new ResponseEntity<>(response,HttpStatus.ACCEPTED);
+    }
+    @RequestMapping(value = "/scholarships/details", method = RequestMethod.GET)
+    public ResponseEntity<List<ScholarshipDetails>> getScholarshipDetails()
+    {
+        List<ScholarshipDetails> response=applicationService.getScholarshipDetails();
+        return  new ResponseEntity<>(response,HttpStatus.ACCEPTED);
+    }
+    /*@RequestMapping(value = "/applicationstat", method = RequestMethod.GET)
+    public ResponseEntity<List<ApplicatonStatastics>> getApplicatonStatastics()
+    {
+        List<ApplicatonStatastics> response=applicationService.getApplicatonStatastics();
+        return  new ResponseEntity<>(response,HttpStatus.ACCEPTED);
+    }
+    @RequestMapping(value = "/benefits", method = RequestMethod.GET)
+    public ResponseEntity<List<Benefit>> getBenefits()
+    {
+        List<Benefit> response=applicationService.getBenefits();
+        return  new ResponseEntity<>(response,HttpStatus.ACCEPTED);
+    }*/
 }
