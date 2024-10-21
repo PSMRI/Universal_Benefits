@@ -1,0 +1,24 @@
+{
+    "seeker_id": "SEEKER12345",
+    "eligibilities": [
+      {
+        "eligibility_type": "10th_board_marks",
+        "documents": [
+          {
+            "document_type": "10th_board_marksheet",
+            "vc_file_path": "vcs/10th_board_marksheet.json"
+          }
+        ]
+      },
+      {
+        "eligibility_type": "annual_income",
+        "documents": [
+          {
+            "document_type": "income_proof",
+            "vc_file_path": "vcs/income_proof.json"
+          }
+        ]
+      }
+    ]
+  }
+  
