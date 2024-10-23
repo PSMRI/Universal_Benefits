@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +24,7 @@ import jakarta.servlet.http.HttpServletRequest;
 @jakarta.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2024-09-09T14:51:43.484446283+05:30[Asia/Calcutta]")
 @Controller
 @RequestMapping("/v1")
+@CrossOrigin(origins = "*")
 public class V1ApiController {
 
     private final ObjectMapper objectMapper;
@@ -62,7 +64,7 @@ public class V1ApiController {
     @RequestMapping(value = "/_appstat", method = RequestMethod.GET)
     public ResponseEntity<List<AppStatResponse>> getAppStat()
     {
-        List<AppStatResponse> response=applicationService.GetAppStat();
+        List<AppStatResponse> response= applicationService.GetAppStat();
         return  new ResponseEntity<>(response,HttpStatus.ACCEPTED);
     }
 
@@ -75,7 +77,7 @@ public class V1ApiController {
     @RequestMapping(value = "/scholarships/top-3", method = RequestMethod.GET)
     public ResponseEntity<List<ScholarshipStat>> getScholarshipStat()
     {
-        List<ScholarshipStat> response=applicationService.getScholarshipStats();
+        List<ScholarshipStat> response= applicationService.getScholarshipStats();
         return  new ResponseEntity<>(response,HttpStatus.ACCEPTED);
     }
     @RequestMapping(value = "/scholarships/details", method = RequestMethod.GET)
