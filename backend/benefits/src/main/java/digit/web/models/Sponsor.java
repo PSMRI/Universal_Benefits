@@ -1,11 +1,14 @@
 package digit.web.models;
 
 import java.util.Objects;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.math.BigDecimal;
+
 import org.springframework.validation.annotation.Validated;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
@@ -24,59 +27,62 @@ import lombok.Builder;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Sponsor   {
-        @JsonProperty("benefitSponsor")
-          @NotNull
+public class Sponsor {
+    @JsonProperty("benefitId")
+    private String benefitId = null;
 
-                private String benefitSponsor = null;
+    @JsonProperty("benefitSponsor")
+    @NotNull
+    private String sponsorName = null;
 
-            /**
-            * Type of sponsor entity (e.g., Corporate, Non-Profit, Government)
-            */
-            public enum SponsorEntityEnum {
-                        NON_PROFIT("Non-Profit"),
-                        
-                        CORPORATE("Corporate"),
-                        
-                        GOVERNMENT("Government"),
-                        
-                        INSTITUTE("Institute"),
-                        
-                        FOUNDATION("Foundation"),
-                        
-                        INDIVIDUAL("Individual");
-            
-            private String value;
-            
-            SponsorEntityEnum(String value) {
+    public enum SponsorEntityEnum {
+        NON_PROFIT("Non-Profit"),
+
+        CORPORATE("Corporate"),
+
+        GOVERNMENT("Government"),
+
+        INSTITUTE("Institute"),
+
+        FOUNDATION("Foundation"),
+
+        INDIVIDUAL("Individual");
+
+        private String value;
+
+        SponsorEntityEnum(String value) {
             this.value = value;
-            }
-            
-            @Override
-            @JsonValue
-            public String toString() {
+        }
+
+        @Override
+        @JsonValue
+        public String toString() {
             return String.valueOf(value);
-            }
-            
-            @JsonCreator
-            public static SponsorEntityEnum fromValue(String text) {
+        }
+
+        @JsonCreator
+        public static SponsorEntityEnum fromValue(String text) {
             for (SponsorEntityEnum b : SponsorEntityEnum.values()) {
-            if (String.valueOf(b.value).equals(text)) {
-            return b;
-            }
+                if (String.valueOf(b.value).equals(text)) {
+                    return b;
+                }
             }
             return null;
-            }
-            }        @JsonProperty("sponsorEntity")
-          @NotNull
+        }
+    }
 
-                private SponsorEntityEnum sponsorEntity = null;
+    @JsonProperty("sponsorEntity")
+    @NotNull
+    private SponsorEntityEnum entityType = null;
 
-        @JsonProperty("sponsorShare")
-          @NotNull
+    @JsonProperty("sponsorShare")
+    @NotNull
+    @Valid
+    private Float sharePercent = null;
 
-          @Valid
-                private BigDecimal sponsorShare = null;
-
+    @JsonProperty("type")
+    @NotNull
+    @Valid
+    private String type;
 
 }

@@ -1,6 +1,7 @@
 package digit.web.models;
 
 import java.util.Objects;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -21,22 +22,20 @@ import lombok.Builder;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class FinancialInformation   {
-        @JsonProperty("parentOccupation")
+public class FinancialInformation {
 
-        @Size(max=128)         private String parentOccupation = null;
+    @JsonProperty("parentOccupation")
+    @Size(max = 128)
+    private String parentOccupation = null;
 
-        @JsonProperty("amountPerBeneficiaryCategory")
+    @JsonProperty("amountPerBeneficiaryCategory")
+    private Object amountPerBeneficiaryCategory = null;
 
-                private Object amountPerBeneficiaryCategory = null;
+    @JsonProperty("maxBeneficiaryLimit")
+    private Boolean maxBeneficiaryLimit = null;
 
-        @JsonProperty("maxBeneficiaryLimit")
-
-                private Boolean maxBeneficiaryLimit = null;
-
-        @JsonProperty("maxBeneficiaryAllowed")
-
-                private Integer maxBeneficiaryAllowed = null;
+    @JsonProperty("maxBeneficiaryAllowed")
+    private Integer maxBeneficiaryAllowed = null;
 
 
 }

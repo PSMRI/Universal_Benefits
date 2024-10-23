@@ -1,15 +1,19 @@
 package digit.web.models;
 
 import java.util.Objects;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import digit.web.models.EligibilityCriteria;
 import digit.web.models.FinancialInformation;
 import digit.web.models.OtherTermsAndConditions;
 import digit.web.models.Sponsor;
 import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import org.springframework.validation.annotation.Validated;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
@@ -27,54 +31,80 @@ import lombok.Builder;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Benefit   {
-        @JsonProperty("benefitId")
+public class Benefit {
+    @JsonProperty("benefitId")
+    private String benefitId = null;
 
-                private String benefitId = null;
+    @JsonProperty("benefitName")
+    @NotNull
+    @Size(max = 128)
+    private String benefitName = null;
 
-        @JsonProperty("benefitName")
-          @NotNull
+    @JsonProperty("benefitProvider")
+    @NotNull
+    @Size(max = 128)
+    private String benefitProvider = null;
 
-        @Size(max=128)         private String benefitName = null;
+    @JsonProperty("sponsors")
+    @NotNull
+    @Valid
+    @Size(min = 1)
+    private List<Sponsor> sponsors = new ArrayList<>();
 
-        @JsonProperty("benefitProvider")
-          @NotNull
+    @JsonProperty("benefitDescription")
+    @Size(max = 256)
+    private String benefitDescription = null;
 
-        @Size(max=128)         private String benefitProvider = null;
+    @JsonProperty("isDraft")
+    @NotNull
+    private BenefitsStatusEnum status = null;
 
-        @JsonProperty("sponsors")
-          @NotNull
-          @Valid
-        @Size(min=1)         private List<Sponsor> sponsors = new ArrayList<>();
+    @JsonProperty("eligibility")
+    @Valid
+    private EligibilityCriteria eligibility = null;
 
-        @JsonProperty("benefitDescription")
+    @JsonProperty("financialInformation")
+    @Valid
+    private FinancialInformation financialInformation = null;
 
-        @Size(max=256)         private String benefitDescription = null;
+    @JsonProperty("otherTermsAndConditions")
+    @Valid
+    private OtherTermsAndConditions otherTermsAndConditions = null;
 
-        @JsonProperty("isDraft")
-          @NotNull
+    public enum BenefitsStatusEnum {
+        NON_PROFIT("Draft"),
 
-                private Boolean isDraft = null;
+        CORPORATE("Active"),
 
-        @JsonProperty("eligibility")
+        GOVERNMENT("Closed");
 
-          @Valid
-                private EligibilityCriteria eligibility = null;
+        private String value;
 
-        @JsonProperty("financialInformation")
+        BenefitsStatusEnum(String value) {
+            this.value = value;
+        }
 
-          @Valid
-                private FinancialInformation financialInformation = null;
+        @Override
+        @JsonValue
+        public String toString() {
+            return String.valueOf(value);
+        }
 
-        @JsonProperty("otherTermsAndConditions")
+        @JsonCreator
+        public static BenefitsStatusEnum fromValue(String text) {
+            for (BenefitsStatusEnum b : BenefitsStatusEnum.values()) {
+                if (String.valueOf(b.value).equals(text)) {
+                    return b;
+                }
+            }
+            return null;
+        }
+    }
 
-          @Valid
-                private OtherTermsAndConditions otherTermsAndConditions = null;
 
-
-        public Benefit addSponsorsItem(Sponsor sponsorsItem) {
+    public Benefit addSponsorsItem(Sponsor sponsorsItem) {
         this.sponsors.add(sponsorsItem);
         return this;
-        }
+    }
 
 }

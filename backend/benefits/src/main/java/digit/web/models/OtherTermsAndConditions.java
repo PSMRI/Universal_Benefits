@@ -1,10 +1,14 @@
 package digit.web.models;
 
+import java.util.Date;
 import java.util.Objects;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.time.LocalDate;
+
 import org.springframework.validation.annotation.Validated;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
@@ -22,33 +26,27 @@ import lombok.Builder;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class OtherTermsAndConditions   {
-        @JsonProperty("allowWithOtherBenefit")
+public class OtherTermsAndConditions {
+    @JsonProperty("allowWithOtherBenefit")
+    private Boolean allowWithOtherBenefit = null;
 
-                private Boolean allowWithOtherBenefit = null;
+    @JsonProperty("allowForOneYearIfFailed")
+    private Boolean allowOneYearIfFailed = null;
 
-        @JsonProperty("allowForOneYearIfFailed")
+    @JsonProperty("applicationDeadlineDate")
+    @Valid
+    private Date applicationDeadlineDate = null;
 
-                private Boolean allowForOneYearIfFailed = null;
+    @JsonProperty("extendedDeadlineDate")
+    @Valid
+    private Date extendedDeadlineDate = null;
 
-        @JsonProperty("applicationDeadlineDate")
+    @JsonProperty("validTillDate")
+    @Valid
+    private Date validTillDate = null;
 
-          @Valid
-                private LocalDate applicationDeadlineDate = null;
-
-        @JsonProperty("extendedDeadlineDate")
-
-          @Valid
-                private LocalDate extendedDeadlineDate = null;
-
-        @JsonProperty("validTillDate")
-
-          @Valid
-                private LocalDate validTillDate = null;
-
-        @JsonProperty("autoRenewalApplicable")
-
-                private Boolean autoRenewalApplicable = null;
+    @JsonProperty("autoRenewalApplicable")
+    private Boolean autoRenewalApplicable = null;
 
 
 }
