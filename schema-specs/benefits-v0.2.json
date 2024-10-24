@@ -362,13 +362,13 @@
                   "title": "Document Type",
                   "description": "Type of the document, e.g., Proof of Identity."
                 },
-                "documentURL": {
-                  "type": "string",
-                  "title": "Document URL",
-                  "description": "URL where the document can be accessed."
+                "isRequierd": {
+                  "type": "boolean",
+                  "title": "Is Required?",
+                  "description": "Document is required?"
                 }
               },
-              "required": ["documentType", "documentURL"]
+              "required": ["documentType", "isRequierd"]
             },
             "minItems": 1
           },
