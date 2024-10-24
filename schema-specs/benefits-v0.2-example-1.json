@@ -184,41 +184,26 @@
       ],
       "eligibilityDescription_md": "Eligibility includes SC students from classes 9 and 10, with annual income below ₹2,50,000."
     },
-
     "benefitDocuments": [
       {
         "documentType": "Proof of Caste",
-        "documentURL": "http://example.com/caste_certificate.pdf",
-        "linkedBenefits": [
-          "Scholarship for SC students",
-          "Nationality Certificate",
-          "Domicile",
-          "Caste validity"
-        ]
+        "documentURL": "true"
       },
       {
         "documentType": "Proof of Income",
-        "documentURL": "http://example.com/income_certificate.pdf",
-        "linkedBenefits": [
-          "Financial Assistance for Day Scholars",
-          "Financial Assistance for Hostellers",
-          "Form-16",
-          "ITR records"
-        ]
+        "isRequierd": "true"
       },
       {
         "documentType": "Academic Performance Report",
-        "documentURL": "http://example.com/academic_performance.pdf",
-        "linkedBenefits": ["Merit-based financial assistance"]
+        "documentURL": "true"
       },
       {
         "documentType": "Attendance Record",
-        "documentURL": "http://example.com/attendance_record.pdf",
-        "linkedBenefits": ["Continued scholarship eligibility"]
+        "documentURL": "true"
       },
       {
         "documentType": "Disability Certificate",
-        "documentURL": "http://example.com/dis"
+        "documentURL": "false"
       }
     ]
   },
