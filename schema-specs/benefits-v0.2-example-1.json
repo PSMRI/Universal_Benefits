@@ -63,7 +63,7 @@
           "phoneNumber": "011-12345678",
           "email": "contact@socialjustice.gov.in"
         },
-        "sponsorShare": 60
+        "sponsorShare": "60"
       },
       {
         "type": "State Govt.",
@@ -79,10 +79,9 @@
           "phoneNumber": "0755-2345678",
           "email": "contact@tribalwelfare.mp.gov.in"
         },
-        "sponsorShare": 40
+        "sponsorShare": "40"
       }
     ],
-
     "eligibilityCriteria": {
       "eligibilityDescription": [
         {
@@ -125,16 +124,6 @@
               "type": "Both"
             }
           ]
-        },
-        {
-          "type": "Academic Performance",
-          "description": "Minimum passing grade required for eligibility.",
-          "requiredDocuments": ["Academic Performance Report"]
-        },
-        {
-          "type": "Attendance",
-          "description": "Minimum 75% attendance required.",
-          "requiredDocuments": ["Attendance Record"]
         },
         {
           "type": "Day Scholar",
@@ -187,23 +176,23 @@
     "benefitDocuments": [
       {
         "documentType": "Proof of Caste",
-        "documentURL": "true"
+        "isRequierd": true
       },
       {
         "documentType": "Proof of Income",
-        "isRequierd": "true"
+        "isRequierd": true
       },
       {
         "documentType": "Academic Performance Report",
-        "documentURL": "true"
+        "isRequierd": true
       },
       {
         "documentType": "Attendance Record",
-        "documentURL": "true"
+        "isRequierd": true
       },
       {
         "documentType": "Disability Certificate",
-        "documentURL": "false"
+        "isRequierd": false
       }
     ]
   },
@@ -217,9 +206,16 @@
       "type": "Online Form",
       "name": "Pre-matric Scholarship Application Form",
       "required": [
-        "Caste Certificate",
-        "Income Certificate",
-        "Academic Records"
+        {
+          "type": "string",
+          "name": "Field 1",
+          "required": true
+        },
+        {
+          "type": "string",
+          "name": "Field 2",
+          "required": true
+        }
       ]
     }
   ]
