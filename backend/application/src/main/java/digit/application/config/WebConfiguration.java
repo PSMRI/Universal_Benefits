@@ -9,11 +9,11 @@ public class WebConfiguration implements WebMvcConfigurer {
  
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-                .allowedOrigins("*") 
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                .allowedHeaders("Authorization", "Content-Type")
-                .allowCredentials(false)  
-                .maxAge(3600);  
+registry.addMapping("/**")
+        .allowedOrigins("https://dev-uba-provider.tekdinext.com", "http://localhost:5173") // No trailing slash on localhost
+        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+        .allowedHeaders("Authorization", "Content-Type")
+        .allowCredentials(false)  // Set to true if you want to send credentials like cookies
+        .maxAge(3600);  // Cache the CORS preflight response for 1 hour
     }
 }
