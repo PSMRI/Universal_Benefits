@@ -5,6 +5,7 @@ import digit.service.BenefitsService;
 import digit.util.ResponseInfoFactory;
 import digit.web.models.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import digit.web.models.Error;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -35,11 +36,14 @@ public class BenefitsApiController {
 
     private final ResponseInfoFactory responseInfoFactory;
 
+    private final BenefitService benefitService;
+
     @Autowired
-    public BenefitsApiController(ObjectMapper objectMapper, HttpServletRequest request, ResponseInfoFactory responseInfoFactory) {
+    public BenefitsApiController(ObjectMapper objectMapper, HttpServletRequest request, ResponseInfoFactory responseInfoFactory, BenefitService benefitService) {
         this.objectMapper = objectMapper;
         this.request = request;
         this.responseInfoFactory = responseInfoFactory;
+        this.benefitService = benefitService;
     }
 
     @RequestMapping(value = "/v1/_create", method = RequestMethod.POST)
@@ -107,7 +111,7 @@ public class BenefitsApiController {
         }
     }
 
-       @RequestMapping(value="/benefits/v1/_getAll", method = RequestMethod.POST)
+       @RequestMapping(value="v1/_getAll", method = RequestMethod.POST)
                 public ResponseEntity<List<Benefit>> GetAll()
                 {
                     List<Benefit> response=new ArrayList<>();
@@ -121,7 +125,7 @@ public class BenefitsApiController {
                     }
                     return new ResponseEntity<>(response,HttpStatus.ACCEPTED);
                 }
-    @RequestMapping(value="/benefits/v1/_publish", method = RequestMethod.POST)
+    @RequestMapping(value="/v1/_publish", method = RequestMethod.POST)
     public ResponseEntity<SuccessResponse> updateBenefitStatus(@RequestBody BenefitStatusUpdateRequestModel benefitStatusUpdateRequestModel)
     {
         SuccessResponse response= new SuccessResponse();
@@ -141,7 +145,7 @@ public class BenefitsApiController {
             return new ResponseEntity<>(response,HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    @RequestMapping(value="/benefits/v1/_get", method = RequestMethod.POST)
+    @RequestMapping(value="v1/_get", method = RequestMethod.POST)
     public ResponseEntity<Benefit> getById(@RequestBody BenefitGetRequest request)
     {
         Benefit response= new Benefit();
@@ -155,7 +159,7 @@ public class BenefitsApiController {
         }
         return new ResponseEntity<>(response,HttpStatus.ACCEPTED);
     }
-    @RequestMapping(value="/benefits/v1/_discard", method = RequestMethod.POST)
+    @RequestMapping(value="v1/_discard", method = RequestMethod.POST)
     public ResponseEntity<SuccessResponse> delete(@RequestBody DiscardRequest discardRequest)
     {
         SuccessResponse response= new SuccessResponse();
@@ -175,7 +179,7 @@ public class BenefitsApiController {
             return new ResponseEntity<>(response,HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    @RequestMapping(value="/benefits/v1/_search", method = RequestMethod.POST)
+    @RequestMapping(value="/v1/_search", method = RequestMethod.POST)
     public ResponseEntity<List<Benefit>> search(@RequestBody SearchCriteria searchCriteria)
     {
         List<Benefit> response=new ArrayList<>();
