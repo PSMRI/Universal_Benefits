@@ -41,17 +41,17 @@ public class BenefitRowMapper implements RowMapper<Benefit> {
         eligibilityCriteria.setAnnualIncome(rs.getString("eligibility_annual_income"));
         eligibilityCriteria.setDisability(rs.getBoolean("eligibility_disability"));
         eligibilityCriteria.setDomicile(rs.getString("eligibility_domicile"));
-        eligibilityCriteria.setAge(rs.getInt("eligibility_age"));
-        eligibilityCriteria.setEligibleChildren(rs.getInt("eligibility_eligible_children"));
+        eligibilityCriteria.setAge(rs.getString("eligibility_age"));
+        eligibilityCriteria.setEligibleChildren(rs.getString("eligibility_eligible_children"));
 
 
         String genderString=rs.getString("eligibility_gender");
         EligibilityCriteria.GenderEnum genderEnum= EligibilityCriteria.GenderEnum.fromValue(genderString);
         eligibilityCriteria.setGender(genderEnum);
 
-        String casteString=rs.getString("eligibility_caste");
-        EligibilityCriteria.CasteEnum casteEnum= EligibilityCriteria.CasteEnum.fromValue(casteString);
-        eligibilityCriteria.setCaste(Collections.singletonList(casteEnum));
+       /* String casteString=rs.getString("eligibility_caste");
+        EligibilityCriteria.CasteEnum casteEnum= EligibilityCriteria.CasteEnum.fromValue(casteString);*/
+        eligibilityCriteria.setCaste(rs.getString("eligibility_caste"));
 
         String studenTypeString=rs.getString("eligibility_student_type");
         EligibilityCriteria.StudentTypeEnum studentTypeEnum= EligibilityCriteria.StudentTypeEnum.fromValue(studenTypeString);
@@ -61,20 +61,20 @@ public class BenefitRowMapper implements RowMapper<Benefit> {
 
         //Finacial Information starts
         financialInformation.setParentOccupation(rs.getString("finance_parent_occupation"));
-        //financialInformation.setAmountPerBeneficiaryCategory(rs.getString(""));
-        financialInformation.setMaxBeneficiaryLimit(rs.getBoolean("max_beneficiary_limit_allowed"));
-        financialInformation.setMaxBeneficiaryAllowed(rs.getInt("max_beneficiary_allowed"));
+        financialInformation.setMaxBeneficiaryLimit(rs.getBoolean("finance_max_beneficiary_limit_allowed"));
+        financialInformation.setMaxBeneficiaryAllowed(rs.getInt("finance_max_beneficiary_allowed"));
         benefit.setFinancialInformation(financialInformation);
+        //......................Finacial Information Ends
         //......................Finacial Information Ends
 
         //OtherTermsAndConditions starts
-        otherTermsAndConditions.setAllowWithOtherBenefit(rs.getBoolean("allow_with_other_benefit"));
+/*        otherTermsAndConditions.setAllowWithOtherBenefit(rs.getBoolean("allow_with_other_benefit"));
         otherTermsAndConditions.setAllowOneYearIfFailed(rs.getBoolean("allow_one_year_if_failed"));
         otherTermsAndConditions.setApplicationDeadlineDate(rs.getDate("application_end"));
         otherTermsAndConditions.setExtendedDeadlineDate(rs.getDate("new_deadline"));
         otherTermsAndConditions.setAutoRenewalApplicable(rs.getBoolean("auto_renew_applicable"));
         otherTermsAndConditions.setValidTillDate(rs.getDate("valid_till_date"));
-        benefit.setOtherTermsAndConditions(otherTermsAndConditions);
+        benefit.setOtherTermsAndConditions(otherTermsAndConditions);*/
         //...................OtherTermsAndConditions ends
         benefit.setSponsors(lstSponsors);
 
