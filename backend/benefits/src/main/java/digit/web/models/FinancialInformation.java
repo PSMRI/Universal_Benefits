@@ -1,5 +1,6 @@
 package digit.web.models;
 
+import java.util.List;
 import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -29,9 +30,11 @@ public class FinancialInformation {
     private String parentOccupation = null;
 
     @JsonProperty("amountPerBeneficiaryCategory")
-    private Object amountPerBeneficiaryCategory = null;
+    @Valid
+    private List<AmountPerBeneficiaryCategory> amountPerBeneficiaryCategory = null;
 
     @JsonProperty("maxBeneficiaryLimit")
+    @NotNull
     private Boolean maxBeneficiaryLimit = null;
 
     @JsonProperty("maxBeneficiaryAllowed")

@@ -1,6 +1,7 @@
 package digit.web.models;
 
 import java.util.Objects;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -23,63 +24,63 @@ import lombok.Builder;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ResponseInfo   {
-        @JsonProperty("apiId")
-          @NotNull
+public class ResponseInfo {
+    @JsonProperty("apiId")
+    @NotNull
 
-        @Size(max=128)         private String apiId = null;
+    @Size(max = 128)
+    private String apiId = null;
 
-        @JsonProperty("ver")
-          @NotNull
+    @JsonProperty("ver")
+    @NotNull
 
-        @Size(max=32)         private String ver = null;
+    @Size(max = 32)
+    private String ver = null;
 
-        @JsonProperty("ts")
-          @NotNull
+    @JsonProperty("ts")
+    @NotNull
+    private Long ts = null;
+    @JsonProperty("resMsgId")
 
-                private Long ts = null;
+    @Size(max = 256)
+    private String resMsgId = null;
 
-        @JsonProperty("resMsgId")
+    @JsonProperty("msgId")
+    @Size(max = 256)
+    private String msgId = null;
 
-        @Size(max=256)         private String resMsgId = null;
+    /**
+     * status of request processing - to be enhanced in futuer to include INPROGRESS
+     */
+    public enum StatusEnum {
+        SUCCESSFUL("SUCCESSFUL"),
 
-        @JsonProperty("msgId")
+        FAILED("FAILED");
 
-        @Size(max=256)         private String msgId = null;
+        private String value;
 
-            /**
-            * status of request processing - to be enhanced in futuer to include INPROGRESS
-            */
-            public enum StatusEnum {
-                        SUCCESSFUL("SUCCESSFUL"),
-                        
-                        FAILED("FAILED");
-            
-            private String value;
-            
-            StatusEnum(String value) {
+        StatusEnum(String value) {
             this.value = value;
-            }
-            
-            @Override
-            @JsonValue
-            public String toString() {
+        }
+
+        @Override
+        @JsonValue
+        public String toString() {
             return String.valueOf(value);
-            }
-            
-            @JsonCreator
-            public static StatusEnum fromValue(String text) {
+        }
+
+        @JsonCreator
+        public static StatusEnum fromValue(String text) {
             for (StatusEnum b : StatusEnum.values()) {
-            if (String.valueOf(b.value).equals(text)) {
-            return b;
-            }
+                if (String.valueOf(b.value).equals(text)) {
+                    return b;
+                }
             }
             return null;
-            }
-            }        @JsonProperty("status")
-          @NotNull
+        }
+    }
 
-                private StatusEnum status = null;
-
-
+    @JsonProperty("status")
+    @NotNull
+    private StatusEnum status = null;
 }

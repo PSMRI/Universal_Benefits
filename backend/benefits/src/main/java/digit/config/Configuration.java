@@ -47,6 +47,8 @@ public class Configuration {
     @Value("${egov.idgen.path}")
     private String idGenPath;
 
+    @Value("${egov.idgen.application.format}")
+    private String idGenApplicationFormat;
 
     //Workflow Config
     @Value("${egov.workflow.host}")
@@ -61,6 +63,23 @@ public class Configuration {
     @Value("${egov.workflow.processinstance.search.path}")
     private String wfProcessInstanceSearchPath;
 
+    @Value("${btr.kafka.create.topic}")
+    private String createTopic;
+
+    @Value("${btr.kafka.update.details.topic}")
+    private String updateDetailsTopic;
+
+    @Value("${btr.kafka.update.eligibility.topic}")
+    private String updateEligibilityTopic;
+
+    @Value("${btr.kafka.update.fininfo.topic}")
+    private String updateFinInfoTopic;
+
+    @Value("${btr.kafka.update.terms.topic}")
+    private String updateTermsTopic;
+
+    @Value("@{btr.kafka.publish.topic}")
+    private String publishTopic;
 
     //MDMS
     @Value("${egov.mdms.host}")

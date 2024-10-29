@@ -1,15 +1,8 @@
 package digit.web.models;
 
-import java.util.Objects;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import digit.web.models.EligibilityCriteria;
-import digit.web.models.FinancialInformation;
-import digit.web.models.OtherTermsAndConditions;
-import digit.web.models.Sponsor;
-import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,26 +31,26 @@ public class Benefit {
     @JsonProperty("benefitName")
     @NotNull
     @Size(max = 128)
-    private String benefitName = null;
+    private String benefitName;
 
     @JsonProperty("benefitProvider")
     @NotNull
     @Size(max = 128)
-    private String benefitProvider = null;
-
-    @JsonProperty("sponsors")
-    @NotNull
-    @Valid
-    @Size(min = 1)
-    private List<Sponsor> sponsors = new ArrayList<>();
+    private String benefitProvider;
 
     @JsonProperty("benefitDescription")
     @Size(max = 256)
     private String benefitDescription = null;
 
-    @JsonProperty("isDraft")
+    @JsonProperty("sponsors")
+    @Valid
     @NotNull
-    private BenefitsStatusEnum status = null;
+    @Size(min = 1)
+    private List<Sponsor> sponsors;
+
+    @JsonProperty("status")
+    @NotNull
+    private BenefitsStatusEnum status;
 
     @JsonProperty("eligibility")
     @Valid
@@ -71,12 +64,16 @@ public class Benefit {
     @Valid
     private OtherTermsAndConditions otherTermsAndConditions = null;
 
+    @JsonProperty("auditDetails")
+    @Valid
+    private AuditDetails auditDetails = null;
+
     public enum BenefitsStatusEnum {
-        NON_PROFIT("Draft"),
+        DRAFT("DRAFT"),
 
-        CORPORATE("Active"),
+        ACTIVE("ACTIVE"),
 
-        GOVERNMENT("Closed");
+        CLOSED("CLOSED");
 
         private String value;
 

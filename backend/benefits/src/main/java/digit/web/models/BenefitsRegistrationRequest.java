@@ -1,13 +1,16 @@
 package digit.web.models;
 
 import java.util.Objects;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import digit.web.models.Benefit;
-import digit.web.models.RequestInfo;
 import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import org.egov.common.contract.request.RequestInfo;
 import org.springframework.validation.annotation.Validated;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
@@ -26,23 +29,15 @@ import lombok.Builder;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class BenefitsRegistrationRequest   {
-        @JsonProperty("RequestInfo")
+public class BenefitsRegistrationRequest {
+    @JsonProperty("RequestInfo")
+    @NotNull
+    @Valid
+    private RequestInfo requestInfo = null;
 
-          @Valid
-                private RequestInfo requestInfo = null;
-
-        @JsonProperty("Benefit")
-          @Valid
-                private List<Benefit> benefit = null;
-
-
-        public BenefitsRegistrationRequest addBenefitItem(Benefit benefitItem) {
-            if (this.benefit == null) {
-            this.benefit = new ArrayList<>();
-            }
-        this.benefit.add(benefitItem);
-        return this;
-        }
+    @JsonProperty("Benefit")
+    @NotNull
+    @Valid
+    private Benefit benefit = null;
 
 }

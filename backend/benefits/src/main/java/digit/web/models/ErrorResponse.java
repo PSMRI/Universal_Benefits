@@ -1,13 +1,16 @@
 package digit.web.models;
 
 import java.util.Objects;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import digit.web.models.Error;
 import digit.web.models.ResponseInfo;
 import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import org.springframework.validation.annotation.Validated;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
@@ -26,24 +29,24 @@ import lombok.Builder;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ErrorResponse   {
-        @JsonProperty("ResponseInfo")
-          @NotNull
+public class ErrorResponse {
+    @JsonProperty("ResponseInfo")
+    @NotNull
 
-          @Valid
-                private ResponseInfo responseInfo = null;
+    @Valid
+    private ResponseInfo responseInfo = null;
 
-        @JsonProperty("Errors")
-          @Valid
-                private List<Error> errors = null;
+    @JsonProperty("Errors")
+    @Valid
+    private List<Error> errors = null;
 
 
-        public ErrorResponse addErrorsItem(Error errorsItem) {
-            if (this.errors == null) {
+    public ErrorResponse addErrorsItem(Error errorsItem) {
+        if (this.errors == null) {
             this.errors = new ArrayList<>();
-            }
+        }
         this.errors.add(errorsItem);
         return this;
-        }
+    }
 
 }

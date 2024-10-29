@@ -29,36 +29,6 @@ import lombok.Builder;
 @Builder
 public class EligibilityCriteria {
 
-    public enum GenderEnum {
-        MALE("Male"),
-
-        FEMALE("Female"),
-
-        BOTH("Both");
-
-        private String value;
-
-        GenderEnum(String value) {
-            this.value = value;
-        }
-
-        @Override
-        @JsonValue
-        public String toString() {
-            return String.valueOf(value);
-        }
-
-        @JsonCreator
-        public static GenderEnum fromValue(String text) {
-            for (GenderEnum b : GenderEnum.values()) {
-                if (String.valueOf(b.value).equals(text)) {
-                    return b;
-                }
-            }
-            return null;
-        }
-    }
-
     @JsonProperty("gender")
     private GenderEnum gender = null;
 
@@ -86,9 +56,89 @@ public class EligibilityCriteria {
     @Size(max = 128)
     private String annualIncome = null;
 
+    @JsonProperty("caste")
+    private String caste = null;
+
+    @JsonProperty("disability")
+    private Boolean disability = null;
+
+    @JsonProperty("domicile")
+    @Size(max = 128)
+    private String domicile = null;
+
+    @JsonProperty("studentType")
+    private StudentTypeEnum studentType = null;
+
+    @JsonProperty("age")
+    @Size(max = 128)
+    private String age = null;
+
+    @JsonProperty("eligibleChildren")
+    @Size(max = 128)
+    private String eligibleChildren = null;
+
+    public enum GenderEnum {
+        MALE("M"),
+
+        FEMALE("F"),
+
+        BOTH("B");
+
+        private String value;
+
+        GenderEnum(String value) {
+            this.value = value;
+        }
+
+        @Override
+        @JsonValue
+        public String toString() {
+            return String.valueOf(value);
+        }
+
+        @JsonCreator
+        public static GenderEnum fromValue(String text) {
+            for (GenderEnum b : GenderEnum.values()) {
+                if (String.valueOf(b.value).equals(text)) {
+                    return b;
+                }
+            }
+            return null;
+        }
+    }
+
+    public enum StudentTypeEnum {
+        DAYSCHOLAR("DAYSCHOLAR"),
+
+        HOSTELER("HOSTELER"),
+
+        BOTH("BOTH");
+
+        private String value;
+
+        StudentTypeEnum(String value) {
+            this.value = value;
+        }
+
+        @Override
+        @JsonValue
+        public String toString() {
+            return String.valueOf(value);
+        }
+
+        @JsonCreator
+        public static StudentTypeEnum fromValue(String text) {
+            for (StudentTypeEnum b : StudentTypeEnum.values()) {
+                if (String.valueOf(b.value).equals(text)) {
+                    return b;
+                }
+            }
+            return null;
+        }
+    }
 
     public enum CasteEnum {
-        GENERAL("General"),
+        GENERAL("GENERAL"),
 
         SC("SC"),
 
@@ -117,64 +167,6 @@ public class EligibilityCriteria {
             }
             return null;
         }
-    }
-
-    @JsonProperty("caste")
-    private List<CasteEnum> caste = null;
-
-    @JsonProperty("disability")
-    private Boolean disability = null;
-
-    @JsonProperty("domicile")
-    @Size(max = 128)
-    private String domicile = null;
-
-    public enum StudentTypeEnum {
-        DAYSCHOLAR("dayscholar"),
-
-        HOSTELER("hosteler"),
-
-        BOTH("both");
-
-        private String value;
-
-        StudentTypeEnum(String value) {
-            this.value = value;
-        }
-
-        @Override
-        @JsonValue
-        public String toString() {
-            return String.valueOf(value);
-        }
-
-        @JsonCreator
-        public static StudentTypeEnum fromValue(String text) {
-            for (StudentTypeEnum b : StudentTypeEnum.values()) {
-                if (String.valueOf(b.value).equals(text)) {
-                    return b;
-                }
-            }
-            return null;
-        }
-    }
-
-    @JsonProperty("studentType")
-    private StudentTypeEnum studentType = null;
-
-    @JsonProperty("age")
-    private Integer age = null;
-
-    @JsonProperty("eligibleChildren")
-    private Integer eligibleChildren = null;
-
-
-    public EligibilityCriteria addCasteItem(CasteEnum casteItem) {
-        if (this.caste == null) {
-            this.caste = new ArrayList<>();
-        }
-        this.caste.add(casteItem);
-        return this;
     }
 
 }

@@ -1,0 +1,384 @@
+serviceMaps:
+  serviceName: benefitPersister
+  mappings:
+    - version: 1.0
+      name: benefit Data Persistence
+      description: Inserts data into benefit, benefit_category, benefit_sponsor, and benefit_extensions tables
+      fromTopic: save-benefits-data
+      isTransaction: true
+      queryMaps:
+        - query: |
+            INSERT INTO benefits 
+            (benefit_id, benefit_name, benefit_description, benefit_provider, status, created_by, last_modified_by, 
+             created_time, last_modified_time) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+          basePath: Benefit
+          jsonMaps:
+            - jsonPath: $.Benefit.benefitId
+              type: STRING
+              dbType: VARCHAR
+            - jsonPath: $.Benefit.benefitName
+              type: STRING
+              dbType: VARCHAR
+            - jsonPath: $.Benefit.benefitDescription
+              type: STRING
+              dbType: VARCHAR
+            - jsonPath: $.Benefit.benefitProvider
+              type: STRING
+              dbType: VARCHAR
+            - jsonPath: $.Benefit.status
+              type: STRING
+              dbType: VARCHAR
+            - jsonPath: $.Benefit.auditDetails.createdBy
+              type: STRING
+              dbType: VARCHAR
+            - jsonPath: $.Benefit.auditDetails.lastModifiedBy
+              type: STRING
+              dbType: VARCHAR
+            - jsonPath: $.Benefit.auditDetails.createdTime
+              type: LONG
+              dbType: BIGINT
+            - jsonPath: $.Benefit.auditDetails.lastModifiedTime
+              type: LONG
+              dbType: BIGINT
+
+        - query: |
+            INSERT INTO benefit_sponsor 
+            (id, benefit_id, sponsor_name, entity_type, share_percent, type, created_by, last_modified_by, created_time, last_modified_time) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+          basePath: $.Benefit.sponsors.*
+          jsonMaps:
+            - jsonPath: $.Benefit.sponsors.*.id
+              type: STRING
+              dbType: VARCHAR
+            - jsonPath: $.Benefit.benefitId
+              type: STRING
+              dbType: VARCHAR
+            - jsonPath: $.Benefit.sponsors.*.benefitSponsor
+              type: STRING
+              dbType: VARCHAR
+            - jsonPath: $.Benefit.sponsors.*.sponsorEntity
+              type: STRING
+              dbType: VARCHAR
+            - jsonPath: $.Benefit.sponsors.*.sponsorShare
+              type: DECIMAL
+              dbType: DECIMAL
+            - jsonPath: $.Benefit.sponsors.*.type
+              type: STRING
+              dbType: VARCHAR
+            - jsonPath: $.Benefit.auditDetails.createdBy
+              type: STRING
+              dbType: VARCHAR
+            - jsonPath: $.Benefit.auditDetails.lastModifiedBy
+              type: STRING
+              dbType: VARCHAR
+            - jsonPath: $.Benefit.auditDetails.createdTime
+              type: LONG
+              dbType: BIGINT
+            - jsonPath: $.Benefit.auditDetails.lastModifiedTime
+              type: LONG
+              dbType: BIGINT
+
+    - version: 1.0
+      name: benefit Data Update
+      description: Updates data in benefit details.
+      fromTopic: update-benefits-details-data
+      isTransaction: true
+      queryMaps:
+
+        # Update query for benefits table
+        - query: |
+            UPDATE benefits SET
+              benefit_name = ?,
+              benefit_provider = ?,
+              benefit_description = ?,
+              last_modified_by = ?,
+              last_modified_time = ?
+            WHERE benefit_id = ?;
+          basePath: Benefit
+          jsonMaps:
+            - jsonPath: $.Benefit.benefitName
+              type: STRING
+              dbType: VARCHAR
+            - jsonPath: $.Benefit.benefitProvider
+              type: STRING
+              dbType: VARCHAR
+            - jsonPath: $.Benefit.benefitDescription
+              type: STRING
+              dbType: VARCHAR
+            - jsonPath: $.Benefit.auditDetails.lastModifiedBy
+              type: STRING
+              dbType: VARCHAR
+            - jsonPath: $.Benefit.auditDetails.lastModifiedTime
+              type: LONG
+              dbType: BIGINT
+            - jsonPath: $.Benefit.benefitId
+              type: STRING
+              dbType: VARCHAR
+
+        - query: |
+            INSERT INTO benefit_sponsor (id, benefit_id, sponsor_name, entity_type, share_percent, type, created_by, last_modified_by, created_time, last_modified_time)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT (id) DO UPDATE SET 
+              sponsor_name = COALESCE(EXCLUDED.sponsor_name, benefit_sponsor.sponsor_name),
+              entity_type = COALESCE(EXCLUDED.entity_type, benefit_sponsor.entity_type),
+              share_percent = COALESCE(EXCLUDED.share_percent, benefit_sponsor.share_percent),
+              type = COALESCE(EXCLUDED.type, benefit_sponsor.type),
+              last_modified_by = EXCLUDED.last_modified_by,
+              last_modified_time = EXCLUDED.last_modified_time;
+          basePath: $.Benefit.sponsors.*
+          jsonMaps:
+            - jsonPath: $.Benefit.sponsors.*.id
+              type: STRING
+              dbType: VARCHAR
+            - jsonPath: $.Benefit.benefitId
+              type: STRING
+              dbType: VARCHAR
+            - jsonPath: $.Benefit.sponsors.*.benefitSponsor
+              type: STRING
+              dbType: VARCHAR
+            - jsonPath: $.Benefit.sponsors.*.sponsorEntity
+              type: STRING
+              dbType: VARCHAR
+            - jsonPath: $.Benefit.sponsors.*.sponsorShare
+              type: DECIMAL
+              dbType: DECIMAL
+            - jsonPath: $.Benefit.sponsors.*.type
+              type: STRING
+              dbType: VARCHAR
+            - jsonPath: $.Benefit.auditDetails.lastModifiedBy
+              type: STRING
+              dbType: VARCHAR
+            - jsonPath: $.Benefit.auditDetails.lastModifiedBy
+              type: STRING
+              dbType: VARCHAR
+            - jsonPath: $.Benefit.auditDetails.lastModifiedTime
+              type: LONG
+              dbType: BIGINT
+            - jsonPath: $.Benefit.auditDetails.lastModifiedTime
+              type: LONG
+              dbType: BIGINT
+
+    - version: 1.0
+      name: benefit eligibility Data Update
+      description: Updates eligibility data in benefit details.
+      fromTopic: update-benefits-eligibility-data
+      isTransaction: true
+      queryMaps:
+        - query: |
+            UPDATE benefits SET
+              eligibility_gender = COALESCE(?, eligibility_gender),
+              eligibility_min_qualification = COALESCE(?, eligibility_min_qualification),
+              eligibility_attendance_percentage = COALESCE(?, eligibility_attendance_percentage),
+              eligibility_academic_class = COALESCE(?, eligibility_academic_class),
+              eligibility_marks = COALESCE(?, eligibility_marks),
+              eligibility_field_of_study = COALESCE(?, eligibility_field_of_study),
+              eligibility_annual_income = COALESCE(?, eligibility_annual_income),
+              eligibility_caste = COALESCE(?, eligibility_caste),
+              eligibility_student_type = COALESCE(?, eligibility_student_type),
+              eligibility_disability = COALESCE(?, eligibility_disability),
+              eligibility_domicile = COALESCE(?, eligibility_domicile),
+              eligibility_age = COALESCE(?, eligibility_age),
+              eligibility_eligible_children = COALESCE(?, eligibility_eligible_children),
+              last_modified_by = COALESCE(?, last_modified_by),
+              last_modified_time = COALESCE(?, last_modified_time)
+            WHERE benefit_id = ?;
+          basePath: Benefit
+          jsonMaps:
+            - jsonPath: $.Benefit.eligibility.gender
+              type: STRING
+              dbType: VARCHAR
+            - jsonPath: $.Benefit.eligibility.minQualification
+              type: STRING
+              dbType: VARCHAR
+            - jsonPath: $.Benefit.eligibility.attendancePercentage
+              type: STRING
+              dbType: VARCHAR
+            - jsonPath: $.Benefit.eligibility.class
+              type: STRING
+              dbType: VARCHAR
+            - jsonPath: $.Benefit.eligibility.marks
+              type: STRING
+              dbType: VARCHAR
+            - jsonPath: $.Benefit.eligibility.fieldOfStudy
+              type: STRING
+              dbType: VARCHAR
+            - jsonPath: $.Benefit.eligibility.annualIncome
+              type: STRING
+              dbType: VARCHAR
+            - jsonPath: $.Benefit.eligibility.caste
+              type: STRING
+              dbType: VARCHAR
+            - jsonPath: $.Benefit.eligibility.studentType
+              type: STRING
+              dbType: VARCHAR
+            - jsonPath: $.Benefit.eligibility.disability
+              type: BOOLEAN
+              dbType: BOOLEAN
+            - jsonPath: $.Benefit.eligibility.domicile
+              type: STRING
+              dbType: VARCHAR
+            - jsonPath: $.Benefit.eligibility.age
+              type: STRING
+              dbType: VARCHAR
+            - jsonPath: $.Benefit.eligibility.eligibleChildren
+              type: STRING
+              dbType: VARCHAR
+            - jsonPath: $.Benefit.auditDetails.lastModifiedBy
+              type: STRING
+              dbType: VARCHAR
+            - jsonPath: $.Benefit.auditDetails.lastModifiedTime
+              type: LONG
+              dbType: BIGINT
+            - jsonPath: $.Benefit.benefitId
+              type: STRING
+              dbType: VARCHAR
+
+
+    - version: 1.0
+      name: benefit Financial Data Update
+      description: Updates Financial information data in benefit details.
+      fromTopic: update-benefits-fininfo-data
+      isTransaction: true
+      queryMaps:
+        - query: |
+            UPDATE benefits SET
+              finance_parent_occupation = COALESCE(?, finance_parent_occupation),
+              beneficiary_count_max = COALESCE(?, beneficiary_count_max),
+              finance_max_beneficiary_limit_allowed = COALESCE(?, finance_max_beneficiary_limit_allowed),
+              finance_max_beneficiary_allowed = COALESCE(?, finance_max_beneficiary_allowed),
+              last_modified_by = COALESCE(?, last_modified_by),
+              last_modified_time = COALESCE(?, last_modified_time)
+            WHERE benefit_id = ?;
+          basePath: Benefit
+          jsonMaps:
+            - jsonPath: $.Benefit.financialInformation.parentOccupation
+              type: STRING
+              dbType: VARCHAR
+            - jsonPath: $.Benefit.financialInformation.maxBeneficiaryAllowed
+              type: INTEGER
+              dbType: INTEGER
+            - jsonPath: $.Benefit.financialInformation.maxBeneficiaryLimit
+              type: BOOLEAN
+              dbType: BOOLEAN
+            - jsonPath: $.Benefit.financialInformation.maxBeneficiaryAllowed
+              type: INTEGER
+              dbType: INTEGER
+            - jsonPath: $.Benefit.auditDetails.lastModifiedBy
+              type: STRING
+              dbType: VARCHAR
+            - jsonPath: $.Benefit.auditDetails.lastModifiedTime
+              type: LONG
+              dbType: BIGINT
+            - jsonPath: $.Benefit.benefitId
+              type: STRING
+              dbType: VARCHAR
+
+        - query: |
+            INSERT INTO benefits_category (id, benefit_id, caste, type, category, amount, created_by, last_modified_by, created_time, last_modified_time)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT (id) DO UPDATE SET 
+              caste = COALESCE(EXCLUDED.caste, benefits_category.caste),
+              type = COALESCE(EXCLUDED.type, benefits_category.type),
+              category = COALESCE(EXCLUDED.category, benefits_category.category),
+              amount = COALESCE(EXCLUDED.amount, benefits_category.amount),
+              last_modified_by = EXCLUDED.last_modified_by,
+              last_modified_time = EXCLUDED.last_modified_time;
+          basePath: $.Benefit.financialInformation.amountPerBeneficiaryCategory.*
+          jsonMaps:
+            - jsonPath: $.Benefit.financialInformation.amountPerBeneficiaryCategory.*.id
+              type: STRING
+              dbType: VARCHAR
+            - jsonPath: $.Benefit.benefitId
+              type: STRING
+              dbType: VARCHAR
+            - jsonPath: $.Benefit.financialInformation.amountPerBeneficiaryCategory.*.beneficiaryCaste
+              type: STRING
+              dbType: VARCHAR
+            - jsonPath: $.Benefit.financialInformation.amountPerBeneficiaryCategory.*.beneficiaryType
+              type: STRING
+              dbType: VARCHAR
+            - jsonPath: $.Benefit.financialInformation.amountPerBeneficiaryCategory.*.beneficiaryCategory
+              type: DECIMAL
+              dbType: DECIMAL
+            - jsonPath: $.Benefit.financialInformation.amountPerBeneficiaryCategory.*.beneficiaryAmount
+              type: STRING
+              dbType: VARCHAR
+            - jsonPath: $.Benefit.auditDetails.lastModifiedBy
+              type: STRING
+              dbType: VARCHAR
+            - jsonPath: $.Benefit.auditDetails.lastModifiedBy
+              type: STRING
+              dbType: VARCHAR
+            - jsonPath: $.Benefit.auditDetails.lastModifiedTime
+              type: LONG
+              dbType: BIGINT
+            - jsonPath: $.Benefit.auditDetails.lastModifiedTime
+              type: LONG
+              dbType: BIGINT
+
+
+    - version: 1.0
+      name: benefit Other terms and conditions Data Update
+      description: Updates Other terms and conditions data in benefit details.
+      fromTopic: update-benefits-terms-data
+      isTransaction: true
+      queryMaps:
+        - query: |
+            UPDATE benefits SET
+              allow_with_other_benefit = COALESCE(?, allow_with_other_benefit),
+              allow_one_year_if_failed = COALESCE(?, allow_one_year_if_failed),
+              application_end = COALESCE(?, application_end),
+              auto_renew_applicable = COALESCE(?, auto_renew_applicable),
+              valid_till_date = COALESCE(?, valid_till_date),
+              last_modified_by = COALESCE(?, last_modified_by),
+              last_modified_time = COALESCE(?, last_modified_time)
+            WHERE benefit_id = ?;
+          basePath: Benefit
+          jsonMaps:
+            - jsonPath: $.Benefit.otherTermsAndConditions.allowWithOtherBenefit
+              type: BOOLEAN
+              dbType: BOOLEAN
+            - jsonPath: $.Benefit.otherTermsAndConditions.allowForOneYearIfFailed
+              type: BOOLEAN
+              dbType: BOOLEAN
+            - jsonPath: $.Benefit.otherTermsAndConditions.applicationDeadlineDate
+              type: LONG
+              dbType: BIGINT
+            - jsonPath: $.Benefit.otherTermsAndConditions.autoRenewalApplicable
+              type: BOOLEAN
+              dbType: BOOLEAN
+            - jsonPath: $.Benefit.otherTermsAndConditions.validTillDate
+              type: LONG
+              dbType: BIGINT
+            - jsonPath: $.Benefit.auditDetails.lastModifiedBy
+              type: STRING
+              dbType: VARCHAR
+            - jsonPath: $.Benefit.auditDetails.lastModifiedTime
+              type: LONG
+              dbType: BIGINT
+            - jsonPath: $.Benefit.benefitId
+              type: STRING
+              dbType: VARCHAR
+
+
+    - version: 1.0
+      name: Update Benefits Status
+      description: Updates the status and application_start date to current date for a specific benefit
+      fromTopic: publish-benefits-data
+      isTransaction: true
+      queryMaps:
+        - query: |
+            UPDATE benefits SET 
+              status = COALESCE(?, status),
+              application_start = CURRENT_DATE
+            WHERE benefit_id = ?;
+          basePath: $.Benefit
+          jsonMaps:
+            - jsonPath: $.Benefit.status
+              type: STRING
+              dbType: VARCHAR
+            - jsonPath: $.Benefit.benefitId
+              type: STRING
+              dbType: VARCHAR
+

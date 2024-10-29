@@ -28,25 +28,42 @@ import lombok.Builder;
 @NoArgsConstructor
 @Builder
 public class Sponsor {
-    @JsonProperty("benefitId")
-    private String benefitId = null;
+    @JsonProperty("id")
+    private String id = null;
 
     @JsonProperty("benefitSponsor")
     @NotNull
-    private String sponsorName = null;
+    private String sponsorName;
+
+    @JsonProperty("sponsorEntity")
+    @NotNull
+    private SponsorEntityEnum entityType;
+
+    @JsonProperty("sponsorShare")
+    @NotNull
+    @Valid
+    @DecimalMin(value = "0.00", inclusive = true, message = "Share percent must be at least 0")
+    @DecimalMax(value = "100.00", inclusive = true, message = "Share percent must not exceed 100")
+    @Digits(integer = 3, fraction = 2, message = "Share percent must have at most two digits after the decimal point")
+    private BigDecimal sharePercent;
+
+    @JsonProperty("type")
+    @NotNull
+    @Valid
+    private SponsorType type;
 
     public enum SponsorEntityEnum {
-        NON_PROFIT("Non-Profit"),
+        NON_PROFIT("NON_PROFIT"),
 
-        CORPORATE("Corporate"),
+        CORPORATE("CORPORATE"),
 
-        GOVERNMENT("Government"),
+        GOVERNMENT("GOVERNMENT"),
 
-        INSTITUTE("Institute"),
+        INSTITUTE("INSTITUTE"),
 
-        FOUNDATION("Foundation"),
+        FOUNDATION("FOUNDATION"),
 
-        INDIVIDUAL("Individual");
+        INDIVIDUAL("INDIVIDUAL");
 
         private String value;
 
@@ -71,18 +88,27 @@ public class Sponsor {
         }
     }
 
-    @JsonProperty("sponsorEntity")
-    @NotNull
-    private SponsorEntityEnum entityType = null;
+    public enum SponsorType {
+        PRIMARY("PRIMARY"),
+        SECONDARY("SECONDARY");
 
-    @JsonProperty("sponsorShare")
-    @NotNull
-    @Valid
-    private Float sharePercent = null;
+        private final String value;
 
-    @JsonProperty("type")
-    @NotNull
-    @Valid
-    private String type;
+        SponsorType(String value) {
+            this.value = value;
+        }
 
+        public String getValue() {
+            return value;
+        }
+
+        public static SponsorType fromValue(String value) {
+            for (SponsorType type : SponsorType.values()) {
+                if (type.value.equalsIgnoreCase(value)) {
+                    return type;
+                }
+            }
+            throw new IllegalArgumentException("Invalid SponsorType: " + value);
+        }
+    }
 }
