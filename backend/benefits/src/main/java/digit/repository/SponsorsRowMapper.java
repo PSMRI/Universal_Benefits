@@ -12,12 +12,11 @@ public class SponsorsRowMapper implements RowMapper<Sponsor> {
         Sponsor sponsor=new Sponsor();
    //     sponsor.setBenefitId(rs.getString("benefit_id"));
         sponsor.setSponsorName(rs.getString("sponsor_name"));
-//        sponsor.setSharePercent(rs.getFloat("share_percent"));
-//        sponsor.setType(rs.getString("type"));
-//
-//        String statusString = rs.getString("entity_type");
-//        Sponsor.SponsorEntityEnum sponsorEntityEnum= Sponsor.SponsorEntityEnum.fromValue(statusString);
-    //    sponsor.setEntityType(sponsorEntityEnum);
+       sponsor.setSharePercent(rs.getBigDecimal("share_percent"));
+      // sponsor.setType(rs.getString("type"));
+
+      String statusString = rs.getString("entity_type");       Sponsor.SponsorEntityEnum sponsorEntityEnum= Sponsor.SponsorEntityEnum.fromValue(statusString);
+       sponsor.setEntityType(sponsorEntityEnum);
         return sponsor;
     }
 }
