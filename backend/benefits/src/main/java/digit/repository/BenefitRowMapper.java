@@ -1,6 +1,6 @@
 package digit.repository;
-
 import digit.web.models.*;
+import digit.web.models.Benefit.BenefitsStatusEnum;
 import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;
@@ -9,14 +9,17 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class BenefitSearchRowMapper implements RowMapper<Benefit> {
+import digit.web.models.Benefit;
+import org.springframework.jdbc.core.RowMapper;
+
+public class BenefitRowMapper implements RowMapper<Benefit> {
     @Override
     public Benefit mapRow(ResultSet rs, int rowNum) throws SQLException {
         Benefit benefit = new Benefit();
-        EligibilityCriteria eligibilityCriteria = new EligibilityCriteria();
-        FinancialInformation financialInformation = new FinancialInformation();
-        OtherTermsAndConditions otherTermsAndConditions = new OtherTermsAndConditions();
-        List<Sponsor> lstSponsors = new ArrayList<>();
+        EligibilityCriteria eligibilityCriteria=new EligibilityCriteria();
+        FinancialInformation financialInformation=new FinancialInformation();
+        OtherTermsAndConditions otherTermsAndConditions=new OtherTermsAndConditions();
+        List<Sponsor> lstSponsors=new ArrayList<>();
 
         benefit.setBenefitId(rs.getString("benefit_id"));
         benefit.setBenefitName(rs.getString("benefit_name"));
@@ -25,7 +28,7 @@ public class BenefitSearchRowMapper implements RowMapper<Benefit> {
 
         // Convert status (String) to BenefitsStatusEnum
         String statusString = rs.getString("status");
-        Benefit.BenefitsStatusEnum statusEnum = Benefit.BenefitsStatusEnum.fromValue(statusString);
+        BenefitsStatusEnum statusEnum = BenefitsStatusEnum.fromValue(statusString);
         benefit.setStatus(statusEnum);
 
         // Map other fields as needed...
@@ -42,16 +45,16 @@ public class BenefitSearchRowMapper implements RowMapper<Benefit> {
         eligibilityCriteria.setEligibleChildren(rs.getString("eligibility_eligible_children"));
 
 
-        String genderString = rs.getString("eligibility_gender");
-        EligibilityCriteria.GenderEnum genderEnum = EligibilityCriteria.GenderEnum.fromValue(genderString);
+        String genderString=rs.getString("eligibility_gender");
+        EligibilityCriteria.GenderEnum genderEnum= EligibilityCriteria.GenderEnum.fromValue(genderString);
         eligibilityCriteria.setGender(genderEnum);
 
-//        String casteString = rs.getString("eligibility_caste");
-//        EligibilityCriteria.CasteEnum casteEnum = EligibilityCriteria.CasteEnum.fromValue(casteString);
+       /* String casteString=rs.getString("eligibility_caste");
+        EligibilityCriteria.CasteEnum casteEnum= EligibilityCriteria.CasteEnum.fromValue(casteString);*/
         eligibilityCriteria.setCaste(rs.getString("eligibility_caste"));
 
-        String studenTypeString = rs.getString("eligibility_student_type");
-        EligibilityCriteria.StudentTypeEnum studentTypeEnum = EligibilityCriteria.StudentTypeEnum.fromValue(studenTypeString);
+        String studenTypeString=rs.getString("eligibility_student_type");
+        EligibilityCriteria.StudentTypeEnum studentTypeEnum= EligibilityCriteria.StudentTypeEnum.fromValue(studenTypeString);
         eligibilityCriteria.setStudentType(studentTypeEnum);
         benefit.setEligibility(eligibilityCriteria);
         //Elgibility criteria ends
@@ -62,12 +65,13 @@ public class BenefitSearchRowMapper implements RowMapper<Benefit> {
         financialInformation.setMaxBeneficiaryAllowed(rs.getInt("finance_max_beneficiary_allowed"));
         benefit.setFinancialInformation(financialInformation);
         //......................Finacial Information Ends
+        //......................Finacial Information Ends
 
         //OtherTermsAndConditions starts
-    /*    otherTermsAndConditions.setAllowWithOtherBenefit(rs.getBoolean("allow_with_other_benefit"));
+/*        otherTermsAndConditions.setAllowWithOtherBenefit(rs.getBoolean("allow_with_other_benefit"));
         otherTermsAndConditions.setAllowOneYearIfFailed(rs.getBoolean("allow_one_year_if_failed"));
         otherTermsAndConditions.setApplicationDeadlineDate(rs.getDate("application_end"));
-        //otherTermsAndConditions.setExtendedDeadlineDate(rs.getDate("new_deadline"));
+        otherTermsAndConditions.setExtendedDeadlineDate(rs.getDate("new_deadline"));
         otherTermsAndConditions.setAutoRenewalApplicable(rs.getBoolean("auto_renew_applicable"));
         otherTermsAndConditions.setValidTillDate(rs.getDate("valid_till_date"));
         benefit.setOtherTermsAndConditions(otherTermsAndConditions);*/
