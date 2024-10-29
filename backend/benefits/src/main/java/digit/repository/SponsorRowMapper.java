@@ -49,8 +49,9 @@ public class SponsorRowMapper implements  RowMapper<Map<String, Benefit>> {
             Sponsor sponsor = new Sponsor();
             sponsor.setSponsorName(rs.getString("benefit_sponsor"));
             //sponsor.setSponsorEntity(rs.getString("sponsor_entity"));
-            sponsor.setSharePercent(rs.getFloat("sponsor_share"));
-            sponsor.setType(rs.getString("sponsor_type"));
+            sponsor.setSharePercent(rs.getBigDecimal("sponsor_share"));
+            String sponsorType = rs.getString("sponsor_type");
+            sponsor.setType(Sponsor.SponsorType.valueOf(sponsorType));
 
             benefit.getSponsors().add(sponsor);
         }
