@@ -1,0 +1,51 @@
+serviceMaps:
+  serviceName: Customer
+  mappings:
+    - version: 1.0
+      name: Customer Data
+      description: Persists and updates customer data in the database
+      fromTopic: save-customer-data
+      isTransaction: true
+      queryMaps:
+        # Insert Query - If customer ID does not exist
+        - query: |
+            INSERT INTO customer (id, name, email, phone, gender, order_id, transaction_id, submission_id, content_id)
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT (id) DO UPDATE SET 
+            name = EXCLUDED.name,
+            email = EXCLUDED.email,
+            phone = EXCLUDED.phone,
+            gender = EXCLUDED.gender,
+            order_id = EXCLUDED.order_id,
+            transaction_id = EXCLUDED.transaction_id,
+            submission_id = EXCLUDED.submission_id,
+            content_id = EXCLUDED.content_id;
+          basePath: $.Customer
+          jsonMaps:
+            - jsonPath: $.Customer.id
+              type: STRING
+              dbType: VARCHAR
+            - jsonPath: $.Customer.name
+              type: STRING
+              dbType: VARCHAR
+            - jsonPath: $.Customer.email
+              type: STRING
+              dbType: VARCHAR
+            - jsonPath: $.Customer.phone
+              type: STRING
+              dbType: VARCHAR
+            - jsonPath: $.Customer.gender
+              type: STRING
+              dbType: VARCHAR
+            - jsonPath: $.Customer.order_id
+              type: STRING
+              dbType: VARCHAR
+            - jsonPath: $.Customer.transaction_id
+              type: STRING
+              dbType: VARCHAR
+            - jsonPath: $.Customer.submission_id
+              type: STRING
+              dbType: VARCHAR
+            - jsonPath: $.Customer.content_id
+              type: STRING
+              dbType: VARCHAR
