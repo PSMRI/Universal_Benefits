@@ -1,4 +1,5 @@
 package digit.repository;
+import digit.repository.Utility.DateUtils;
 import digit.web.models.*;
 import digit.web.models.Benefit.BenefitsStatusEnum;
 import org.springframework.jdbc.core.RowMapper;
@@ -19,6 +20,7 @@ public class BenefitRowMapper implements RowMapper<Benefit> {
         EligibilityCriteria eligibilityCriteria=new EligibilityCriteria();
         FinancialInformation financialInformation=new FinancialInformation();
         OtherTermsAndConditions otherTermsAndConditions=new OtherTermsAndConditions();
+        AuditDetails auditDetails=new AuditDetails();
         List<Sponsor> lstSponsors=new ArrayList<>();
 
         benefit.setBenefitId(rs.getString("benefit_id"));
@@ -63,19 +65,36 @@ public class BenefitRowMapper implements RowMapper<Benefit> {
         financialInformation.setParentOccupation(rs.getString("finance_parent_occupation"));
         financialInformation.setMaxBeneficiaryLimit(rs.getBoolean("finance_max_beneficiary_limit_allowed"));
         financialInformation.setMaxBeneficiaryAllowed(rs.getInt("finance_max_beneficiary_allowed"));
+        //financialInformation.setAmountPerBeneficiaryCategory();
         benefit.setFinancialInformation(financialInformation);
-        //......................Finacial Information Ends
         //......................Finacial Information Ends
 
         //OtherTermsAndConditions starts
-/*        otherTermsAndConditions.setAllowWithOtherBenefit(rs.getBoolean("allow_with_other_benefit"));
+        otherTermsAndConditions.setAllowWithOtherBenefit(rs.getBoolean("allow_with_other_benefit"));
         otherTermsAndConditions.setAllowOneYearIfFailed(rs.getBoolean("allow_one_year_if_failed"));
-        otherTermsAndConditions.setApplicationDeadlineDate(rs.getDate("application_end"));
         otherTermsAndConditions.setExtendedDeadlineDate(rs.getDate("new_deadline"));
         otherTermsAndConditions.setAutoRenewalApplicable(rs.getBoolean("auto_renew_applicable"));
-        otherTermsAndConditions.setValidTillDate(rs.getDate("valid_till_date"));
-        benefit.setOtherTermsAndConditions(otherTermsAndConditions);*/
+
+        long validTillDateTimestamp = rs.getLong("valid_till_date");
+        otherTermsAndConditions.setValidTillDate(DateUtils.convertBigintToDate(validTillDateTimestamp));
+
+        long applicationEndTimestamp = rs.getLong("application_end");
+        otherTermsAndConditions.setApplicationDeadlineDate(DateUtils.convertBigintToDate(applicationEndTimestamp));
+
+        long applicationEndExtendedTimestamp = rs.getLong("application_end_extended");
+        otherTermsAndConditions.setExtendedDeadlineDate(DateUtils.convertBigintToDate(applicationEndExtendedTimestamp));
+
+        benefit.setOtherTermsAndConditions(otherTermsAndConditions);
         //...................OtherTermsAndConditions ends
+
+
+        //Audit Details
+        auditDetails.setCreatedBy(rs.getString("created_by"));
+        auditDetails.setCreatedTime(rs.getLong("created_time"));
+        auditDetails.setLastModifiedBy(rs.getString("last_modified_by"));
+        auditDetails.setLastModifiedTime(rs.getLong("last_modified_time"));
+        benefit.setAuditDetails(auditDetails);
+        //ends
         benefit.setSponsors(lstSponsors);
 
         /*benefit.setEligibilityGender(rs.getString("eligibility_gender"));
