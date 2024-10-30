@@ -55,7 +55,7 @@ import java.util.*;
 
 
 
-    @RequestMapping(value="v1/_create", method = RequestMethod.POST)
+    @RequestMapping(value="v1/_upsert", method = RequestMethod.POST)
     public ResponseEntity<CustomerResponse> customerV1CreatePost(
             @Parameter(in = ParameterIn.DEFAULT, description = "Details for the new customer record + RequestInfo metadata.", required=true, schema=@Schema())
             @Valid @RequestBody CustomerRequest body) {
