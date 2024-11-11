@@ -76,9 +76,10 @@ public class Customer   {
             }
             return null;
             }
-            }        @JsonProperty("gender")
+            }
 
-                private GenderEnum gender = null;
+            @JsonProperty("gender")
+                private String gender = null;
 
         @JsonProperty("order_id")
 
