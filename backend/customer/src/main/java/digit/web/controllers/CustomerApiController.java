@@ -3,26 +3,19 @@ package digit.web.controllers;
 
 import digit.config.Configuration;
 import digit.kafka.Producer;
+import digit.service.CustomerService;
 import digit.web.models.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.bind.annotation.RequestMapping;
-import java.io.IOException;
 import java.util.*;
 
     import jakarta.validation.constraints.*;
@@ -42,15 +35,79 @@ import java.util.*;
 
         private final Configuration configuration;
 
+        private final CustomerService customerService;
+
 
     @Autowired
-        public CustomerApiController(ObjectMapper objectMapper, HttpServletRequest request,Producer producer, Configuration configuration) {
+        public CustomerApiController(ObjectMapper objectMapper, HttpServletRequest request,Producer producer, Configuration configuration, CustomerService customerService) {
         this.objectMapper = objectMapper;
         this.request = request;
         this.producer =  producer;
         this.configuration=configuration;
+        this.customerService=customerService;
 
         }
+
+
+//Get Customer by Id
+
+    @RequestMapping(value="v1/_get", method = RequestMethod.POST)
+    public ResponseEntity<CustomerResponse> getCustomerById(
+            @Parameter(in = ParameterIn.DEFAULT, description = "Request metadata + Customer ID to fetch.", required=true, schema=@Schema())
+            @RequestBody CustomerRequest body) {
+
+        String accept = request.getHeader("Accept");
+        System.out.println("Received Get Customer Request: " + body);
+
+        if (accept != null && accept.contains("application/json")) {
+            try {
+                // Assuming there’s a service or repository method to fetch customer by ID
+                String customerId = body.getCustomer().getId();
+                Customer customer = customerService.getCustomerById(customerId);  // Use your service/repository layer to fetch data
+
+                if (customer == null) {
+                    return new ResponseEntity<>(HttpStatus.NOT_FOUND);  // If customer is not found, return 404
+                }
+
+                // Build a dynamic CustomerResponse based on fetched customer data
+                CustomerResponse response = new CustomerResponse();
+
+                // Populate ResponseInfo
+                ResponseInfo responseInfo = new ResponseInfo();
+                responseInfo.setApiId("customer-get-api");
+                responseInfo.setVer("1.0");
+                responseInfo.setTs(System.currentTimeMillis());
+                responseInfo.setMsgId("customer-get-success");
+                responseInfo.setStatus(ResponseInfo.StatusEnum.SUCCESSFUL);
+                response.setResponseInfo(responseInfo);
+
+                // Set fetched Customer data in the response
+                response.setCustomer(customer);
+
+                // Return the response with the fetched Customer
+                return new ResponseEntity<>(response, HttpStatus.OK);
+
+            } catch (Exception e) {
+                // Log error details
+                System.err.println("Error fetching customer by ID: " + e.getMessage());
+                e.printStackTrace();
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        }
+
+        // Default response if JSON is not accepted
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+    }
+
+
+
+
+
+
+    //End
+
+
+
 
 
 
