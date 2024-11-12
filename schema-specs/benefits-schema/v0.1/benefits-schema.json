@@ -126,7 +126,7 @@
               }
             }
           },
-          "offeringEntity": {
+          "providingEntity": {
             "type": "object",
             "title": "Offering Entity",
             "description": "Information about the entity providing the benefit.",

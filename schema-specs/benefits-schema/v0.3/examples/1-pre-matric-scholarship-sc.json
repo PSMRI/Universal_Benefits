@@ -4,14 +4,9 @@
       "title": "Pre- Matric Scholarships Scheme for Scheduled Castes & Others",
       "category": "education-and-learning",
       "subCategory": "scholarship",
-      "tags": [
-        "SC",
-        "Financial Assistance",
-        "Scholarship",
-        "Student"
-      ],
-      "openDate": "2024-10-31",
-      "closeDate": "2024-12-31"
+      "tags": ["SC", "Financial Assistance", "Scholarship", "Student"],
+      "applicationOpenDate": "2024-10-31",
+      "applicationCloseDate": "2024-12-31"
     },
     "benefitContent": {
       "imageUrl": "https://fastly.picsum.photos/id/24/200/200.jpg?hmac=Tw5b43UPAehS5e4JyB0qMQysvfLBmu_GZ_iafWou3m8",
@@ -29,7 +24,8 @@
       ],
       "exclusions": [
         {
-          "description": "Duplicate Government Scholarship: Students who are already availing of another government scholarship or financial aid for the same purpose will not be eligible."
+          "description": "Duplicate Government Scholarship: Students who are already availing of another government scholarship or financial aid for the same purpose will not be eligible.",
+          "description_md": ""
         }
       ],
       "references": [
@@ -43,7 +39,7 @@
         }
       ]
     },
-    "offeringEntity": {
+    "providingEntity": {
       "type": "Central Government",
       "name": "Ministry of Social Justice",
       "address": {
@@ -61,7 +57,7 @@
     "sponsoringEntities": [
       {
         "type": "Central Govt.",
-        "sponsorName": "Ministry of Social Justice Department",
+        "name": "Ministry of Social Justice Department",
         "address": {
           "street": "123 Central Avenue",
           "city": "New Delhi",
@@ -77,7 +73,7 @@
       },
       {
         "type": "State Govt.",
-        "sponsorName": "Tribal Welfare Department, Madhya Pradesh",
+        "name": "Tribal Welfare Department, Madhya Pradesh",
         "address": {
           "street": "456 State Highway",
           "city": "Bhopal",
@@ -94,19 +90,23 @@
     ],
     "eligibility": [
       {
-        "type": "education",
-        "clause": "The applicant must be a student studying in Class 9th or Class 10th",
+        "type": "educational",
+        "description": "The applicant must be a student studying in Class 9th or Class 10th",
         "evidence": "class",
         "criteria": {
           "name": "class",
           "condition": "in",
           "conditionValues": ["9", "10"]
         },
-        "allowedproofs": ["academicCertificate", "bonafideCertificate", "enrollmentCertificate"]
+        "allowedproofs": [
+          "academicCertificate",
+          "bonafideCertificate",
+          "enrollmentCertificate"
+        ]
       },
       {
         "type": "personal",
-        "clause": "The applicant must be from Scheduled Caste",
+        "description": "The applicant must be from Scheduled Caste",
         "evidence": "caste",
         "criteria": {
           "name": "caste",
@@ -116,8 +116,8 @@
         "allowedproofs": ["casteCertificate"]
       },
       {
-        "type": "economic",
-        "clause": "The Total Annual income of parents/guardians of the applicant (from all sources) must not exceed ₹ 2.50 Lakh per Annum",
+        "type": "economical",
+        "description": "The Total Annual income of parents/guardians of the applicant (from all sources) must not exceed ₹ 2.50 Lakh per Annum",
         "evidence": "annualIncome",
         "criteria": {
           "name": "annualIncome",
@@ -128,7 +128,7 @@
       },
       {
         "type": "geographical",
-        "clause": "The applicant must be from Madhya Pradesh state",
+        "description": "The applicant must be from Madhya Pradesh state",
         "evidence": "state",
         "criteria": {
           "name": "state",
@@ -230,8 +230,7 @@
           {
             "value": "500000",
             "label": "₹2,50,001 - ₹5,00,000"
-          }
-          ,
+          },
           {
             "value": "750000",
             "label": "₹5,00,001 - ₹7,50,000"

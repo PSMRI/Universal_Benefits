@@ -33,7 +33,7 @@
         }
       ]
     },
-    "offeringEntity": {
+    "providingEntity": {
       "type": "Central Government",
       "name": "Ministry of Social Justice",
       "address": {

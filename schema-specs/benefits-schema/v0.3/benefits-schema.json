@@ -9,6 +9,16 @@
     "en": {
       "type": "object",
       "title": "English Version",
+      "required": [
+        "basicDetails",
+        "benefitContent",
+        "providingEntity",
+        "sponsoringEntities",
+        "eligibility",
+        "documents",
+        "applicationProcess",
+        "applicationForm"
+      ],
       "properties": {
         "basicDetails": {
           "type": "object",
@@ -31,18 +41,6 @@
               "title": "Benefit SubCategory",
               "description": "Subcategory under the benefit."
             },
-            "openDate": {
-              "type": "string",
-              "title": "Benefit Open Date",
-              "description": "The date when the benefit opens for application.",
-              "format": "date"
-            },
-            "closeDate": {
-              "type": "string",
-              "title": "Benefit Close Date",
-              "description": "The date when the benefit closes for application.",
-              "format": "date"
-            },
             "tags": {
               "type": "array",
               "title": "Tags",
@@ -51,6 +49,18 @@
                 "type": "string",
                 "title": "Tag"
               }
+            },
+            "applicationOpenDate": {
+              "type": "string",
+              "title": "Benefit Open Date",
+              "description": "The date when the benefit opens for application.",
+              "format": "date"
+            },
+            "applicationCloseDate": {
+              "type": "string",
+              "title": "Benefit Close Date",
+              "description": "The date when the benefit closes for application.",
+              "format": "date"
             }
           }
         },
@@ -58,7 +68,7 @@
           "type": "object",
           "title": "Benefit Content",
           "description": "Content details about the benefit.",
-          "required": ["longDescription"],
+          "required": ["shortDescription", "longDescription", "benefits"],
           "properties": {
             "imageUrl": {
               "type": "string",
@@ -106,6 +116,11 @@
                     "type": "string",
                     "title": "Benefit Description",
                     "description": "Description of the specific benefit."
+                  },
+                  "description_md": {
+                    "type": "string",
+                    "title": "Benefit Description Markdown",
+                    "description": "Description of the specific benefit in markdown format"
                   }
                 },
                 "minItems": 1
@@ -122,11 +137,15 @@
                     "type": "string",
                     "title": "Exclusion Description",
                     "description": "Details about specific exclusions from the benefit."
+                  },
+                  "description_md": {
+                    "type": "string",
+                    "title": "Exclusion Description Markdown",
+                    "description": "Details about specific exclusions from the benefit in markdown format"
                   }
                 },
                 "required": ["description"]
-              },
-              "minItems": 1
+              }
             },
             "references": {
               "type": "array",
@@ -134,11 +153,11 @@
                 "type": "object",
                 "required": ["link", "title"],
                 "properties": {
-                  "type": {
+                  "link": {
                     "type": "string",
                     "title": "Benefit Reference Link"
                   },
-                  "description": {
+                  "title": {
                     "type": "string",
                     "title": "Benefit Reference Link Title"
                   }
@@ -149,7 +168,7 @@
         },
         "providingEntity": {
           "type": "object",
-          "title": "Offering Entity",
+          "title": "Providing Entity",
           "description": "Information about the entity providing the benefit.",
           "required": ["type", "name", "address", "department", "contactInfo"],
           "properties": {
@@ -217,7 +236,7 @@
             }
           }
         },
-        "sponsoringEntity": {
+        "sponsoringEntities": {
           "type": "array",
           "title": "Sponsoring Entity",
           "description": "Information about the sponsoring entity/entities.",
@@ -229,7 +248,7 @@
                 "title": "Entity Type",
                 "description": "The type or category of the sponsoring entity."
               },
-              "sponsorName": {
+              "name": {
                 "type": "string",
                 "title": "Sponsor Name",
                 "description": "The name of the sponsoring entity."
@@ -293,7 +312,7 @@
               }
             },
             "required": [
-              "sponsorName",
+              "name",
               "address",
               "department",
               "contactInfo",
@@ -302,53 +321,73 @@
           },
           "minItems": 1
         },
-        "eligibilityCriteria": {
-          "type": "object",
+        "eligibility": {
+          "type": "array",
           "title": "Eligibility Criteria",
           "description": "Criteria for determining eligibility for the benefit.",
-          "properties": {
-            "eligibilityDescription_md": {
-              "type": "string",
-              "title": "Eligibility Description (Markdown)",
-              "description": "A detailed description of the eligibility criteria, in Markdown format."
-            },
-            "eligibilityDescription": {
-              "type": "array",
-              "title": "Eligibility Description",
-              "description": "A nested description of the eligibility criteria with structured text.",
-              "items": {
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "title": "Eligibility Type",
+                "description": "The type of eligibility (e.g., 'education', 'personal', 'geographical', 'economical')."
+              },
+              "description": {
+                "type": "string",
+                "title": "Eligibility Description",
+                "description": "The type of eligibility description"
+              },
+              "evidence": {
+                "type": "string",
+                "title": "Eligibility Evidence",
+                "description": "The type of eligibility evidence"
+              },
+              "criteria": {
                 "type": "object",
+                "title": "Eligibility Criteria",
+                "description": "Eligibility criteria",
                 "properties": {
-                  "type": {
+                  "name": {
                     "type": "string",
-                    "title": "Criteria Type",
-                    "description": "The type of eligibility criteria (e.g., 'Age', 'Income')."
+                    "title": "Eligibility Criteria Name",
+                    "description": "Eligibility Criteria Name"
                   },
-                  "children": {
-                    "type": "array",
-                    "title": "Sub-Criteria",
-                    "description": "Nested criteria or conditions.",
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "type": {
-                          "type": "string",
-                          "title": "Sub-Criteria Type",
-                          "description": "The type of sub-criteria."
+                  "condition": {
+                    "type": "string",
+                    "title": "Eligibility Condition",
+                    "description": "Eligibility condition"
+                  },
+                  "conditionValues": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
                         }
                       }
-                    }
+                    ]
                   }
                 },
-                "required": ["type", "children"]
+                "required": ["name", "condition", "conditionValues"]
               }
-            }
+            },
+            "required": [
+              "type",
+              "description",
+              "evidence",
+              "criteria",
+              "allowedproofs"
+            ]
           }
         },
-        "benefitDocuments": {
+        "documents": {
           "type": "array",
-          "title": "Benefit Documents",
-          "description": "Documents related to the benefit.",
+          "title": "Documents",
+          "description": "Documents required to avail the benefit.",
           "items": {
             "type": "object",
             "properties": {
@@ -357,13 +396,21 @@
                 "title": "Document Type",
                 "description": "Type of the document, e.g., Proof of Identity."
               },
-              "isRequierd": {
+              "isRequired": {
                 "type": "boolean",
                 "title": "Is Required?",
                 "description": "Document is required?"
+              },
+              "allowedproofs": {
+                "type": "array",
+                "title": "Allowed proofs",
+                "description": "Allowed proof for this document type",
+                "items": {
+                  "type": "string"
+                }
               }
             },
-            "required": ["documentType", "isRequierd"]
+            "required": ["documentType", "isRequired", "allowedproofs"]
           },
           "minItems": 1
         },
@@ -387,33 +434,60 @@
         },
         "applicationForm": {
           "type": "array",
-          "title": "Application Forms",
+          "title": "Application Form",
           "description": "Details about the application forms required to apply for the benefit.",
           "items": {
             "type": "object",
-            "required": ["type", "name", "required"],
+            "required": ["type", "name", "label", "required"],
             "properties": {
               "type": {
                 "type": "string",
-                "title": "Form Type",
-                "description": "The type of application form."
+                "title": "Field Type",
+                "description": "The type of the form field."
               },
               "name": {
                 "type": "string",
-                "title": "Form Name",
-                "description": "The name of the application form."
+                "title": "Field Name",
+                "description": "The name of the form field."
+              },
+              "label": {
+                "type": "string",
+                "title": "Field Label",
+                "description": "The label of the form field."
               },
               "required": {
+                "type": "boolean",
+                "title": "Is this field required?",
+                "description": "Is this field required?"
+              },
+              "options": {
                 "type": "array",
-                "title": "Required Fields",
-                "description": "List of required fields in the application form.",
+                "title": "Field options",
+                "description": "Field options for checkbox / radio / select",
                 "items": {
-                  "type": "string"
+                  "type": "object",
+                  "properties": {
+                    "label": {
+                      "type": "string",
+                      "title": "Field Option Label",
+                      "description": "Field option label."
+                    },
+                    "value": {
+                      "type": "string",
+                      "title": "Field Option Value",
+                      "description": "Field option value."
+                    }
+                  }
                 }
+              },
+              "multiple": {
+                "type": "boolean",
+                "title": "Is this multiselect field?",
+                "description": "Is this multiselect field?"
               }
-            }
-          },
-          "minItems": 1
+            },
+            "minItems": 1
+          }
         }
       }
     }

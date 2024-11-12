@@ -28,7 +28,7 @@
         }
       ]
     },
-    "offeringEntity": {
+    "providingEntity": {
       "type": "Ministry",
       "name": "Ministry of Tribal Welfare",
       "address": {
