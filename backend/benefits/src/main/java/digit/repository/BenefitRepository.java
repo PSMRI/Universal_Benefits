@@ -226,27 +226,26 @@ public class BenefitRepository {
     public BenefitInfo getBenefitBriefDetails(String benefitId)
     {
         Benefit benefit=new Benefit();
-        BenefitInfo benefitResponse=new BenefitInfo();
+        List<BenefitInfo> benefitResponse=new ArrayList<>();
+        BenefitInfo response=new BenefitInfo();
         List<Sponsor> sponsors=new ArrayList<>();
         String sql = "SELECT " +
                 "b.benefit_id AS id, " +
-                "b.price, " +
-                "b.application_deadline, " +
-                "array_agg(DISTINCT be.new_deadline) AS extended_deadlines " +
+                "b.application_end, " +
+                "array_agg(be.new_deadline) AS extended_deadlines " +
                 "FROM public.benefits b " +
                 "LEFT JOIN public.benefit_extensions be ON b.benefit_id = be.benefit_id " +
                 "WHERE b.benefit_id = ? " +
-                "GROUP BY b.benefit_id, b.price, b.application_deadline";
+                "GROUP BY b.benefit_id, b.application_end";
 
         // jdbcTemplate.execute(sql);
-        benefitResponse = jdbcTemplate.queryForObject(sql, new Object[]{benefitId}, new BenefitBriefDetailsRowMapper());
-
-
+        benefitResponse = jdbcTemplate.query(sql, new Object[]{benefitId}, new BenefitBriefDetailsRowMapper());
+        response=benefitResponse.get(0);
         String sql1 = "SELECT * FROM benefit_sponsor where benefit_id= ?";// Your SQL query
         // jdbcTemplate.execute(sql1);
         sponsors= jdbcTemplate.query(sql1, new SponsorsRowMapper(),benefitId);
-        benefitResponse.setSponsors(sponsors);
-        return  benefitResponse;
+        response.setSponsors(sponsors);
+        return  response;
     }
 
 
