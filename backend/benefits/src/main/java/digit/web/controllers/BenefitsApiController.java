@@ -179,13 +179,44 @@ public class BenefitsApiController {
             return new ResponseEntity<>(response,HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    @RequestMapping(value="/v1/_search", method = RequestMethod.POST)
+   /* @RequestMapping(value="/v1/_search", method = RequestMethod.POST)
     public ResponseEntity<List<Benefit>> search(@RequestBody SearchCriteria searchCriteria)
     {
         List<Benefit> response=new ArrayList<>();
         try
         {
             response=benefitService.search(searchCriteria);
+            return new ResponseEntity<>(response,HttpStatus.ACCEPTED);
+        }
+        catch (Exception ex)
+        {
+            return new ResponseEntity<>(response,HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }*/
+
+    @RequestMapping(value="/v1/_search", method = RequestMethod.POST)
+    public ResponseEntity<List<BenefitStatusCount>> search(@RequestBody SearchCriteria searchCriteria)
+    {
+        List<BenefitStatusCount> response=new ArrayList<>();
+        try
+        {
+            response=benefitService.getApplicantionsStatusCount_Benefitwise(searchCriteria);
+            return new ResponseEntity<>(response,HttpStatus.ACCEPTED);
+        }
+        catch (Exception ex)
+        {
+            return new ResponseEntity<>(response,HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
+    @RequestMapping(value="/v1/collapse/_get", method = RequestMethod.POST)
+    public ResponseEntity<BenefitCollapseResponse> getBenefitBriefDetails(@RequestBody BenefitGetRequest request)
+    {
+        BenefitCollapseResponse response=new BenefitCollapseResponse();
+        try
+        {
+            response=benefitService.getBenefitBriefDetails(request.getBenefitId());
             return new ResponseEntity<>(response,HttpStatus.ACCEPTED);
         }
         catch (Exception ex)

@@ -1,9 +1,6 @@
 package digit.repository;
 
-import digit.web.models.Benefit;
-import digit.web.models.BenefitSearchResponse;
-import digit.web.models.BenefitStatusUpdateRequestModel;
-import digit.web.models.Sponsor;
+import digit.web.models.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -147,5 +144,110 @@ public class BenefitRepository {
 
         return  sponsors;
     }
+   /* public List<BenefitStatusCount> getBenefitStatusCounts() {
+        String sql = "SELECT b.benefit_id, b.benefit_name, b.application_end, " +
+                "COUNT(CASE WHEN a.status = 'Approved' THEN 1 END) AS approved_count, " +
+                "COUNT(CASE WHEN a.status = 'Rejected' THEN 1 END) AS rejected_count, " +
+                "COUNT(*) AS total_applications " +  // Fixed spacing here
+                "FROM public.benefits b " +
+                "LEFT JOIN public.eg_ubp_application a ON b.benefit_id = a.program_code " +
+                "GROUP BY b.benefit_id, b.benefit_name, b.application_end";
+
+        // Use the BenefitStatusCountRowMapper
+        return jdbcTemplate.query(sql, new BenefitStatusCountRowMapper());
+    }*/
+    public List<BenefitStatusCount> getBenefitStatusCount(SearchCriteria filter) {
+        StringBuilder sql = new StringBuilder(
+                "SELECT b.benefit_id, b.benefit_name, b.application_end, " +
+                        "COUNT(CASE WHEN a.status = 'Approved' THEN 1 END) AS approved_count, " +
+                        "COUNT(CASE WHEN a.status = 'Rejected' THEN 1 END) AS rejected_count, " +
+                        "COUNT(*) AS total_applications " +
+                        "FROM public.benefits b " +
+                        "LEFT JOIN public.eg_ubp_application a ON b.benefit_id = a.program_code " +
+                        "WHERE 1 = 1 "
+        );
+
+        // Apply filters dynamically
+        if (filter.getName() != null) {
+            sql.append("AND b.benefit_name ILIKE ? ");
+        }
+        if (filter.getValidTill() != null) {
+            sql.append("AND b.valid_till_date <= ? ");
+        }
+        if (filter.getCreatedStart() != null) {
+            sql.append("AND b.created_time >= ? ");
+        }
+        if (filter.getCreatedEnd() != null) {
+            sql.append("AND b.created_time <= ? ");
+        }
+        if (filter.getStatus() != null) {
+            sql.append("AND b.status = ? ");
+        }
+
+        sql.append("GROUP BY b.benefit_id, b.benefit_name, b.application_end ");
+
+        // Add sorting logic
+        if ("benefit_name".equals(filter.getSortBy())) {
+            sql.append("ORDER BY b.benefit_name ");
+        } else {
+            sql.append("ORDER BY b.benefit_id "); // Default sorting
+        }
+
+        // Apply pagination
+        sql.append("LIMIT ? OFFSET ?");
+
+        // Prepare the parameters
+        List<Object> params = new ArrayList<>();
+
+        if (filter.getName() != null) {
+            params.add("%" + filter.getName() + "%");
+        }
+        if (filter.getValidTill() != null) {
+            params.add(Long.parseLong(String.valueOf(filter.getValidTill())));
+        }
+        if (filter.getCreatedStart() != null) {
+            params.add(Long.parseLong(String.valueOf(filter.getCreatedStart())));
+        }
+        if (filter.getCreatedEnd() != null) {
+            params.add(Long.parseLong(String.valueOf(filter.getCreatedEnd())));
+        }
+        if (filter.getStatus() != null) {
+            params.add(filter.getStatus());
+        }
+
+        // Pagination params
+        params.add(filter.getPageSize());
+        params.add(filter.getPageNo() * filter.getPageSize()); // offset calculation
+
+        // Execute the query with the dynamically built SQL
+        return jdbcTemplate.query(sql.toString(), params.toArray(), new BenefitStatusCountRowMapper());
+    }
+
+    public BenefitInfo getBenefitBriefDetails(String benefitId)
+    {
+        Benefit benefit=new Benefit();
+        BenefitInfo benefitResponse=new BenefitInfo();
+        List<Sponsor> sponsors=new ArrayList<>();
+        String sql = "SELECT " +
+                "b.benefit_id AS id, " +
+                "b.price, " +
+                "b.application_deadline, " +
+                "array_agg(DISTINCT be.new_deadline) AS extended_deadlines " +
+                "FROM public.benefits b " +
+                "LEFT JOIN public.benefit_extensions be ON b.benefit_id = be.benefit_id " +
+                "WHERE b.benefit_id = ? " +
+                "GROUP BY b.benefit_id, b.price, b.application_deadline";
+
+        // jdbcTemplate.execute(sql);
+        benefitResponse = jdbcTemplate.queryForObject(sql, new Object[]{benefitId}, new BenefitBriefDetailsRowMapper());
+
+
+        String sql1 = "SELECT * FROM benefit_sponsor where benefit_id= ?";// Your SQL query
+        // jdbcTemplate.execute(sql1);
+        sponsors= jdbcTemplate.query(sql1, new SponsorsRowMapper(),benefitId);
+        benefitResponse.setSponsors(sponsors);
+        return  benefitResponse;
+    }
+
 
 }

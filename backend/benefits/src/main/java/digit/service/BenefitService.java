@@ -121,6 +121,35 @@ public class BenefitService
         }
 
     }
+    public List<BenefitStatusCount> getApplicantionsStatusCount_Benefitwise(SearchCriteria filter)
+    {
+        List<BenefitStatusCount> benefits=new ArrayList<>();
+        try
+        {
+            benefits=benefitRepository.getBenefitStatusCount(filter);
+            return  benefits;
+        }
+        catch (Exception e)
+        {
+            return  benefits;
+        }
+
+    }
+    public BenefitCollapseResponse getBenefitBriefDetails(String benefitId)
+    {
+        BenefitCollapseResponse response=new BenefitCollapseResponse();
+        BenefitInfo data=new BenefitInfo();
+        try
+        {
+            data=benefitRepository.getBenefitBriefDetails(benefitId);
+
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
+        return  response;
+    }
     public static boolean isValidBenefitStatus(String status) {
         try {
             ResponseInfo.StatusEnum.valueOf(status.toUpperCase()); // Convert to uppercase for case-insensitivity
