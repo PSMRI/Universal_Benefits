@@ -47,7 +47,7 @@
       ]
     },
     "providingEntity": {
-      "type": "Ministry",
+      "type": "government",
       "name": "Ministry of Tribal Welfare",
       "address": {
         "street": "Some Street",
@@ -63,7 +63,7 @@
     },
     "sponsoringEntities": [
       {
-        "type": "Government",
+        "type": "government",
         "name": "Ministry of Tribal Welfare",
         "address": {
           "street": "Some Street",
@@ -79,7 +79,7 @@
         "sponsorShare": "75"
       },
       {
-        "type": "Government",
+        "type": "government",
         "name": "Tribal Welfare Department, Madhya Pradesh",
         "address": {
           "street": "Some Street",
@@ -105,7 +105,7 @@
           "condition": "in",
           "conditionValues": ["9", "10"]
         },
-        "allowedproofs": [
+        "allowedProofs": [
           "academicCertificate",
           "bonafideCertificate",
           "enrollmentCertificate"
@@ -120,7 +120,7 @@
           "condition": "equals",
           "conditionValues": "st"
         },
-        "allowedproofs": ["casteCertificate"]
+        "allowedProofs": ["casteCertificate"]
       },
       {
         "type": "economical",
@@ -131,7 +131,7 @@
           "condition": "max",
           "conditionValues": "250000"
         },
-        "allowedproofs": ["incomeCertificate"]
+        "allowedProofs": ["incomeCertificate"]
       },
       {
         "type": "geographical",
@@ -142,24 +142,24 @@
           "condition": "equals",
           "conditionValues": "madhyaPradesh"
         },
-        "allowedproofs": ["domicileCertificate"]
+        "allowedProofs": ["domicileCertificate"]
       }
     ],
     "documents": [
       {
         "documentType": "identityProof",
         "isRequired": true,
-        "allowedproofs": ["aadhaar"]
+        "allowedProofs": ["aadhaar"]
       },
       {
         "documentType": "disablityProof",
         "isRequired": false,
-        "allowedproofs": ["disablityCertificate"]
+        "allowedProofs": ["disablityCertificate"]
       },
       {
         "documentType": "hostelerProof",
         "isRequired": false,
-        "allowedproofs": ["hostelAccommodationCertificate"]
+        "allowedProofs": ["hostelAccommodationCertificate"]
       }
     ],
     "applicationProcess": {

@@ -40,7 +40,7 @@
       ]
     },
     "providingEntity": {
-      "type": "Central Government",
+      "type": "government",
       "name": "Ministry of Social Justice",
       "address": {
         "street": "123 Central Avenue",
@@ -56,7 +56,7 @@
     },
     "sponsoringEntities": [
       {
-        "type": "Central Govt.",
+        "type": "government",
         "name": "Ministry of Social Justice Department",
         "address": {
           "street": "123 Central Avenue",
@@ -72,7 +72,7 @@
         "sponsorShare": "60"
       },
       {
-        "type": "State Govt.",
+        "type": "government",
         "name": "Tribal Welfare Department, Madhya Pradesh",
         "address": {
           "street": "456 State Highway",
@@ -98,7 +98,7 @@
           "condition": "in",
           "conditionValues": ["9", "10"]
         },
-        "allowedproofs": [
+        "allowedProofs": [
           "academicCertificate",
           "bonafideCertificate",
           "enrollmentCertificate"
@@ -113,7 +113,7 @@
           "condition": "equals",
           "conditionValues": "sc"
         },
-        "allowedproofs": ["casteCertificate"]
+        "allowedProofs": ["casteCertificate"]
       },
       {
         "type": "economical",
@@ -124,7 +124,7 @@
           "condition": "max",
           "conditionValues": "250000"
         },
-        "allowedproofs": ["incomeCertificate"]
+        "allowedProofs": ["incomeCertificate"]
       },
       {
         "type": "geographical",
@@ -135,24 +135,24 @@
           "condition": "equals",
           "conditionValues": "madhyaPradesh"
         },
-        "allowedproofs": ["domicileCertificate"]
+        "allowedProofs": ["domicileCertificate"]
       }
     ],
     "documents": [
       {
         "documentType": "identityProof",
         "isRequired": true,
-        "allowedproofs": ["aadhaar"]
+        "allowedProofs": ["aadhaar"]
       },
       {
         "documentType": "disablityProof",
         "isRequired": false,
-        "allowedproofs": ["disablityCertificate"]
+        "allowedProofs": ["disablityCertificate"]
       },
       {
         "documentType": "hostelerProof",
         "isRequired": false,
-        "allowedproofs": ["hostelAccommodationCertificate"]
+        "allowedProofs": ["hostelAccommodationCertificate"]
       }
     ],
     "applicationProcess": {
