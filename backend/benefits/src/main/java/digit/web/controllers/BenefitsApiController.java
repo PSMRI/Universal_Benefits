@@ -194,5 +194,20 @@ public class BenefitsApiController {
         }
 
     }
+
+    @RequestMapping(value="/v1/{id}/application", method = RequestMethod.POST)
+    public ResponseEntity<?> getApplicationsByBenefitId(@PathVariable String id)
+    {
+        try
+        {
+            ResponseEntity<?> response=benefitService.getApplicationsByBenefitId(id);
+            return response;
+        }
+        catch (Exception ex)
+        {
+            return new ResponseEntity<>(ex.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
     
 }

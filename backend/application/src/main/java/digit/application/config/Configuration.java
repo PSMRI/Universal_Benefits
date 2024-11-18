@@ -29,8 +29,17 @@ public class Configuration {
     @Value("${egov.idgen.path}")
     private String idGenPath;
 
+    @Value("${egov.fileStore.host}")
+    private String fileStoreHost;
+
+    @Value("${egov.fileStore.path}")
+    private String fileStorePath;
+
     @Value("${egov.idgen.application.format}")
     private String idGenApplicationFormat;
+
+    @Value("${moduleName}")
+    private String moduleName;
 
 
     //Workflow Config

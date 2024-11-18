@@ -1,23 +1,31 @@
 package digit.application.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import digit.application.config.Configuration;
 import digit.application.kafka.Producer;
 import digit.application.repository.ApplicationRepository;
+import digit.application.util.DocumentAddHttpClient;
 import digit.application.util.EnrichmentUtil;
 import digit.application.util.ResponseInfoFactory;
 import digit.application.util.WorkflowUtil;
 import digit.application.validators.BPApplicationValidator;
 import digit.application.web.models.*;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.Response;
 import org.egov.common.contract.response.ResponseInfo;
 import org.egov.common.contract.workflow.State;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.io.IOException;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -36,9 +44,13 @@ public class ApplicationService {
     private RestTemplate restTemplate;
     @Autowired
     private Configuration configs;
+    private final DocumentAddHttpClient httpClient;
 
     @Autowired
-    public ApplicationService(EnrichmentUtil enrichmentUtil, WorkflowUtil workflowUtil, Configuration configuration, Producer producer, ResponseInfoFactory responseInfoFactory, ApplicationRepository applicationRepository,BPApplicationValidator applicationValidator) {
+    public ApplicationService(EnrichmentUtil enrichmentUtil, WorkflowUtil workflowUtil,
+                              Configuration configuration, Producer producer,
+                              ResponseInfoFactory responseInfoFactory, ApplicationRepository applicationRepository,
+                              BPApplicationValidator applicationValidator, DocumentAddHttpClient httpClient) {
         this.enrichmentUtil = enrichmentUtil;
         this.workflowUtil = workflowUtil;
         this.configuration = configuration;
@@ -46,43 +58,125 @@ public class ApplicationService {
         this.responseInfoFactory = responseInfoFactory;
         this.applicationRepository = applicationRepository;
         this.applicationValidator = applicationValidator;
+        this.httpClient = httpClient;
     }
 
-    public ApplicationResponse create(ApplicationRequest applicationRequest) {
-        Application application = applicationRequest.getApplication();
-        ApplicationResponse response = null;
+    public ApplicationResponse create(ApplicationRequest applicationRequest, List<MultipartFile> files) throws JsonProcessingException {
+        try{
+            Application application = applicationRequest.getApplication();
+            ApplicationResponse response = null;
 
-        // TODO: Do custom validations here
-        // For example: programCode, individualId, filestoreIds should be valid
+            applicationValidator.validateBPApplication(applicationRequest, files);
+            this.enrichmentUtil.enrichApplicationForCreation(applicationRequest);
 
-        applicationValidator.validateBPApplication(applicationRequest);
-        this.enrichmentUtil.enrichApplicationForCreation(applicationRequest);
+            log.info("Creating Application: " + application);
 
-        log.info("Creating Application: " + application);
+            int index = 0;
 
-        if (this.configuration.getIsWorkflowEnabled()) {
-            State wfState = workflowUtil.callWorkFlow(workflowUtil.prepareWorkflowRequestForApplication(applicationRequest));
+            List<Document> docList = new ArrayList<>();
+
+            if(!ObjectUtils.isEmpty(files)){
+                for (MultipartFile file : files) {
+                    Response uploadResponse = httpClient.uploadFile(file, application.getTenantId(), configuration.getModuleName(), application.getApplicationNumber());
+
+                    if (uploadResponse.isSuccessful()) {
+                        ObjectMapper objectMapper = new ObjectMapper();
+
+                        JsonNode responseBody = objectMapper.readTree(uploadResponse.body().string());
+                        JsonNode filesArray = responseBody.get("files");
+                        if (filesArray.size() > 0) {
+                            JsonNode firstFile = filesArray.get(0);
+                            String fileStoreId = firstFile.get("fileStoreId").asText();
+
+                            Document document = Document.builder().fileStoreId(fileStoreId).id(UUID.randomUUID().toString()).build();
+
+                            docList.add(document);
+                        } else {
+                            log.error("File not uploaded to fileStore service.");
+                            throw new IOException("Error while uploading documents.");
+                        }
+                        index++;
+                    } else {
+                        log.error("File not uploaded to fileStore service.");
+                        throw new IOException("Error while uploading documents.");
+                    }
+                }
+            }
+
+            if(!docList.isEmpty()){
+                application.setDocuments(docList);
+            }
+
+            if (this.configuration.getIsWorkflowEnabled()) {
+                State wfState = workflowUtil.callWorkFlow(workflowUtil.prepareWorkflowRequestForApplication(applicationRequest));
+                application.setWfStatus(Application.WFStatusEnum.APPROVED);
+            }
+            application.setStatus(Application.StatusEnum.ARCHIVED);
             application.setWfStatus(Application.WFStatusEnum.APPROVED);
-        }
-        application.setStatus(Application.StatusEnum.ARCHIVED);
-        application.setWfStatus(Application.WFStatusEnum.APPROVED);
-        // TODO: Remove after creating the workflow
-//        application.setWfStatus("PENDING_FOR_VERIFICATION"); //
-        producer.push(configuration.getKafkaTopicApplicationCreate(), applicationRequest);
-        log.info("Application pushed successfully: " + application);
-        response = ApplicationResponse.builder()
-                .applications(Arrays.asList(applicationRequest.getApplication()))
-                .responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(applicationRequest.getRequestInfo(), true))
-                .build();
 
-        return response;
+            //String schema = createJsonFromApplicationRequest(applicationRequest);
+            //applicationRequest.getApplication().setSchema(schema);
+
+            producer.push(configuration.getKafkaTopicApplicationCreate(), applicationRequest);
+            log.info("Application pushed successfully: " + application);
+            response = ApplicationResponse.builder()
+                    .applications(Arrays.asList(applicationRequest.getApplication()))
+                    .responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(applicationRequest.getRequestInfo(), true))
+                    .build();
+
+            return response;
+        }catch (IOException e) {
+            log.error(e.getMessage());
+            throw new RuntimeException("Error while uploading documents.");
+        }
+        catch (Exception e) {
+            throw new RuntimeException("Error while adding application - " + e.getMessage());
+        }
     }
 
-    /**
-     * Updates an existing application
-     * @param applicationRequest
-     * @return ApplicationResponse with the updated application
-     */
+    public String createJsonFromApplicationRequest(ApplicationRequest applicationRequest) throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        ArrayNode jsonArray = objectMapper.createArrayNode();
+
+        Application application = applicationRequest.getApplication();
+        Applicant applicant = application.getApplicant();
+
+        addFieldToJson(jsonArray, objectMapper, "id", application.getId());
+        addFieldToJson(jsonArray, objectMapper, "applicationNumber", application.getApplicationNumber());
+        addFieldToJson(jsonArray, objectMapper, "individualId", application.getIndividualId());
+        addFieldToJson(jsonArray, objectMapper, "programCode", application.getProgramCode());
+        addFieldToJson(jsonArray, objectMapper, "status", application.getStatus() != null ? application.getStatus().toString() : null);
+
+        addFieldToJson(jsonArray, objectMapper, "applicantId", applicant.getId());
+        addFieldToJson(jsonArray, objectMapper, "studentName", applicant.getStudentName());
+        addFieldToJson(jsonArray, objectMapper, "fatherName", applicant.getFatherName());
+        addFieldToJson(jsonArray, objectMapper, "samagraId", applicant.getSamagraId());
+        addFieldToJson(jsonArray, objectMapper, "currentSchoolName", applicant.getCurrentSchoolName());
+        addFieldToJson(jsonArray, objectMapper, "currentSchoolAddress", applicant.getCurrentSchoolAddress());
+        addFieldToJson(jsonArray, objectMapper, "currentSchoolAddressDistrict", applicant.getCurrentSchoolAddressDistrict());
+        addFieldToJson(jsonArray, objectMapper, "currentClass", applicant.getCurrentClass());
+        addFieldToJson(jsonArray, objectMapper, "previousYearMarks", applicant.getPreviousYearMarks());
+        addFieldToJson(jsonArray, objectMapper, "studentType", applicant.getStudentType());
+        addFieldToJson(jsonArray, objectMapper, "aadharLast4Digits", applicant.getAadharLast4Digits());
+        addFieldToJson(jsonArray, objectMapper, "caste", applicant.getCaste());
+        addFieldToJson(jsonArray, objectMapper, "income", applicant.getIncome());
+        addFieldToJson(jsonArray, objectMapper, "gender", applicant.getGender());
+        addFieldToJson(jsonArray, objectMapper, "age", String.valueOf(applicant.getAge()));
+        addFieldToJson(jsonArray, objectMapper, "disability", String.valueOf(applicant.isDisability()));
+
+        return objectMapper.writeValueAsString(jsonArray);
+    }
+
+    private void addFieldToJson(ArrayNode jsonArray, ObjectMapper objectMapper, String name, String value) {
+        if (value != null) {
+            ObjectNode jsonNode = objectMapper.createObjectNode();
+            jsonNode.put("name", name);
+            jsonNode.put("value", value);
+            jsonArray.add(jsonNode);
+        }
+    }
+
+
     public ApplicationResponse update(ApplicationRequest applicationRequest) {
 
         Application application = applicationRequest.getApplication();
@@ -366,5 +460,20 @@ public class ApplicationService {
         List<ProviderFundDetails> result=getFundStatistics( benefits, stats);
         List<ProviderFundStat> response=calculateProviderFundStats(result);
         return response;
+    }
+
+    public Application getApplicationById(String applicationId) {
+        try {
+            Optional<Application> optionalApplication = applicationRepository.getApplicationById(applicationId);
+
+            if (optionalApplication.isPresent()) {
+                return optionalApplication.get();
+            } else {
+                throw new RuntimeException("Application not found with ID: " + applicationId);
+            }
+        } catch (Exception e) {
+            System.err.println("Error occurred while fetching application: " + e.getMessage());
+            throw new RuntimeException("Unable to fetch application. Please try again later.", e);
+        }
     }
 }
