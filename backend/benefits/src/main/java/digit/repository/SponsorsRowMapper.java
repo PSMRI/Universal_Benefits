@@ -11,6 +11,7 @@ public class SponsorsRowMapper implements RowMapper<Sponsor> {
     public Sponsor mapRow(ResultSet rs, int rowNum) throws SQLException {
         Sponsor sponsor=new Sponsor();
    //     sponsor.setBenefitId(rs.getString("benefit_id"));
+        sponsor.setId(rs.getString("id"));
         sponsor.setSponsorName(rs.getString("sponsor_name"));
        sponsor.setSharePercent(rs.getBigDecimal("share_percent"));
 

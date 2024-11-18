@@ -1,4 +1,5 @@
 package digit.repository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import digit.repository.Utility.DateUtils;
 import digit.web.models.*;
 import digit.web.models.Benefit.BenefitsStatusEnum;
@@ -14,9 +15,15 @@ import digit.web.models.Benefit;
 import org.springframework.jdbc.core.RowMapper;
 
 public class BenefitRowMapper implements RowMapper<Benefit> {
+    private final ObjectMapper objectMapper;
+
+    public BenefitRowMapper() {
+        this.objectMapper = new ObjectMapper(); // Initialize ObjectMapper for JSON conversion
+    }
     @Override
     public Benefit mapRow(ResultSet rs, int rowNum) throws SQLException {
         Benefit benefit = new Benefit();
+
         EligibilityCriteria eligibilityCriteria=new EligibilityCriteria();
         FinancialInformation financialInformation=new FinancialInformation();
         OtherTermsAndConditions otherTermsAndConditions=new OtherTermsAndConditions();
@@ -27,6 +34,12 @@ public class BenefitRowMapper implements RowMapper<Benefit> {
         benefit.setBenefitName(rs.getString("benefit_name"));
         benefit.setBenefitProvider(rs.getString("benefit_provider"));
         benefit.setBenefitDescription(rs.getString("benefit_description"));
+        benefit.setImageUrl(rs.getString("image_url"));
+        benefit.setShortDescription(rs.getString("short_description"));
+        benefit.setShortDescriptionMd(rs.getString("short_description_md"));
+        benefit.setLongDescription(rs.getString("long_description"));
+        benefit.setLongDescriptionMd(rs.getString("long_description_md"));
+
 
         // Convert status (String) to BenefitsStatusEnum
         String statusString = rs.getString("status");
@@ -96,6 +109,16 @@ public class BenefitRowMapper implements RowMapper<Benefit> {
         benefit.setAuditDetails(auditDetails);
         //ends
         benefit.setSponsors(lstSponsors);
+
+        String schemaJson = rs.getString("schema");
+        if(schemaJson!=null) {
+            try {
+                Object schemaObject = objectMapper.readValue(schemaJson, Object.class);
+                benefit.setSchema(schemaObject.toString());
+            } catch (Exception e) {
+                throw new SQLException("Error parsing schema JSON", e);
+            }
+        }
 
         /*benefit.setEligibilityGender(rs.getString("eligibility_gender"));
         benefit.setEligibilityMinQualification(rs.getString("eligibility_min_qualification"));

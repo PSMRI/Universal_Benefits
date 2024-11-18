@@ -92,6 +92,15 @@ public class BenefitRepository {
        // jdbcTemplate.execute(sql1);
         sponsors= jdbcTemplate.query(sql1, new SponsorsRowMapper(),benefitId);
         benefit.setSponsors(sponsors);
+
+
+        String amtperBenefitCategoryQuery = "SELECT * FROM benefits_category WHERE benefit_id = ?";
+        List<AmountPerBeneficiaryCategory> lstAmtperBenefitCategory = jdbcTemplate.query(
+                amtperBenefitCategoryQuery,
+                new Object[]{benefit.getBenefitId()}, // Pass benefitId as a parameter
+                new AmountPerBeneficiaryCategoryRowMapper()
+        );
+        benefit.getFinancialInformation().setAmountPerBeneficiaryCategory(lstAmtperBenefitCategory);
         return  benefit;
     }
     public  int updateStatus(String benefitId,String status)

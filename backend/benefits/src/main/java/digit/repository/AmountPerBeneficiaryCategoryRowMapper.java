@@ -12,6 +12,7 @@ public class AmountPerBeneficiaryCategoryRowMapper implements RowMapper<AmountPe
     public AmountPerBeneficiaryCategory mapRow(ResultSet rs, int rowNum) throws SQLException
     {
         AmountPerBeneficiaryCategory amountPerBeneficiaryCategory=new AmountPerBeneficiaryCategory();
+        amountPerBeneficiaryCategory.setId(rs.getString("id"));
         amountPerBeneficiaryCategory.setBeneficiaryAmount(rs.getDouble("amount"));
         amountPerBeneficiaryCategory.setBeneficiaryCategory(rs.getString("category"));
 

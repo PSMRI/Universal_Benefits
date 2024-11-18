@@ -42,6 +42,27 @@ public class Benefit {
     @Size(max = 256)
     private String benefitDescription = null;
 
+    @JsonProperty("image_url")
+    @Valid
+    private String imageUrl = null;
+
+    @JsonProperty("short_description")
+    @Valid
+    private String shortDescription = null;
+
+    @JsonProperty("short_description_md")
+    @Valid
+    private String shortDescriptionMd = null;
+
+    @JsonProperty("long_description")
+    @Valid
+    private String longDescription = null;
+
+    @JsonProperty("long_description_md")
+    @Valid
+    private String longDescriptionMd = null;
+
+
     @JsonProperty("sponsors")
     @Valid
     @NotNull
@@ -67,6 +88,10 @@ public class Benefit {
     @JsonProperty("auditDetails")
     @Valid
     private AuditDetails auditDetails = null;
+
+    @JsonProperty("schema")
+    @Valid
+    private Object schema = null;
 
     public enum BenefitsStatusEnum {
         DRAFT("DRAFT"),

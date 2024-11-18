@@ -5,6 +5,7 @@ import digit.service.BenefitsService;
 import digit.util.ResponseInfoFactory;
 import digit.web.models.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import digit.web.models.BenefitNewResponse.ScholarshipDetails;
 import digit.web.models.Error;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -240,5 +241,20 @@ public class BenefitsApiController {
         }
 
     }
+   /* @RequestMapping(value="/v1/_getNewList", method = RequestMethod.POST)
+    public ResponseEntity<List<ScholarshipDetails>> getNewList()
+    {
+        List<ScholarshipDetails> response=new ArrayList<>();
+        try
+        {
+            response=benefitService.getNewList();
+            return new ResponseEntity<>(response,HttpStatus.ACCEPTED);
+        }
+        catch (Exception ex)
+        {
+            return new ResponseEntity<>(response,HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }*/
     
 }
