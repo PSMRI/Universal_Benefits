@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import java.io.Console;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -123,6 +124,49 @@ public class BenefitService
             return  benefits;
         }
 
+    }
+    public List<BenefitStatusCount> getApplicantionsStatusCount_Benefitwise(SearchCriteria filter)
+    {
+        List<BenefitStatusCount> benefits=new ArrayList<>();
+        try
+        {
+            benefits=benefitRepository.getBenefitStatusCount(filter);
+            return  benefits;
+        }
+        catch (Exception e)
+        {
+            return  benefits;
+        }
+
+    }
+    public BenefitCollapseResponse getBenefitBriefDetails(String benefitId)
+    {
+        BenefitCollapseResponse response=new BenefitCollapseResponse();
+        ProviderInfo providerInfo=new ProviderInfo();
+        BenefitInfo data=new BenefitInfo();
+        try
+        {
+            data=benefitRepository.getBenefitBriefDetails(benefitId);
+            if(data!=null)
+            {
+                //set provider data
+                providerInfo.setId(18);
+                providerInfo.setDocumentId("jz4r7ot3rq66kzwzk7tbkb8v");
+                data.setProvider(providerInfo);
+
+                data.setDocumentId("xxm9upd67fqkxa05flzqlor0");
+                data.setPrice(new BigDecimal("1000000"));
+
+                response.setSuccess(true);
+                response.setBenefitInfo(data);
+            }
+
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
+        return  response;
     }
     public static boolean isValidBenefitStatus(String status) {
         try {
