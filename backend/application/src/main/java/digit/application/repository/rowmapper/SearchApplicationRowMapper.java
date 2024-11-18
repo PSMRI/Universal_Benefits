@@ -3,6 +3,7 @@ package digit.application.repository.rowmapper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
+import digit.application.web.models.Applicant;
 import digit.application.web.models.Application;
 import digit.application.web.models.Document;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +11,7 @@ import org.egov.common.contract.models.AuditDetails;
 import org.egov.tracer.model.CustomException;
 import org.postgresql.util.PGobject;
 import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -139,6 +141,40 @@ public class SearchApplicationRowMapper implements ResultSetExtractor<List<Appli
         return additionalDetails;
 
     }
+
+    public RowMapper<Document> documentRowMapper() {
+        return (rs, rowNum) -> Document.builder()
+                .id(rs.getString("id"))
+                .documentType(rs.getString("document_type"))
+                .fileStoreId(rs.getString("filestore_id"))
+                .documentUid(rs.getString("document_uid"))
+                .additionalDetails(rs.getString("additional_details"))
+                .status(Document.StatusEnum.fromValue(rs.getString("status")))
+                .build();
+    }
+
+    public RowMapper<Applicant> applicantRowMapper() {
+        return (rs, rowNum) -> Applicant.builder()
+                .id(rs.getString("id"))
+                .applicationId(rs.getString("application_id"))
+                .studentName(rs.getString("student_name"))
+                .fatherName(rs.getString("father_name"))
+                .samagraId(rs.getString("samagra_id"))
+                .currentSchoolName(rs.getString("school_name"))
+                .currentSchoolAddress(rs.getString("school_address"))
+                .currentSchoolAddressDistrict(rs.getString("school_address_district"))
+                .currentClass(rs.getString("current_class"))
+                .previousYearMarks(rs.getString("previous_year_marks"))
+                .studentType(rs.getString("student_type"))
+                .aadharLast4Digits(rs.getString("aadhar_last_4_digits"))
+                .caste(rs.getString("caste"))
+                .income(rs.getString("income"))
+                .gender(rs.getString("gender"))
+                .age(rs.getInt("age"))
+                .disability(rs.getBoolean("disability"))
+                .build();
+    }
+
 
 
 }

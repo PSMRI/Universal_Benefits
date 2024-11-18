@@ -1,30 +1,32 @@
 package digit.application.web.controllers;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import digit.application.service.ApplicationService;
 import digit.application.web.models.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
 import jakarta.validation.Valid;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.web.multipart.MultipartFile;
 
 @jakarta.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2024-09-09T14:51:43.484446283+05:30[Asia/Calcutta]")
 @Controller
 @RequestMapping("/v1")
 @CrossOrigin(origins = "*")
+@Slf4j
 public class V1ApiController {
 
     private final ObjectMapper objectMapper;
@@ -42,10 +44,20 @@ public class V1ApiController {
 
     }
 
-    @RequestMapping(value = "/_create", method = RequestMethod.POST)
-    public ResponseEntity<ApplicationResponse> v1CreatePost(@Parameter(in = ParameterIn.DEFAULT, description = "Request object to create Application in the system", required = true, schema = @Schema()) @Valid @RequestBody ApplicationRequest body) {
-        ApplicationResponse response = applicationService.create(body);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    @RequestMapping(value = "/_create", method = RequestMethod.POST, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE})
+    public ResponseEntity<?> v1CreatePost(@Parameter(in = ParameterIn.DEFAULT, description = "Request object to create Application in the system", required = true, schema = @Schema())
+                                                                @Valid @RequestPart("application") ApplicationRequest application,
+                                                            @RequestPart(value ="files", required = false) List<MultipartFile> files) {
+        try{
+            ApplicationResponse response = applicationService.create(application, files);
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
+        } catch (JsonProcessingException e) {
+            log.error(e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @RequestMapping(value = "/_search", method = RequestMethod.POST)
@@ -85,6 +97,18 @@ public class V1ApiController {
     {
         List<ScholarshipDetails> response=applicationService.getScholarshipDetails();
         return  new ResponseEntity<>(response,HttpStatus.ACCEPTED);
+    }
+
+    @RequestMapping(value = "getById/{id}", method = RequestMethod.POST)
+    public ResponseEntity<Object> getApplicationById(@PathVariable String id) {
+        try {
+            Application application = applicationService.getApplicationById(id);
+            return new ResponseEntity<>(application,HttpStatus.ACCEPTED);
+        } catch (Exception e) {
+            System.err.println("Error while fetching application: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error occurred: " + e.getMessage());
+        }
     }
     /*@RequestMapping(value = "/applicationstat", method = RequestMethod.GET)
     public ResponseEntity<List<ApplicatonStatastics>> getApplicatonStatastics()

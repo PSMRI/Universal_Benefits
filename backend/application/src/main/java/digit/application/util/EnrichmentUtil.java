@@ -34,9 +34,7 @@ public class EnrichmentUtil {
         application.setAuditDetails(audit);
         application.setId(UUID.randomUUID().toString());
 
-        for (Document document : application.getDocuments()) {
-            document.setId(UUID.randomUUID().toString());
-        }
+
     }
 
 

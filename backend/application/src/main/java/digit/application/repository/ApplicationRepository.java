@@ -5,11 +5,13 @@ import digit.application.repository.rowmapper.SearchApplicationRowMapper;
 import digit.application.web.models.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class ApplicationRepository {
@@ -103,4 +105,51 @@ public class ApplicationRepository {
             return statsResponse;
         });
     }
+
+    public Optional<Application> getApplicationById(String applicationId) {
+        String query = "SELECT * FROM eg_ubp_application WHERE id = ?";
+
+        return jdbcTemplate.query(query,
+                new Object[]{applicationId},
+                applicationRowMapper()).stream().findFirst();
+    }
+
+    private RowMapper<Application> applicationRowMapper() {
+        return (rs, rowNum) -> {
+            Application application = Application.builder()
+                    .id(rs.getString("id"))
+                    .tenantId(rs.getString("tenant_id"))
+                    .applicationNumber(rs.getString("application_number"))
+                    .individualId(rs.getString("individual_id"))
+                    .programCode(rs.getString("program_code"))
+                    .status(Application.StatusEnum.fromValue(rs.getString("status")))
+                    .wfStatus(Application.WFStatusEnum.fromValue(rs.getString("wf_status")))
+                    .additionalDetails(rs.getString("additional_details"))
+                    .schema(rs.getString("schema"))
+                    .auditDetails(null) // Populate audit details as needed
+                    .build();
+
+            // Fetch and attach related Applicant
+            application.setApplicant(getApplicantByApplicationId(application.getId()));
+
+            // Fetch and attach related Documents
+            application.setDocuments(getDocumentsByApplicationId(application.getId()));
+
+            return application;
+        };
+    }
+
+    private Applicant getApplicantByApplicationId(String applicationId) {
+        String query = "SELECT * FROM eg_ubp_applicant WHERE application_id = ?";
+        return jdbcTemplate.query(query, new Object[]{applicationId}, searchApplicationRowMapper.applicantRowMapper()).stream().findFirst().orElse(null);
+    }
+
+
+
+    private List<Document> getDocumentsByApplicationId(String applicationId) {
+        String query = "SELECT * FROM eg_ubp_application_documents WHERE application_id = ?";
+        return jdbcTemplate.query(query, new Object[]{applicationId}, searchApplicationRowMapper.documentRowMapper());
+    }
+
+
 }

@@ -1,18 +1,15 @@
 package digit.repository;
 
+import digit.repository.rowmapper.ApplicationResultSetExtractor;
 import digit.web.models.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.sql.ResultSet;
-import java.util.Map;
 
 @Repository
 public class BenefitRepository {
@@ -32,6 +29,33 @@ public class BenefitRepository {
 
         return jdbcTemplate.query(sql, new BenefitRowMapper());
     }
+
+    public List<Application> getApplicationsByBenefitName(String benefitName) {
+        String sql = "SELECT app.id AS application_id, app.tenant_id, app.application_number, " +
+                "app.individual_id, app.program_code, app.status, app.wf_status, app.additional_details, " +
+                "app.schema, app.created_by, app.last_modified_by, app.created_time, app.last_modified_time, " +
+                "applicant.id AS applicant_id, applicant.student_name, applicant.father_name, applicant.samagra_id, " +
+                "applicant.school_name AS current_school_name, applicant.school_address AS current_school_address, " +
+                "applicant.school_address_district AS current_school_address_district, applicant.current_class, " +
+                "applicant.previous_year_marks, applicant.student_type, applicant.aadhar_last_4_digits, applicant.caste, " +
+                "applicant.income, applicant.gender, applicant.age, applicant.disability, doc.id AS document_id, " +
+                "doc.document_type, doc.filestore_id, doc.document_uid, doc.status AS document_status, doc.additional_details " +
+                "AS document_additional_details FROM eg_ubp_application app LEFT JOIN eg_ubp_applicant applicant ON app.id = " +
+                "applicant.application_id LEFT JOIN eg_ubp_application_documents doc ON app.id = doc.application_id " +
+                "WHERE app.program_code = ?;";
+
+        return jdbcTemplate.query(sql, new Object[]{benefitName}, new ApplicationResultSetExtractor());
+    }
+
+    public String findBenefitNameById(String benefitId) {
+        String sql = "SELECT benefit_name FROM benefits WHERE benefit_id = ?";
+        try {
+            return jdbcTemplate.queryForObject(sql, new Object[]{benefitId}, String.class);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
+
     public boolean updateBenefitStatus(String benefitId, String status) {
         String sql = "UPDATE benefits SET status = ? WHERE benefit_id = ?";
         int rowsAffected = jdbcTemplate.update(sql, status, benefitId);

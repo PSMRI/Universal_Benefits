@@ -4,8 +4,11 @@ import digit.repository.BenefitRepository;
 import digit.web.models.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import java.io.Console;
 import java.math.BigDecimal;
@@ -201,4 +204,17 @@ public class BenefitService
         }
     }
 
+    public ResponseEntity<?> getApplicationsByBenefitId(String benefitId) {
+        try{
+            String benefitName =benefitRepository.findBenefitNameById(benefitId);
+
+            if(ObjectUtils.isEmpty(benefitName)) {
+                return new ResponseEntity<>("BenefitId not found", HttpStatus.BAD_REQUEST);
+            }
+            List<Application> result = benefitRepository.getApplicationsByBenefitName(benefitName);
+            return new ResponseEntity<>(result, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error while fetching applications", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

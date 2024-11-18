@@ -225,32 +225,20 @@ public class BenefitsApiController {
         }
 
     }
-    /*@RequestMapping(value="v1/_getBenefits", method = RequestMethod.POST)
-    public ResponseEntity<List<Benefit>> GetBenefits()
+
+    @RequestMapping(value="/v1/{id}/application", method = RequestMethod.POST)
+    public ResponseEntity<?> getApplicationsByBenefitId(@PathVariable String id)
     {
-        List<Benefit> response=new ArrayList<>();
         try
         {
-            response=benefitService.GetBenefits();
+            ResponseEntity<?> response=benefitService.getApplicationsByBenefitId(id);
+            return response;
         }
         catch (Exception ex)
         {
+            return new ResponseEntity<>(ex.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 
-        }
-        return new ResponseEntity<>(response,HttpStatus.ACCEPTED);
-    }*/
-   /* @RequestMapping(value="v1/_getamtpercat", method = RequestMethod.POST)
-    public ResponseEntity<List<AmountPerBeneficiaryCategory>> GetAmtperBenefitCategory()
-    {
-        List<AmountPerBeneficiaryCategory> response=new ArrayList<>();
-        try
-        {
-            response=benefitService.GetAmtperBenefitCategory();
-        }
-        catch (Exception ex)
-        {
-
-        }
-        return new ResponseEntity<>(response,HttpStatus.ACCEPTED);
-    }*/
+    }
+    
 }
