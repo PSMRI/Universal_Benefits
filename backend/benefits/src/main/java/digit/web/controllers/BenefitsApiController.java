@@ -117,7 +117,7 @@ public class BenefitsApiController {
                     List<Benefit> response=new ArrayList<>();
                     try
                     {
-                        response=benefitService.GetAll();
+                        response=benefitService.GetBenefits();
                     }
                     catch (Exception ex)
                     {
@@ -225,5 +225,32 @@ public class BenefitsApiController {
         }
 
     }
-    
+    /*@RequestMapping(value="v1/_getBenefits", method = RequestMethod.POST)
+    public ResponseEntity<List<Benefit>> GetBenefits()
+    {
+        List<Benefit> response=new ArrayList<>();
+        try
+        {
+            response=benefitService.GetBenefits();
+        }
+        catch (Exception ex)
+        {
+
+        }
+        return new ResponseEntity<>(response,HttpStatus.ACCEPTED);
+    }*/
+   /* @RequestMapping(value="v1/_getamtpercat", method = RequestMethod.POST)
+    public ResponseEntity<List<AmountPerBeneficiaryCategory>> GetAmtperBenefitCategory()
+    {
+        List<AmountPerBeneficiaryCategory> response=new ArrayList<>();
+        try
+        {
+            response=benefitService.GetAmtperBenefitCategory();
+        }
+        catch (Exception ex)
+        {
+
+        }
+        return new ResponseEntity<>(response,HttpStatus.ACCEPTED);
+    }*/
 }

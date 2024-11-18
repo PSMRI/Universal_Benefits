@@ -249,4 +249,36 @@ public class BenefitRepository {
     }
 
 
+    public List<Benefit> getBenefits()
+    {
+        String benefitQuery = "SELECT * FROM benefits LEFT JOIN (SELECT  * FROM benefit_extensions ORDER BY id DESC LIMIT 1) AS be ON benefits.benefit_id = be.benefit_id"; // Adjust the query as needed
+        jdbcTemplate.execute(benefitQuery);
+        List<Benefit> benefits = jdbcTemplate.query(benefitQuery, new BenefitRowMapper());
+
+        for (Benefit benefit : benefits) {
+            String sponsorQuery = "SELECT * FROM public.benefit_sponsor WHERE benefit_id = ?";
+            List<Sponsor> sponsors = jdbcTemplate.query(sponsorQuery, new Object[]{benefit.getBenefitId()}, new SponsorsRowMapper());
+            benefit.setSponsors(sponsors);
+        }
+        for (Benefit benefit : benefits) {
+            // Query to fetch categories related to the specific benefit_id
+            String amtperBenefitCategoryQuery = "SELECT * FROM benefits_category WHERE benefit_id = ?";
+            List<AmountPerBeneficiaryCategory> lstAmtperBenefitCategory = jdbcTemplate.query(
+                    amtperBenefitCategoryQuery,
+                    new Object[]{benefit.getBenefitId()}, // Pass benefitId as a parameter
+                    new AmountPerBeneficiaryCategoryRowMapper()
+            );
+            benefit.getFinancialInformation().setAmountPerBeneficiaryCategory(lstAmtperBenefitCategory);
+        }
+
+        return benefits;
+    }
+    public List<AmountPerBeneficiaryCategory> getAmtperBenefitCategory()
+    {
+        String amtperBenefitCategory="Select * FROM benefits_category";
+        jdbcTemplate.execute(amtperBenefitCategory);
+        List<AmountPerBeneficiaryCategory> amountPerBeneficiaryCategories=jdbcTemplate.query(amtperBenefitCategory,new AmountPerBeneficiaryCategoryRowMapper());
+        return  amountPerBeneficiaryCategories;
+    }
+
 }

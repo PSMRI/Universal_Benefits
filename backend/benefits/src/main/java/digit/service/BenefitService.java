@@ -165,6 +165,33 @@ public class BenefitService
         }
         return  response;
     }
+
+    public List<Benefit> GetBenefits()
+    {
+        List<Benefit> lstBenefits=new ArrayList<>();
+        try
+        {
+            lstBenefits=benefitRepository.getBenefits();
+        }
+        catch (Exception e)
+        {
+
+        }
+        return  lstBenefits;
+    }
+    public List<AmountPerBeneficiaryCategory> GetAmtperBenefitCategory()
+    {
+        List<AmountPerBeneficiaryCategory> amtpercategory=new ArrayList<>();
+        try
+        {
+            amtpercategory=benefitRepository.getAmtperBenefitCategory();
+        }
+        catch (Exception e)
+        {
+
+        }
+        return  amtpercategory;
+    }
     public static boolean isValidBenefitStatus(String status) {
         try {
             ResponseInfo.StatusEnum.valueOf(status.toUpperCase()); // Convert to uppercase for case-insensitivity
