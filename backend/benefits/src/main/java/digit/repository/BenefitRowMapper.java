@@ -113,8 +113,15 @@ public class BenefitRowMapper implements RowMapper<Benefit> {
         String schemaJson = rs.getString("schema");
         if(schemaJson!=null) {
             try {
+                /*Object schemaObject = objectMapper.readValue(schemaJson, Object.class);
+                benefit.setSchema(schemaObject.toString());*/
                 Object schemaObject = objectMapper.readValue(schemaJson, Object.class);
-                benefit.setSchema(schemaObject.toString());
+
+                // Serialize the object back into a JSON string
+                String serializedSchema = objectMapper.writeValueAsString(schemaObject);
+
+                // Set the serialized JSON string
+                benefit.setSchema(serializedSchema);
             } catch (Exception e) {
                 throw new SQLException("Error parsing schema JSON", e);
             }
