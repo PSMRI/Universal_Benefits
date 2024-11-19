@@ -73,26 +73,26 @@ public class V1ApiController {
         return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
     }
 
-    @RequestMapping(value = "/_appstat", method = RequestMethod.GET)
+    @RequestMapping(value = "/_appstat", method = RequestMethod.POST)
     public ResponseEntity<List<AppStatResponse>> getAppStat()
     {
         List<AppStatResponse> response= applicationService.GetAppStat();
         return  new ResponseEntity<>(response,HttpStatus.ACCEPTED);
     }
 
-    @RequestMapping(value = "/_fundsstat", method = RequestMethod.GET)
+    @RequestMapping(value = "/_fundsstat", method = RequestMethod.POST)
     public ResponseEntity<List<ProviderFundStat>> getFundsStat()
     {
         List<ProviderFundStat> response=applicationService.getProviderFundStats();
         return  new ResponseEntity<>(response,HttpStatus.ACCEPTED);
     }
-    @RequestMapping(value = "/scholarships/top-3", method = RequestMethod.GET)
+    @RequestMapping(value = "/scholarships/top-3", method = RequestMethod.POST)
     public ResponseEntity<List<ScholarshipStat>> getScholarshipStat()
     {
         List<ScholarshipStat> response= applicationService.getScholarshipStats();
         return  new ResponseEntity<>(response,HttpStatus.ACCEPTED);
     }
-    @RequestMapping(value = "/scholarships/details", method = RequestMethod.GET)
+    @RequestMapping(value = "/scholarships/details", method = RequestMethod.POST)
     public ResponseEntity<List<ScholarshipDetails>> getScholarshipDetails()
     {
         List<ScholarshipDetails> response=applicationService.getScholarshipDetails();
