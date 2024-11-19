@@ -99,10 +99,10 @@ public class V1ApiController {
         return  new ResponseEntity<>(response,HttpStatus.ACCEPTED);
     }
 
-    @RequestMapping(value = "getById/{id}", method = RequestMethod.POST)
-    public ResponseEntity<Object> getApplicationById(@PathVariable String id) {
+    @RequestMapping(value = "getByApplicationId", method = RequestMethod.POST)
+    public ResponseEntity<Object> getApplicationById(@RequestBody IdRequestBody body) {
         try {
-            Application application = applicationService.getApplicationById(id);
+            Application application = applicationService.getApplicationById(body.getApplicationId());
             return new ResponseEntity<>(application,HttpStatus.ACCEPTED);
         } catch (Exception e) {
             System.err.println("Error while fetching application: " + e.getMessage());

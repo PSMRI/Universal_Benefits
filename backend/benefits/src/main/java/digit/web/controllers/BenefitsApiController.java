@@ -227,12 +227,12 @@ public class BenefitsApiController {
 
     }
 
-    @RequestMapping(value="/v1/{id}/application", method = RequestMethod.POST)
-    public ResponseEntity<?> getApplicationsByBenefitId(@PathVariable String id)
+    @RequestMapping(value="/v1/getApplicationsByBenefitId", method = RequestMethod.POST)
+    public ResponseEntity<?> getApplicationsByBenefitId(@RequestBody IdRequestBody body)
     {
         try
         {
-            ResponseEntity<?> response=benefitService.getApplicationsByBenefitId(id);
+            ResponseEntity<?> response=benefitService.getApplicationsByBenefitId(body.getBenefitId());
             return response;
         }
         catch (Exception ex)
