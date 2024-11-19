@@ -114,6 +114,12 @@ public class ApplicationRepository {
                 applicationRowMapper()).stream().findFirst();
     }
 
+    public boolean doesApplicationExist(String id) {
+        String sql = "SELECT COUNT(*) FROM eg_ubp_application WHERE id = ?";
+        Integer count = jdbcTemplate.queryForObject(sql, new Object[]{id}, Integer.class);
+        return count != null && count > 0;
+    }
+
     private RowMapper<Application> applicationRowMapper() {
         return (rs, rowNum) -> {
             Application application = Application.builder()
@@ -126,7 +132,11 @@ public class ApplicationRepository {
                     .wfStatus(Application.WFStatusEnum.fromValue(rs.getString("wf_status")))
                     .additionalDetails(rs.getString("additional_details"))
                     .schema(rs.getString("schema"))
-                    .auditDetails(null) // Populate audit details as needed
+                    .orderId(rs.getString("order_id"))
+                    .transactionId(rs.getString("transaction_id"))
+                    .submissionId(rs.getString("submission_id"))
+                    .contentId(rs.getString("content_id"))
+                    .auditDetails(null)
                     .build();
 
             // Fetch and attach related Applicant

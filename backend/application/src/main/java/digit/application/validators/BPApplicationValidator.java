@@ -21,4 +21,14 @@ public class BPApplicationValidator {
                 throw new RuntimeException("tenantId is mandatory for applications");
 
     }
+
+    public void validateBPUpdateApplication(ApplicationRequest applicationRequest) {
+        if(ObjectUtils.isEmpty(applicationRequest.getApplication().getId()))
+            throw new RuntimeException("Id is mandatory for updating applications");
+
+        boolean appExists = repository.doesApplicationExist(applicationRequest.getApplication().getId());
+
+        if(!appExists)
+            throw new RuntimeException("Application for Id not found");
+    }
 }

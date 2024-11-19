@@ -114,6 +114,18 @@ public class Application {
     @JsonProperty("schema")
     public String schema;
 
+    @JsonProperty("orderId")
+    private String orderId = null;
+
+    @JsonProperty("transactionId")
+    private String transactionId = null;
+
+    @JsonProperty("submissionId")
+    private String submissionId = null;
+
+    @JsonProperty("contentId")
+    private String contentId = null;
+
     public Application addDocumentsItem(Document documentsItem) {
         this.documents = new ArrayList<>(this.documents);
         this.documents.add(documentsItem);

@@ -179,16 +179,27 @@ public class ApplicationService {
 
     public ApplicationResponse update(ApplicationRequest applicationRequest) {
 
-        Application application = applicationRequest.getApplication();
-        ApplicationResponse response = null;
-        // TODO: Write business logic to update the application
-        producer.push(configuration.getKafkaTopicApplicationUpdate(), applicationRequest);
-        response = ApplicationResponse.builder()
-                .applications(Arrays.asList(applicationRequest.getApplication()))
-                .responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(applicationRequest.getRequestInfo(), true))
-                .build();
+        try{
+            Application application = applicationRequest.getApplication();
+            ApplicationResponse response = null;
 
-        return response;
+            applicationValidator.validateBPUpdateApplication(applicationRequest);
+            this.enrichmentUtil.enrichApplicationForUpdate(applicationRequest);
+
+            log.info("Updating Application: " + application);
+
+            producer.push(configuration.getKafkaTopicApplicationUpdate(), applicationRequest);
+            log.info("Application pushed successfully: " + application);
+            response = ApplicationResponse.builder()
+                    .applications(Arrays.asList(applicationRequest.getApplication()))
+                    .responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(applicationRequest.getRequestInfo(), true))
+                    .build();
+
+            return response;
+        }
+        catch (Exception e) {
+            throw new RuntimeException("Error while adding application - " + e.getMessage());
+        }
     }
 
     /**

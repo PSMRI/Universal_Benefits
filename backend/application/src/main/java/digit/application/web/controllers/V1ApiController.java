@@ -68,9 +68,14 @@ public class V1ApiController {
     }
 
     @RequestMapping(value = "/_update", method = RequestMethod.POST)
-    public ResponseEntity<ApplicationResponse> v1UpdatePost(@Parameter(in = ParameterIn.DEFAULT, description = "Request object to create Application in the system", required = true, schema = @Schema()) @Valid @RequestBody ApplicationRequest body) {
-        ApplicationResponse response = applicationService.update(body);
-        return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
+    public ResponseEntity<?> v1UpdatePost(@Parameter(in = ParameterIn.DEFAULT, description = "Request object to update Application in the system", required = true, schema = @Schema()) @Valid @RequestBody ApplicationRequest body) {
+        try{
+            ApplicationResponse response = applicationService.update(body);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @RequestMapping(value = "/_appstat", method = RequestMethod.POST)

@@ -37,6 +37,14 @@ public class EnrichmentUtil {
 
     }
 
+    public void enrichApplicationForUpdate(ApplicationRequest applicationRequest) {
+        Application application = applicationRequest.getApplication();
+        String updatedBy = applicationRequest.getRequestInfo().getUserInfo().getUuid();
+        AuditDetails audit = getAuditDetails(updatedBy, false);
+
+        application.setAuditDetails(audit);
+    }
+
 
     /**
      * Method to return auditDetails for create/update flows
