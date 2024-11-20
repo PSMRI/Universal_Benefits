@@ -424,4 +424,23 @@ public class BenefitService
 
         return scholarshipDetails;
     }
+
+    public VisualRepresentationResponse getVisualRepresentation(String benefitId, String monthYear) {
+        // Fetch distributions using repository methods
+        List<GraphData> applicantsDisbursals = benefitRepository.getWeeklyData(benefitId, monthYear);
+        List<GraphData> gender = benefitRepository.getGenderDistribution(benefitId, monthYear);
+        List<GraphData> caste = benefitRepository.getCasteDistribution(benefitId, monthYear);
+        List<GraphData> age = benefitRepository.getAgeDistribution(benefitId, monthYear);
+        List<GraphData> ratio = benefitRepository.getRatioDistribution(benefitId, monthYear);
+
+        // Construct response object
+        VisualRepresentationResponse response = new VisualRepresentationResponse();
+        response.setApplicantsDisbursals(applicantsDisbursals);
+        response.setGender(gender);
+        response.setCaste(caste);
+        response.setAge(age);
+        response.setRatio(ratio);
+
+        return response;
+    }
 }

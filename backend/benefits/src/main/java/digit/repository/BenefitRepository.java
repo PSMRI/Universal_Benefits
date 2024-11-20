@@ -1,12 +1,14 @@
 package digit.repository;
 
 import digit.repository.rowmapper.ApplicationResultSetExtractor;
+import digit.repository.rowmapper.GraphDataRowMapper;
 import digit.web.models.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -314,4 +316,239 @@ public class BenefitRepository {
         return  amountPerBeneficiaryCategories;
     }
 
+    private ResultSetExtractor<List<GraphData>> extractGraphData() {
+        return rs -> {
+            List<GraphData> graphDataList = new ArrayList<>();
+            while (rs.next()) {
+                GraphData graphData = new GraphData();
+                graphData.setLabel(rs.getString("label"));
+                graphData.setCount(rs.getInt("count"));
+                graphDataList.add(graphData);
+            }
+            return graphDataList;
+        };
+    }
+
+    public List<GraphData> getWeeklyData(String benefitId, String monthYear) {
+        String sql = """
+                WITH date_range AS (
+                    SELECT
+                        DATE_TRUNC('month', TO_DATE(?, 'Month YYYY')) AS start_date,  -- Start of the month
+                        (DATE_TRUNC('month', TO_DATE(?, 'Month YYYY')) + INTERVAL '1 month - 1 day')::DATE AS end_date -- End of the month
+                ),
+                week_ranges AS (
+                    SELECT
+                        generate_series(
+                            (SELECT start_date FROM date_range),
+                            (SELECT end_date FROM date_range),
+                            '7 days'::interval
+                        )::DATE AS week_start,
+                        generate_series(
+                            (SELECT start_date FROM date_range),
+                            (SELECT end_date FROM date_range),
+                            '7 days'::interval
+                        )::DATE + INTERVAL '6 days' AS raw_week_end
+                    FROM date_range
+                ),
+                final_week_ranges AS (
+                    SELECT
+                        week_start,
+                        LEAST(raw_week_end, (SELECT end_date FROM date_range)) AS week_end -- Ensure no overlap and end date is within the month
+                    FROM
+                        week_ranges
+                ),
+                weekly_data AS (
+                    SELECT
+                        fwr.week_start,
+                        fwr.week_end,
+                        COUNT(id) AS count
+                    FROM
+                        final_week_ranges fwr
+                    LEFT JOIN LATERAL (
+                        SELECT
+                            app.id,
+                            DATE_TRUNC('day', TO_TIMESTAMP(app.created_time / 1000))::DATE AS created_date
+                        FROM
+                            eg_ubp_application app
+                        JOIN
+                            benefits ben
+                        ON
+                            app.program_code = ben.benefit_name
+                        WHERE
+                            ben.benefit_id = ?
+                        ) AS app_data
+                    ON app_data.created_date BETWEEN fwr.week_start AND fwr.week_end
+                    GROUP BY
+                        fwr.week_start, fwr.week_end
+                )
+                SELECT
+                    'Week ' || ROW_NUMBER() OVER (ORDER BY week_start ASC) AS label,
+                    COALESCE(weekly_data.count, 0) AS count
+                FROM
+                    weekly_data
+                ORDER BY
+                    week_start;
+        """;
+
+        return jdbcTemplate.query(sql, new Object[]{monthYear, monthYear, benefitId}, extractGraphData());
+    }
+
+    public List<GraphData> getCasteDistribution(String benefitId, String monthYear) {
+        String sql = """
+                WITH date_range AS (
+                    SELECT
+                        DATE_TRUNC('month', TO_DATE(?, 'Month YYYY')) AS start_date, -- Start of the month
+                        (DATE_TRUNC('month', TO_DATE(?, 'Month YYYY')) + INTERVAL '1 month - 1 day')::DATE AS end_date -- End of the month
+                ),
+                caste_data AS (
+                    SELECT
+                        appl.caste AS label,
+                        COUNT(*) AS count
+                    FROM
+                        eg_ubp_application app
+                    JOIN
+                        benefits ben ON app.program_code = ben.benefit_name
+                    JOIN
+                        eg_ubp_applicant appl ON app.id = appl.application_id
+                    WHERE
+                        ben.benefit_id = ?
+                        AND TO_TIMESTAMP(app.created_time / 1000)::DATE BETWEEN
+                            (SELECT start_date FROM date_range) AND
+                            (SELECT end_date FROM date_range)
+                    GROUP BY
+                        appl.caste
+                )
+                SELECT
+                    label,
+                    COALESCE(count, 0) AS count
+                FROM
+                    caste_data
+                ORDER BY
+                    count DESC;
+        """;
+
+        return jdbcTemplate.query(sql, new Object[]{monthYear, monthYear, benefitId}, extractGraphData());
+    }
+
+    public List<GraphData> getAgeDistribution(String benefitId, String monthYear) {
+        String sql = """
+                WITH date_range AS (
+                    SELECT
+                        DATE_TRUNC('month', TO_DATE(?, 'Month YYYY')) AS start_date, -- Start of the month
+                        (DATE_TRUNC('month', TO_DATE(?, 'Month YYYY')) + INTERVAL '1 month - 1 day')::DATE AS end_date -- End of the month
+                ),
+                age_data AS (
+                    SELECT
+                        CASE
+                            WHEN appl.age BETWEEN 15 AND 25 THEN '15-25'
+                            WHEN appl.age BETWEEN 25 AND 35 THEN '25-35'
+                            WHEN appl.age BETWEEN 45 AND 55 THEN '45-55'
+                            ELSE 'Others'
+                        END AS label,
+                        COUNT(*) AS count
+                    FROM
+                        eg_ubp_application app
+                    JOIN
+                        benefits ben ON app.program_code = ben.benefit_name
+                    JOIN
+                        eg_ubp_applicant appl ON app.id = appl.application_id
+                    WHERE
+                        ben.benefit_id = ?
+                        AND TO_TIMESTAMP(app.created_time / 1000)::DATE BETWEEN
+                            (SELECT start_date FROM date_range) AND
+                            (SELECT end_date FROM date_range)
+                    GROUP BY
+                        label
+                )
+                SELECT
+                    label,
+                    COALESCE(count, 0) AS count
+                FROM
+                    age_data
+                ORDER BY
+                    count DESC;
+    """;
+
+        return jdbcTemplate.query(sql, new Object[]{monthYear, monthYear, benefitId}, extractGraphData());
+    }
+
+    public List<GraphData> getRatioDistribution(String benefitId, String monthYear) {
+        String sql = """
+                WITH date_range AS (
+                    SELECT
+                        DATE_TRUNC('month', TO_DATE(?, 'Month YYYY')) AS start_date, -- Start of the month
+                        (DATE_TRUNC('month', TO_DATE(?, 'Month YYYY')) + INTERVAL '1 month - 1 day')::DATE AS end_date -- End of the month
+                ),
+                student_type_data AS (
+                    SELECT
+                        appl.student_type AS label,
+                        COUNT(*) AS count
+                    FROM
+                        eg_ubp_application app
+                    JOIN
+                        benefits ben
+                    ON
+                        app.program_code = ben.benefit_name
+                    JOIN
+                        eg_ubp_applicant appl
+                    ON
+                        app.id = appl.application_id
+                    WHERE
+                        ben.benefit_id = ?
+                        AND TO_TIMESTAMP(app.created_time / 1000)::DATE BETWEEN
+                            (SELECT start_date FROM date_range) AND
+                            (SELECT end_date FROM date_range)
+                    GROUP BY
+                        appl.student_type
+                )
+                SELECT
+                    label,
+                    COALESCE(count, 0) AS count
+                FROM
+                    student_type_data
+                ORDER BY
+                    count DESC;
+        """;
+
+        return jdbcTemplate.query(sql, new Object[]{monthYear, monthYear, benefitId}, extractGraphData());
+    }
+
+    public List<GraphData> getGenderDistribution(String benefitId, String monthYear) {
+        String sql = """
+                WITH date_range AS (
+                    SELECT
+                        DATE_TRUNC('month', TO_DATE(?, 'Month YYYY')) AS start_date, -- Start of the month
+                        (DATE_TRUNC('month', TO_DATE(?, 'Month YYYY')) + INTERVAL '1 month - 1 day')::DATE AS end_date -- End of the month
+                ),
+                gender_data AS (
+                    SELECT
+                        appl.gender AS label,
+                        COUNT(*) AS count
+                    FROM
+                        eg_ubp_application app
+                    JOIN
+                        benefits ben
+                        ON app.program_code = ben.benefit_name
+                    JOIN
+                        eg_ubp_applicant appl
+                        ON app.id = appl.application_id
+                    WHERE
+                        ben.benefit_id = ?
+                        AND TO_TIMESTAMP(app.created_time / 1000)::DATE BETWEEN
+                            (SELECT start_date FROM date_range) AND
+                            (SELECT end_date FROM date_range)
+                    GROUP BY
+                        appl.gender
+                )
+                SELECT
+                    label,
+                    COALESCE(count, 0) AS count
+                FROM
+                    gender_data
+                ORDER BY
+                    count DESC;
+        """;
+
+        return jdbcTemplate.query(sql, new Object[]{monthYear, monthYear, benefitId}, extractGraphData());
+    }
 }

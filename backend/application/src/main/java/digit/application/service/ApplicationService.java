@@ -75,59 +75,61 @@ public class ApplicationService {
 
             List<Document> docList = new ArrayList<>();
 
-            if(!ObjectUtils.isEmpty(files)){
-                for (MultipartFile file : files) {
-                    Response uploadResponse = httpClient.uploadFile(file, application.getTenantId(), configuration.getModuleName(), application.getApplicationNumber());
+            try{
+                if(!ObjectUtils.isEmpty(files)){
+                    for (MultipartFile file : files) {
+                        Response uploadResponse = httpClient.uploadFile(file, application.getTenantId(), configuration.getModuleName(), application.getApplicationNumber());
 
-                    if (uploadResponse.isSuccessful()) {
-                        ObjectMapper objectMapper = new ObjectMapper();
+                        if (uploadResponse.isSuccessful()) {
+                            ObjectMapper objectMapper = new ObjectMapper();
 
-                        JsonNode responseBody = objectMapper.readTree(uploadResponse.body().string());
-                        JsonNode filesArray = responseBody.get("files");
-                        if (filesArray.size() > 0) {
-                            JsonNode firstFile = filesArray.get(0);
-                            String fileStoreId = firstFile.get("fileStoreId").asText();
+                            JsonNode responseBody = objectMapper.readTree(uploadResponse.body().string());
+                            JsonNode filesArray = responseBody.get("files");
+                            if (filesArray.size() > 0) {
+                                JsonNode firstFile = filesArray.get(0);
+                                String fileStoreId = firstFile.get("fileStoreId").asText();
 
-                            Document document = Document.builder().fileStoreId(fileStoreId).id(UUID.randomUUID().toString()).build();
+                                Document document = Document.builder().fileStoreId(fileStoreId).id(UUID.randomUUID().toString()).build();
 
-                            docList.add(document);
+                                docList.add(document);
+                            } else {
+                                log.error("File not uploaded to fileStore service.");
+                                throw new IOException("Error while uploading documents.");
+                            }
+                            index++;
                         } else {
                             log.error("File not uploaded to fileStore service.");
                             throw new IOException("Error while uploading documents.");
                         }
-                        index++;
-                    } else {
-                        log.error("File not uploaded to fileStore service.");
-                        throw new IOException("Error while uploading documents.");
                     }
                 }
-            }
+            }catch (IOException e) {
+                log.error(e.getMessage());
+            }finally {
 
-            if(!docList.isEmpty()){
-                application.setDocuments(docList);
-            }
+                if(!docList.isEmpty()){
+                    application.setDocuments(docList);
+                }
 
-            if (this.configuration.getIsWorkflowEnabled()) {
-                State wfState = workflowUtil.callWorkFlow(workflowUtil.prepareWorkflowRequestForApplication(applicationRequest));
+                if (this.configuration.getIsWorkflowEnabled()) {
+                    State wfState = workflowUtil.callWorkFlow(workflowUtil.prepareWorkflowRequestForApplication(applicationRequest));
+                    application.setWfStatus(Application.WFStatusEnum.APPROVED);
+                }
+                application.setStatus(Application.StatusEnum.ARCHIVED);
                 application.setWfStatus(Application.WFStatusEnum.APPROVED);
+
+                //String schema = createJsonFromApplicationRequest(applicationRequest);
+                //applicationRequest.getApplication().setSchema(schema);
+
+                producer.push(configuration.getKafkaTopicApplicationCreate(), applicationRequest);
+                log.info("Application pushed successfully: " + application);
+                response = ApplicationResponse.builder()
+                        .applications(Arrays.asList(applicationRequest.getApplication()))
+                        .responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(applicationRequest.getRequestInfo(), true))
+                        .build();
+
+                return response;
             }
-            application.setStatus(Application.StatusEnum.ARCHIVED);
-            application.setWfStatus(Application.WFStatusEnum.APPROVED);
-
-            //String schema = createJsonFromApplicationRequest(applicationRequest);
-            //applicationRequest.getApplication().setSchema(schema);
-
-            producer.push(configuration.getKafkaTopicApplicationCreate(), applicationRequest);
-            log.info("Application pushed successfully: " + application);
-            response = ApplicationResponse.builder()
-                    .applications(Arrays.asList(applicationRequest.getApplication()))
-                    .responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(applicationRequest.getRequestInfo(), true))
-                    .build();
-
-            return response;
-        }catch (IOException e) {
-            log.error(e.getMessage());
-            throw new RuntimeException("Error while uploading documents.");
         }
         catch (Exception e) {
             throw new RuntimeException("Error while adding application - " + e.getMessage());

@@ -10,6 +10,7 @@ import digit.web.models.Error;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import jakarta.servlet.http.HttpServletRequest;
 
+@Slf4j
 @jakarta.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2024-10-23T15:21:03.651111+05:30[Asia/Calcutta]")
 @Controller
 @RequestMapping("")
@@ -240,6 +242,18 @@ public class BenefitsApiController {
             return new ResponseEntity<>(ex.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
+    }
+
+    @RequestMapping(value="/v1/_visualRepresentation", method = RequestMethod.POST)
+    public ResponseEntity<VisualRepresentationResponse> getVisualRepresentation(@RequestBody VisualRepresentationRequest request) {
+        VisualRepresentationResponse response = new VisualRepresentationResponse();
+        try{
+            response = benefitService.getVisualRepresentation(request.getBenefitId(), request.getMonthYear());
+            return new ResponseEntity<VisualRepresentationResponse>(response,HttpStatus.OK);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return new ResponseEntity<VisualRepresentationResponse>(response,HttpStatus.NO_CONTENT);
+        }
     }
    /* @RequestMapping(value="/v1/_getNewList", method = RequestMethod.POST)
     public ResponseEntity<List<ScholarshipDetails>> getNewList()
