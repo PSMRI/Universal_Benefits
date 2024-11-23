@@ -14,6 +14,8 @@ import digit.application.util.ResponseInfoFactory;
 import digit.application.util.WorkflowUtil;
 import digit.application.validators.BPApplicationValidator;
 import digit.application.web.models.*;
+import digit.application.web.models.Application.StatusEnum;
+import digit.application.web.models.ApplicationStatusUpdateResponse.ApplicationStatusUpdateResponseBuilder;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Response;
 import org.egov.common.contract.response.ResponseInfo;
@@ -75,61 +77,59 @@ public class ApplicationService {
 
             List<Document> docList = new ArrayList<>();
 
-            try{
-                if(!ObjectUtils.isEmpty(files)){
-                    for (MultipartFile file : files) {
-                        Response uploadResponse = httpClient.uploadFile(file, application.getTenantId(), configuration.getModuleName(), application.getApplicationNumber());
+            if(!ObjectUtils.isEmpty(files)){
+                for (MultipartFile file : files) {
+                    Response uploadResponse = httpClient.uploadFile(file, application.getTenantId(), configuration.getModuleName(), application.getApplicationNumber());
 
-                        if (uploadResponse.isSuccessful()) {
-                            ObjectMapper objectMapper = new ObjectMapper();
+                    if (uploadResponse.isSuccessful()) {
+                        ObjectMapper objectMapper = new ObjectMapper();
 
-                            JsonNode responseBody = objectMapper.readTree(uploadResponse.body().string());
-                            JsonNode filesArray = responseBody.get("files");
-                            if (filesArray.size() > 0) {
-                                JsonNode firstFile = filesArray.get(0);
-                                String fileStoreId = firstFile.get("fileStoreId").asText();
+                        JsonNode responseBody = objectMapper.readTree(uploadResponse.body().string());
+                        JsonNode filesArray = responseBody.get("files");
+                        if (filesArray.size() > 0) {
+                            JsonNode firstFile = filesArray.get(0);
+                            String fileStoreId = firstFile.get("fileStoreId").asText();
 
-                                Document document = Document.builder().fileStoreId(fileStoreId).id(UUID.randomUUID().toString()).build();
+                            Document document = Document.builder().fileStoreId(fileStoreId).id(UUID.randomUUID().toString()).build();
 
-                                docList.add(document);
-                            } else {
-                                log.error("File not uploaded to fileStore service.");
-                                throw new IOException("Error while uploading documents.");
-                            }
-                            index++;
+                            docList.add(document);
                         } else {
                             log.error("File not uploaded to fileStore service.");
                             throw new IOException("Error while uploading documents.");
                         }
+                        index++;
+                    } else {
+                        log.error("File not uploaded to fileStore service.");
+                        throw new IOException("Error while uploading documents.");
                     }
                 }
-            }catch (IOException e) {
-                log.error(e.getMessage());
-            }finally {
-
-                if(!docList.isEmpty()){
-                    application.setDocuments(docList);
-                }
-
-                if (this.configuration.getIsWorkflowEnabled()) {
-                    State wfState = workflowUtil.callWorkFlow(workflowUtil.prepareWorkflowRequestForApplication(applicationRequest));
-                    application.setWfStatus(Application.WFStatusEnum.APPROVED);
-                }
-                application.setStatus(Application.StatusEnum.ARCHIVED);
-                application.setWfStatus(Application.WFStatusEnum.APPROVED);
-
-                //String schema = createJsonFromApplicationRequest(applicationRequest);
-                //applicationRequest.getApplication().setSchema(schema);
-
-                producer.push(configuration.getKafkaTopicApplicationCreate(), applicationRequest);
-                log.info("Application pushed successfully: " + application);
-                response = ApplicationResponse.builder()
-                        .applications(Arrays.asList(applicationRequest.getApplication()))
-                        .responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(applicationRequest.getRequestInfo(), true))
-                        .build();
-
-                return response;
             }
+
+            if(!docList.isEmpty()){
+                application.setDocuments(docList);
+            }
+
+            if (this.configuration.getIsWorkflowEnabled()) {
+                State wfState = workflowUtil.callWorkFlow(workflowUtil.prepareWorkflowRequestForApplication(applicationRequest));
+                application.setWfStatus(Application.WFStatusEnum.APPROVED);
+            }
+            application.setStatus(Application.StatusEnum.ACTIVE);
+            application.setWfStatus(Application.WFStatusEnum.APPROVED);
+
+            //String schema = createJsonFromApplicationRequest(applicationRequest);
+            //applicationRequest.getApplication().setSchema(schema);
+
+            producer.push(configuration.getKafkaTopicApplicationCreate(), applicationRequest);
+            log.info("Application pushed successfully: " + application);
+            response = ApplicationResponse.builder()
+                    .applications(Arrays.asList(applicationRequest.getApplication()))
+                    .responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(applicationRequest.getRequestInfo(), true))
+                    .build();
+
+            return response;
+        }catch (IOException e) {
+            log.error(e.getMessage());
+            throw new RuntimeException("Error while uploading documents.");
         }
         catch (Exception e) {
             throw new RuntimeException("Error while adding application - " + e.getMessage());
@@ -181,29 +181,38 @@ public class ApplicationService {
 
     public ApplicationResponse update(ApplicationRequest applicationRequest) {
 
-        try{
-            Application application = applicationRequest.getApplication();
-            ApplicationResponse response = null;
+        Application application = applicationRequest.getApplication();
+        ApplicationResponse response = null;
+        // TODO: Write business logic to update the application
+        producer.push(configuration.getKafkaTopicApplicationUpdate(), applicationRequest);
+        response = ApplicationResponse.builder()
+                .applications(Arrays.asList(applicationRequest.getApplication()))
+                .responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(applicationRequest.getRequestInfo(), true))
+                .build();
 
-            applicationValidator.validateBPUpdateApplication(applicationRequest);
-            this.enrichmentUtil.enrichApplicationForUpdate(applicationRequest);
-
-            log.info("Updating Application: " + application);
-
-            producer.push(configuration.getKafkaTopicApplicationUpdate(), applicationRequest);
-            log.info("Application pushed successfully: " + application);
-            response = ApplicationResponse.builder()
-                    .applications(Arrays.asList(applicationRequest.getApplication()))
-                    .responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(applicationRequest.getRequestInfo(), true))
-                    .build();
-
-            return response;
-        }
-        catch (Exception e) {
-            throw new RuntimeException("Error while adding application - " + e.getMessage());
-        }
+        return response;
     }
+    
+    public ApplicationStatusUpdateResponse updateApplicationStatus(ApplicationStatusUpdateRequest applicationRequest) {
 
+    	String applicationid = applicationRequest.getApplicationId();
+    	System.out.println("applicationid is =========>"+applicationid);	
+    	String status=applicationRequest.getStatus();  
+    	System.out.println("applicationid status is =========>"+status);
+    	Application.WFStatusEnum statusEnum = Application.WFStatusEnum.fromValue(status);
+        ApplicationStatusUpdateResponse response = null;
+//        Application a=getApplicationById(applicationid);
+//        if(getApplicationById(applicationid)!=null)		
+//        {
+//        	a.setStatus(statusEnum);
+//        }
+        producer.push(configuration.getKafkaTopicApplicationUpdateStatus(), applicationRequest);
+        response = ApplicationStatusUpdateResponse.builder().responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(applicationRequest.getRequestInfo(),true)).build();
+        return response;
+    }
+    
+    
+    
     /**
      * method to search applications from DB based on application search criteria
      * @param applicationSearchRequest
@@ -488,22 +497,5 @@ public class ApplicationService {
             System.err.println("Error occurred while fetching application: " + e.getMessage());
             throw new RuntimeException("Unable to fetch application. Please try again later.", e);
         }
-    }
-    public ApplicationStatusUpdateResponse updateApplicationStatus(ApplicationStatusUpdateRequest applicationRequest) {
-
-    	String applicationid = applicationRequest.getApplicationId();
-    	System.out.println("applicationid is =========>"+applicationid);	
-    	String status=applicationRequest.getStatus();  
-    	System.out.println("applicationid status is =========>"+status);
-    	Application.WFStatusEnum statusEnum = Application.WFStatusEnum.fromValue(status);
-        ApplicationStatusUpdateResponse response = null;
-//        Application a=getApplicationById(applicationid);
-//        if(getApplicationById(applicationid)!=null)		
-//        {
-//        	a.setStatus(statusEnum);
-//        }
-        producer.push(configuration.getKafkaTopicApplicationUpdateStatus(), applicationRequest);
-        response = ApplicationStatusUpdateResponse.builder().responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(applicationRequest.getRequestInfo(),true)).build();
-        return response;
     }
 }
