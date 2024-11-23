@@ -127,4 +127,13 @@ public class V1ApiController {
         List<Benefit> response=applicationService.getBenefits();
         return  new ResponseEntity<>(response,HttpStatus.ACCEPTED);
     }*/
+
+    @RequestMapping(value = "/_updatestatus", method = RequestMethod.POST)
+    public ResponseEntity<ApplicationStatusUpdateResponse> v1UpdatePostApplicayionStatus(@Parameter(in = ParameterIn.DEFAULT, description = "Request object to create Application in the system", required = true, schema = @Schema()) @Valid @RequestBody ApplicationStatusUpdateRequest body) {
+//        ApplicationResponse response = applicationService.update(body);
+    	System.out.println("inside update status");
+    	  ApplicationStatusUpdateResponse response = applicationService.updateApplicationStatus(body);
+        return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
+    }
+    
 }
