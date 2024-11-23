@@ -15,6 +15,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import digit.application.web.models.ApplicationStatusUpdateRequest;
+import digit.application.web.models.ApplicationStatusUpdateResponse;
+
 
 import java.util.*;
 
