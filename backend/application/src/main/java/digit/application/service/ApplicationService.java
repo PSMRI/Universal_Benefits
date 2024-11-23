@@ -489,4 +489,21 @@ public class ApplicationService {
             throw new RuntimeException("Unable to fetch application. Please try again later.", e);
         }
     }
+    public ApplicationStatusUpdateResponse updateApplicationStatus(ApplicationStatusUpdateRequest applicationRequest) {
+
+    	String applicationid = applicationRequest.getApplicationId();
+    	System.out.println("applicationid is =========>"+applicationid);	
+    	String status=applicationRequest.getStatus();  
+    	System.out.println("applicationid status is =========>"+status);
+    	Application.WFStatusEnum statusEnum = Application.WFStatusEnum.fromValue(status);
+        ApplicationStatusUpdateResponse response = null;
+//        Application a=getApplicationById(applicationid);
+//        if(getApplicationById(applicationid)!=null)		
+//        {
+//        	a.setStatus(statusEnum);
+//        }
+        producer.push(configuration.getKafkaTopicApplicationUpdateStatus(), applicationRequest);
+        response = ApplicationStatusUpdateResponse.builder().responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(applicationRequest.getRequestInfo(),true)).build();
+        return response;
+    }
 }
