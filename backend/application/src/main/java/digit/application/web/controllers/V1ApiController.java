@@ -70,5 +70,10 @@ public class V1ApiController {
         ApplicationResponse response = applicationService.update(body);
         return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
     }
-
+public ResponseEntity<ApplicationStatusUpdateResponse> v1UpdatePostApplicayionStatus(@Parameter(in = ParameterIn.DEFAULT, description = "Request object to create Application in the system", required = true, schema = @Schema()) @Valid @RequestBody ApplicationStatusUpdateRequest body) {
+//        ApplicationResponse response = applicationService.update(body);
+    	System.out.println("inside update status");
+    	  ApplicationStatusUpdateResponse response = applicationService.updateApplicationStatus(body);
+        return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
+    }
 }
