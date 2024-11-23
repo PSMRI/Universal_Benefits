@@ -90,6 +90,8 @@ public class Configuration {
     @Value("${kafka.topic.application.update}")
     private String kafkaTopicApplicationUpdate;
 
+     @Value("${kafka.topic.application.updatestatus}")
+    private String kafkaTopicApplicationUpdateStatus;
     // application search configs
     @Value("${application.search.default.limit}")
     private Integer defaultLimit;
