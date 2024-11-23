@@ -30,6 +30,9 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import digit.application.web.models.ApplicationStatusUpdateRequest;
+import digit.application.web.models.ApplicationStatusUpdateResponse;
+
 
 @Service
 @Slf4j
