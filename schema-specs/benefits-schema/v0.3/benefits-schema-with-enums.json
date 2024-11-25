@@ -177,7 +177,7 @@
               "type": "string",
               "title": "Entity Type",
               "description": "The type or category of the offering entity.",
-              "enum": ["government", "private"]
+              "enum": ["government", "private", "individual"]
             },
             "name": {
               "type": "string",
@@ -249,7 +249,7 @@
                 "type": "string",
                 "title": "Entity Type",
                 "description": "The type or category of the sponsoring entity.",
-                "enum": ["government", "private"]
+                "enum": ["government", "private", "individual"]
               },
               "name": {
                 "type": "string",
