@@ -393,7 +393,8 @@
                         "incomeCertificate",
                         "domicileCertificate",
                         "disablityCertificate",
-                        "hostelAccommodationCertificate"
+                        "hostelAccommodationCertificate",
+                        "marksheet"
                       ]
                     }
                   }
@@ -427,7 +428,8 @@
                   "hostelerProof",
                   "incomeProof",
                   "domicileProof",
-                  "disablityProof"
+                  "disablityProof",
+                  "marksProof"
                 ]
               },
               "isRequired": {
@@ -448,7 +450,8 @@
                     "incomeCertificate",
                     "domicileCertificate",
                     "disablityCertificate",
-                    "hostelAccommodationCertificate"
+                    "hostelAccommodationCertificate",
+                    "marksheet"
                   ]
                 }
               }
