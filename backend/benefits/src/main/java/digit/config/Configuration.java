@@ -80,6 +80,12 @@ public class Configuration {
 
     @Value("@{btr.kafka.publish.topic}")
     private String publishTopic;
+    
+    @Value("${btr.kafka.extend.benefit.date.topic}")
+    private String extendbenefitdateTopic;
+    
+    @Value("${btr.kafka.extend.benefit.date.in.extension.table.topic}")
+    private String extendbenefitdateTopicInExtensionTable;
 
     //MDMS
     @Value("${egov.mdms.host}")

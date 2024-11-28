@@ -1,6 +1,6 @@
 package digit.application;
 
-
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.egov.tracer.config.TracerConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Import;
 
 @Import({TracerConfiguration.class})
 @SpringBootApplication
+@EnableScheduling
 @ComponentScan(basePackages = {"digit.application", "digit.application.web.controllers", "digit.application.config"})
 public class ApplicationMain {
 

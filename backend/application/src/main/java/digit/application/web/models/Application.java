@@ -125,6 +125,10 @@ public class Application {
 
     @JsonProperty("contentId")
     private String contentId = null;
+    
+    //priyanka
+    @JsonProperty("batch_id")
+    private int batch_id;
 
     public Application addDocumentsItem(Document documentsItem) {
         this.documents = new ArrayList<>(this.documents);
@@ -137,8 +141,12 @@ public class Application {
 
         VERIFIED("VERIFIED"),
 
-        REJECTED("REJECTED");
-
+        REJECTED("REJECTED"),
+        
+        SUBMITTED_FOR_DISBURSAL("SUBMITTED FOR DISBURSAL");
+        
+    	
+    	
 
         private String value;
 
@@ -162,5 +170,7 @@ public class Application {
             return null;
         }
     }
+
+	
 
 }

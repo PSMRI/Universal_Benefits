@@ -501,4 +501,64 @@ public class ApplicationService {
             throw new RuntimeException("Unable to fetch application. Please try again later.", e);
         }
     }
+    
+    
+  //priyanka 25Nov2024
+    public Application direct_disbursals(String applicationId) {
+        try {
+            Optional<Application> optionalApplication = applicationRepository.direct_disbursals(applicationId);
+ 
+            if (optionalApplication.isPresent()) {
+                return optionalApplication.get();
+            } else {
+                throw new RuntimeException("Application not found with ID: " + applicationId);
+            }
+        } catch (Exception e) {
+            System.err.println("Error occurred while fetching application: " + e.getMessage());
+            throw new RuntimeException("Unable to fetch application. Please try again later.", e);
+        }
+    }
+    
+    public ApplicationUpdateBatchIDResponse updateApplication_BatchId(ApplicationUpdateBatchIDRequest applicationRequest) {
+    	String applicationid = applicationRequest.getApplicationId();
+    	System.out.println("applicationid ID "+applicationid);	
+    	int batch_id=applicationRequest.getBatch_id();  
+    	System.out.println("batch ID "+batch_id);
+        boolean isSuccess = false;
+        String message = "";
+ 
+        try {
+            // Simulate Kafka push or any other operation
+            producer.push(configuration.getKafkaTopicApplicationUpdateBatchID(), applicationRequest);
+            isSuccess = true; // Operation succeeded
+            message = "Batch ID updated successfully.";
+        } catch (Exception e) {
+            System.err.println("Error: " + e.getMessage());
+            isSuccess = false;
+            message = "Failed to update Batch ID.";
+        }
+        
+        return ApplicationUpdateBatchIDResponse.builder()
+                .batchId(isSuccess ? batch_id : null)
+                .success(isSuccess)
+                .message(message)
+                .build();
+    }
+    
+    //public Application getDisbursementProcessApplications(Map<String, Object> requestPayload) {
+    public List<Application> getDisbursementProcessApplications(String disbursalStatus) {
+        try {
+            List<Application> optionalApplication = applicationRepository.getDisbursementProcessApplications(disbursalStatus);
+ 
+            if (optionalApplication.isEmpty()) {
+                throw new RuntimeException("Application not found with ID: " + disbursalStatus);
+            }
+            
+            return optionalApplication;
+        } catch (Exception e) {
+            System.err.println("Error occurred while fetching application: " + e.getMessage());
+            throw new RuntimeException("Unable to fetch application. Please try again later.", e);
+        }
+    }
+
 }

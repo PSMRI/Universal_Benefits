@@ -137,6 +137,7 @@ public class ApplicationRepository {
                     .submissionId(rs.getString("submission_id"))
                     .contentId(rs.getString("content_id"))
                     .auditDetails(null)
+                    .batch_id(rs.getInt("batch_id"))
                     .build();
 
             // Fetch and attach related Applicant
@@ -161,5 +162,25 @@ public class ApplicationRepository {
         return jdbcTemplate.query(query, new Object[]{applicationId}, searchApplicationRowMapper.documentRowMapper());
     }
 
+  //priyanka 25Nov2024
+    public Optional<Application> direct_disbursals(String applicationId) {
+        String query = "SELECT * FROM eg_ubp_application WHERE id = ?";
+ 
+        return jdbcTemplate.query(query,
+                new Object[]{applicationId},
+                applicationRowMapper()).stream().findFirst();
+    }
+    
+   //public Optional<Application> getDisbursementProcessApplications(Map<String, Object> requestPayload) {
+   public List<Application> getDisbursementProcessApplications(String disbursalStatus) {
+            String query = "SELECT * FROM eg_ubp_application WHERE wf_status = ?";
+            List<Application> applications = jdbcTemplate.query(query,
+                    new Object[]{disbursalStatus},
+                    applicationRowMapper());
+            return applications;
+    }
+ 
+   
+    //End by priyanka
 
 }

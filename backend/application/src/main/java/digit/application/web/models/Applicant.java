@@ -68,4 +68,6 @@ public class Applicant {
 
     @JsonProperty("disability")
     private boolean disability;
+    
+ 
 }

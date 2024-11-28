@@ -1,4 +1,4 @@
-package digit.config;
+package digit.application.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.*;

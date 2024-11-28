@@ -271,4 +271,23 @@ public class BenefitsApiController {
 
     }*/
     
+    @RequestMapping(value = "/v1/_extenddate", method = RequestMethod.POST)
+    public ResponseEntity<?> benefitsV1ExtendDatePost(@Parameter(in = ParameterIn.DEFAULT, description = "Details for the updated Benefits Registration Applications + RequestInfo metadata.", required = true, schema = @Schema()) @Valid @RequestBody BenifitDateExtendRequest body) {
+        try {
+            ResponseEntity<?> response;
+//            response = benefitsService.updateBenefit(body);
+            response = benefitsService.extendBenifitDate(body);
+            return response;
+        } catch (Exception e) {
+            List<digit.web.models.Error> errors = new ArrayList<>();
+            errors.add(Error.builder().code("Internal Error").message("Error while updating benefit scheme").build());
+
+            ErrorResponse errorResponse = ErrorResponse.builder()
+                    .errors(errors)
+                    .responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(body.getRequestInfo(), false))
+                    .build();
+
+            return new ResponseEntity<>(errorResponse,HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
