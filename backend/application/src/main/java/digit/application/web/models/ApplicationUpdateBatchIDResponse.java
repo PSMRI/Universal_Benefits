@@ -1,9 +1,5 @@
 package digit.application.web.models;
-<<<<<<< HEAD
 
-=======
- 
->>>>>>> 1db5cb3ea2b8ccfc54b43c97812a031c0b9eeecc
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.egov.common.contract.response.ResponseInfo;
