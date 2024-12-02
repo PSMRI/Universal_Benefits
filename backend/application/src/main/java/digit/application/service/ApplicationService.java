@@ -132,7 +132,7 @@ public class ApplicationService {
 			 * List<Application> appString = response.getApplications();
 			 */
 
-			for (int i = 0; i < response.getApplications().size(); i++) {
+			/*for (int i = 0; i < response.getApplications().size(); i++) {
 				String applicationId = response.getApplications().get(i).getId();
 				boolean isApproved = configuration.isAuto_Approve_Applications();
 
@@ -143,7 +143,7 @@ public class ApplicationService {
 				if (isApproved) {
 					updateApplicationStatus(applicationStatusUpdateRequest);
 				}
-			}
+			}*/
 			return response;
 		} catch (IOException e) {
 			log.error(e.getMessage());
