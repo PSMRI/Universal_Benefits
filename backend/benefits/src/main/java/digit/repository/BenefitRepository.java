@@ -23,8 +23,6 @@ public class BenefitRepository {
     }
 
     public List<Benefit> getAllBenefits() {
-
-
         //String sql = "SELECT * FROM benefits"; // Your SQL query
         String sql="SELECT * FROM benefits LEFT JOIN (SELECT  * FROM benefit_extensions ORDER BY id DESC LIMIT 1) AS be ON benefits.benefit_id = be.benefit_id";
         jdbcTemplate.execute(sql);
@@ -50,6 +48,7 @@ public class BenefitRepository {
     }
 
     public String findBenefitNameById(String benefitId) {
+    	System.out.println("benefitId in query -"+benefitId);
         String sql = "SELECT benefit_name FROM benefits WHERE benefit_id = ?";
         try {
             return jdbcTemplate.queryForObject(sql, new Object[]{benefitId}, String.class);

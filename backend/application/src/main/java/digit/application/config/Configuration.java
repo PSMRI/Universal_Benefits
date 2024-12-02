@@ -92,7 +92,8 @@ public class Configuration {
 
      @Value("${kafka.topic.application.updatestatus}")
     private String kafkaTopicApplicationUpdateStatus;
-    // application search configs
+    
+     // application search configs
     @Value("${application.search.default.limit}")
     private Integer defaultLimit;
 
@@ -101,4 +102,38 @@ public class Configuration {
 
     @Value("${application.search.max.limit}")
     private Integer maxSearchLimit;
+    
+    //Priyanka 26Nov2024 direct disbursals 
+    @Value("${direct_disbursals_APIURL}")
+    private String direct_dibursals_APIURL;
+    
+    @Value("${direct_disbursals_x_api_key}")
+    private String direct_disbursals_x_api_key;
+    
+    @Value("${check_disbursals_status}")
+    private String check_disbursals_status;
+    
+    @Value("${kafka.topic.application.updateBatchID}")
+    private String kafkaTopicApplicationUpdateBatchID;
+    
+    @Value("${kafka.topic.application.updateStatusOnDisbursals}")
+    private String kafkaTopicApplicationUpdateStatusOnDisbursals;
+    
+    @Value("${kafka.topic.application.updateStatusByBatchId}")
+    private String kafkaTopicApplicationupdateStatusByBatchId;
+    
+    @Value("${kafka.topic.application.updateStatusByBatchIdErrorLog}")
+    private String kafkaTopicApplicationupdateStatusByBatchIdErrorLog;
+    
+    @Value("${disbursal_status}")
+    private String disbursal_status;
+   
+    @Value("${kafka.topic.application.updateApplicationLog}")
+    private String updateApplicationLog;
+    
+  //Vishal
+    @Value("${Auto_Approve_Applications}")
+    private boolean Auto_Approve_Applications;
+    
+    //End by priyanka
 }

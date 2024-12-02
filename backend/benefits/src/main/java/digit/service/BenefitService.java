@@ -213,7 +213,9 @@ public class BenefitService
     public ResponseEntity<?> getApplicationsByBenefitId(String benefitId) {
         try{
             String benefitName =benefitRepository.findBenefitNameById(benefitId);
-
+            
+            System.out.println("benefitName -"+benefitName);
+            
             if(ObjectUtils.isEmpty(benefitName)) {
                 return new ResponseEntity<>("BenefitId not found", HttpStatus.BAD_REQUEST);
             }

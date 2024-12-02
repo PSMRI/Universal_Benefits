@@ -1,4 +1,4 @@
-package digit.config;
+package digit.application.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.*;
@@ -29,8 +29,8 @@ public class BPAConfiguration {
         TimeZone.setDefault(TimeZone.getTimeZone(timeZone));
     }
 
-    @Bean
-    @Autowired
+    //@Bean
+    @Autowired 	
     public MappingJackson2HttpMessageConverter jacksonConverter(ObjectMapper objectMapper) {
         MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
         converter.setObjectMapper(objectMapper);
