@@ -251,7 +251,7 @@ public class V1ApiController {
 			JsonNode jsonSchema;
 			String firstname = null; // firstName
 			String lastName = null; // lastName
-			String amount = "1500"; // annualIncome need to change in discussion
+			String amount = "0"; // annualIncome need to change in discussion
 			String ifsc_code = null; // bankIfscCode
 			String account_number = null; // bankAccountNumber
 			String mobile = null; // not present
@@ -316,16 +316,21 @@ public class V1ApiController {
 				}
 
 				// need to change on benefit type pls refer doc
-				if (isDisabled != null && isDisabled.toLowerCase().equals("true")) {
+				/*if (isDisabled != null && isDisabled.toLowerCase().equals("true")) {
 					System.out.println("isDisabled inside");
 					amount = "1650"; // Set amount if the condition is true
-				}
+				}*/
 
 			} catch (JsonProcessingException e) {
 				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 						.body("Error parsing schema field to JSON: " + e.getMessage());
 			}
 
+			if(scheme.equals("PB-BTR-2024-12-02-000726")) {
+			       amount = "1000";
+			}else if(scheme.equals("PB-BTR-2024-12-02-000725")) {
+				amount = "1500";
+			}
 			// Make the POST request
 			Map<String, Object> dataEntry = new HashMap<>();
 			dataEntry.put("first_name", firstname);
