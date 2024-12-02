@@ -121,6 +121,14 @@
                     "type": "string",
                     "title": "Benefit Description Markdown",
                     "description": "Description of the specific benefit in markdown format"
+                  },
+                  "minValue": {
+                    "type": "string",
+                    "title": "Benefit Min Value"
+                  },
+                  "maxValue": {
+                    "type": "string",
+                    "title": "Benefit Max Value"
                   }
                 },
                 "minItems": 1
