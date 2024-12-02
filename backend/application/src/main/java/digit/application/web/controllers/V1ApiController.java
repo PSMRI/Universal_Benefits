@@ -74,6 +74,27 @@ public class V1ApiController {
 			@RequestPart(value = "files", required = false) List<MultipartFile> files) {
 		try {
 			ApplicationResponse response = applicationService.create(application, files);
+
+			 try {
+		            Thread.sleep(4000); // Wait for 3000 milliseconds (3 seconds)
+		            
+		            for (int i = 0; i < response.getApplications().size(); i++) {
+				String applicationId = response.getApplications().get(i).getId();
+				boolean isApproved = configuration.isAuto_Approve_Applications();
+
+				ApplicationStatusUpdateRequest applicationStatusUpdateRequest = new ApplicationStatusUpdateRequest();
+
+				applicationStatusUpdateRequest.setApplicationId(applicationId);
+				applicationStatusUpdateRequest.setStatus("APPROVED");
+				if (isApproved) {
+					System.out.println("Inside Approved");
+					v1UpdatePostApplicayionStatus(applicationStatusUpdateRequest);
+				}
+			}
+		            
+		        } catch (InterruptedException e) {
+		            e.printStackTrace();
+		        }
 			return new ResponseEntity<>(response, HttpStatus.CREATED);
 		} catch (JsonProcessingException e) {
 			log.error(e.getMessage());
@@ -271,7 +292,7 @@ public class V1ApiController {
 					if (node.get("name").asText().equals("lastName")) {
 						lastName = node.get("value").asText();
 					}
-					if (node.get("name").asText().equals("mobileNumber")) {
+					if (node.get("name").asText().equals("mobile")) {
 						mobile = node.get("value").asText();
 					}
 					/*
@@ -284,12 +305,13 @@ public class V1ApiController {
 					if (node.get("name").asText().equals("bankAccountNumber")) {
 						account_number = node.get("value").asText();
 					}
-					if (node.get("name").asText().equals("programCode")) {
+					
+					if (node.get("name").asText().equals("benefit_id")) {
 						scheme = node.get("value").asText();
 					}
-					if (node.get("name").asText().equals("disability")) {
+					/*if (node.get("name").asText().equals("disability")) {
 						isDisabled = node.get("value").asText();
-					}
+					}*/
 				}
 
 				// Validate extracted fields
@@ -311,11 +333,11 @@ public class V1ApiController {
 				if (scheme == null || scheme.isBlank()) {
 					scheme = "";
 				}
-				if (isDisabled == null || isDisabled.isBlank()) {
+			/*	if (isDisabled == null || isDisabled.isBlank()) {
 					return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Disability field is missing in schema");
-				}
+				}*/
 
-				// need to change on benefit type pls refer doc
+				// currently not in use
 				/*if (isDisabled != null && isDisabled.toLowerCase().equals("true")) {
 					System.out.println("isDisabled inside");
 					amount = "1650"; // Set amount if the condition is true
@@ -327,10 +349,11 @@ public class V1ApiController {
 			}
 
 			if(scheme.equals("PB-BTR-2024-12-02-000726")) {
-			       amount = "1000";
+				amount = "1000";
 			}else if(scheme.equals("PB-BTR-2024-12-02-000725")) {
 				amount = "1500";
 			}
+			
 			// Make the POST request
 			Map<String, Object> dataEntry = new HashMap<>();
 			dataEntry.put("first_name", firstname);
