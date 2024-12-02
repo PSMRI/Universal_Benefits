@@ -1,5 +1,4 @@
 package digit.application.web.models;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.egov.common.contract.models.Workflow;
@@ -24,7 +23,6 @@ import lombok.Builder;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-
 public class ApplicationUpdateBatchIDRequest {
 	@JsonProperty("applicationId")
     @NotNull

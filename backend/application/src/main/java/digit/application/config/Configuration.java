@@ -103,7 +103,7 @@ public class Configuration {
     @Value("${application.search.max.limit}")
     private Integer maxSearchLimit;
     
-    //Priyanka 26Nov2024 direct disbursals 
+  //Priyanka 26Nov2024 direct disbursals
     @Value("${direct_disbursals_APIURL}")
     private String direct_dibursals_APIURL;
     
