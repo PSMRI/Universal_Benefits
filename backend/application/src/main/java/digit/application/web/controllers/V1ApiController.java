@@ -89,7 +89,6 @@ public class V1ApiController {
 			@RequestPart(value = "files", required = false) List<MultipartFile> files) {
 		try {
 			ApplicationResponse response = applicationService.create(application, files);
-
 			 try {
 		         Thread.sleep(2000); // Wait for 3000 milliseconds (3 seconds)
 		        for (int i = 0; i < response.getApplications().size(); i++) {
@@ -533,24 +532,32 @@ public class V1ApiController {
 	
 								// Check if 'data' exists and is a Map
 								if (responseBody.containsKey("data") && responseBody.get("data") instanceof Map) {
+									System.out.println("----------disbursal_status: 535 " );
 									Map<String, Object> dataMap = (Map<String, Object>) responseBody.get("data");
 	
 									// Check if 'disbursal_status' exists and is a list
 									if (dataMap.containsKey("disbursal_status")&& dataMap.get("disbursal_status") instanceof List) {
+										System.out.println("----------disbursal_status: 540 " );
 										List<Map<String, Object>> disbursalStatusList = (List<Map<String, Object>>) dataMap
 												.get("disbursal_status");
 	
 										// Check if the list is not empty and extract the first item (or process all items)
 										if (!disbursalStatusList.isEmpty()) {
+											
 											Map<String, Object> firstItem = disbursalStatusList.get(0);
 											disbursal_status = (String) firstItem.get("disbursal_status");
-											System.out.println("----------disbursal_status: " + disbursal_status);
+				
+											
+											
 	
 											//verified
 											String configStatus = configuration.getDisbursal_status();
-											if(configStatus.toLowerCase().equals("verified")) {
+											System.out.println("----------disbursal_status: configStatus 553 " + configStatus);
+											if(configStatus != null && configStatus.trim().toLowerCase().equals("verified")) {
+												System.out.println("----------disbursal_status: 5151 " + disbursal_status);
 												if (disbursal_status.toLowerCase().equals("verified")) {
-													System.out.println("----------disbursal_status Verified");
+												
+													System.out.println("----------disbursal_status Verified 554");
 													if (Disbursals_batchIds.length() > 0) {
 														Disbursals_batchIds.append(","); // Add a comma only if this is not the
 													}
@@ -592,6 +599,10 @@ public class V1ApiController {
 				System.err.println("Error while parsing JSON: " + e.getMessage());
 			}
 
+			
+			
+			System.out.println("----Disbursals_batchIds  -- "+Disbursals_batchIds);
+			System.out.println("----Disbursals_batchIds_Empty  -- "+Disbursals_batchIds_Empty);
 			// Update status by id with success
 			if (!(Disbursals_batchIds == null || Disbursals_batchIds.length() == 0)) {
 				String[] batchIdArray = Disbursals_batchIds.toString().split(",");
