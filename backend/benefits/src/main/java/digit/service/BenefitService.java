@@ -219,7 +219,10 @@ public class BenefitService
             if(ObjectUtils.isEmpty(benefitName)) {
                 return new ResponseEntity<>("BenefitId not found", HttpStatus.BAD_REQUEST);
             }
+            
             List<Application> result = benefitRepository.getApplicationsByBenefitName(benefitId);
+//            List<Application> result = benefitRepository.getApplicationsByBenefitName(benefitName);
+            System.out.println("result is "+result);
             return new ResponseEntity<>(result, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>("Error while fetching applications", HttpStatus.INTERNAL_SERVER_ERROR);

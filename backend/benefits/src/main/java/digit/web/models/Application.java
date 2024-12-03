@@ -55,12 +55,19 @@ public class Application {
      * Flag to soft delete
      */
     public enum StatusEnum {
-        ACTIVE("ACTIVE"),
+    	ACTIVE("ACTIVE"),
 
-        INACTIVE("INACTIVE"),
+		INACTIVE("INACTIVE"),
 
-        ARCHIVED("ARCHIVED");
+		ARCHIVED("ARCHIVED"),
 
+		APPROVED("APPROVED"),
+
+		PENDING_FOR_REVIEW("PENDING FOR REVIEW"),
+
+		AMOUNT_TRANSFER_IN_PROGRESS("AMOUNT TRANSFER IN PROGRESS"),
+
+		SUBMITTED_FOR_DISBURSAL("SUBMITTED FOR DISBURSAL");
 
         private String value;
 
@@ -118,12 +125,19 @@ public class Application {
     }
 
     public enum WFStatusEnum {
-        APPROVED("APPROVED"),
+    	ACTIVE("ACTIVE"),
 
-        VERIFIED("VERIFIED"),
+		INACTIVE("INACTIVE"),
 
-        REJECTED("REJECTED");
+		ARCHIVED("ARCHIVED"),
 
+		APPROVED("APPROVED"),
+
+		PENDING_FOR_REVIEW("PENDING FOR REVIEW"),
+
+		AMOUNT_TRANSFER_IN_PROGRESS("AMOUNT TRANSFER IN PROGRESS"),
+
+		SUBMITTED_FOR_DISBURSAL("SUBMITTED FOR DISBURSAL");
 
         private String value;
 
