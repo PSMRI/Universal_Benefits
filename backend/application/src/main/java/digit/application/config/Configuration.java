@@ -104,15 +104,6 @@ public class Configuration {
     private Integer maxSearchLimit;
     
   //Priyanka 26Nov2024 direct disbursals
-    @Value("${direct_disbursals_APIURL}")
-    private String direct_dibursals_APIURL;
-    
-    @Value("${direct_disbursals_x_api_key}")
-    private String direct_disbursals_x_api_key;
-    
-    @Value("${check_disbursals_status}")
-    private String check_disbursals_status;
-    
     @Value("${kafka.topic.application.updateBatchID}")
     private String kafkaTopicApplicationUpdateBatchID;
     

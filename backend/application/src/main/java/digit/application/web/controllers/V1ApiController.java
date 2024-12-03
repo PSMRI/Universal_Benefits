@@ -5,19 +5,12 @@ import digit.application.config.Configuration;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import digit.application.service.ApplicationService;
 import digit.application.web.models.*;
-
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
-
- 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
- 
-
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -64,9 +57,31 @@ public class V1ApiController {
 		this.request = request;
 		this.applicationService = applicationService;
 		this.configuration = configuration;
-		this.restTemplate = restTemplate;
+		this.restTemplate = restTemplate;	
+		getApplicationIntegration();
 	}
-
+	
+	public String direct_disbursals_APIURL,	direct_disbursals_x_api_key ,check_disbursals_status = null;
+	public void getApplicationIntegration() {
+	    List<ApplicationIntegrationResponse> response = applicationService.getApplicationIntegration();
+	    System.out.println("Call function: " + response);
+	    
+	    for (int i = 0; i < response.size(); i++) {
+	        ApplicationIntegrationResponse item = response.get(i);
+	       if(item.getKey().equals("direct_disbursals_APIURL")) {
+	    	   direct_disbursals_APIURL = item.getValue();
+	    	   direct_disbursals_x_api_key = item.getXapikey();
+	       }
+	       if(item.getKey().equals("check_disbursals_status")) {
+	    	   check_disbursals_status = item.getValue();
+	       }
+	    }
+	    
+	    System.out.println("direct_disbursals_APIURL " + direct_disbursals_APIURL);
+	   // return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
+	}
+	
+	
 	@RequestMapping(value = "/_create", method = RequestMethod.POST, consumes = { MediaType.MULTIPART_FORM_DATA_VALUE,
 			MediaType.APPLICATION_OCTET_STREAM_VALUE })
 	public ResponseEntity<?> v1CreatePost(
@@ -76,9 +91,8 @@ public class V1ApiController {
 			ApplicationResponse response = applicationService.create(application, files);
 
 			 try {
-		            Thread.sleep(4000); // Wait for 3000 milliseconds (3 seconds)
-		            
-		            for (int i = 0; i < response.getApplications().size(); i++) {
+		         Thread.sleep(2000); // Wait for 3000 milliseconds (3 seconds)
+		        for (int i = 0; i < response.getApplications().size(); i++) {
 				String applicationId = response.getApplications().get(i).getId();
 				boolean isApproved = configuration.isAuto_Approve_Applications();
 
@@ -162,13 +176,12 @@ public class V1ApiController {
 						        String result = String.join(", ", messages);
 						        System.out.println(result);
 						        errorMsg = result;
-								
 						}
 					} else {
 						System.out.println("Unexpected response type: " + responseBody.getClass());
 					}
 				}
- 
+				
 				System.out.println("Response batch ID - " + batchId);
  
 				ApplicationUpdateBatchIDResponse BatchIDresponse = null;
@@ -261,7 +274,7 @@ public class V1ApiController {
 				return ResponseEntity.status(HttpStatus.NOT_FOUND)
 						.body("Application not found for ID: " + body.getApplicationId());
 			}
-
+			
 			// Extract the schema field
 			String schema = application.getSchema();
 			if (schema == null || schema.isBlank()) {
@@ -351,7 +364,7 @@ public class V1ApiController {
 			if(scheme.equals("PB-BTR-2024-12-02-000726")) {
 				amount = "1000";
 			}else if(scheme.equals("PB-BTR-2024-12-02-000725")) {
-				amount = "1500";
+				amount = "1800";
 			}
 			
 			// Make the POST request
@@ -377,11 +390,12 @@ public class V1ApiController {
 			requestPayload.put("data", dataList);
 
 			HttpHeaders headers = new HttpHeaders();
-			String xapikey = configuration.getDirect_disbursals_x_api_key();
+			String xapikey = direct_disbursals_x_api_key;
 			headers.set("x-api-key", xapikey);
 			HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestPayload, headers);
 
-			String externalApiUrl = configuration.getDirect_dibursals_APIURL();
+			String externalApiUrl = direct_disbursals_APIURL;
+			System.out.println("externalApiUrl - "+ externalApiUrl + ", "+direct_disbursals_x_api_key);
 			ResponseEntity<Object> externalResponse;
 
 			try {
@@ -468,7 +482,7 @@ public class V1ApiController {
 
 	// Create function to check disbursal status
 	//@GetMapping("/UpdateDisbursals") 
-	public ResponseEntity<?> getDisbursementProcessApplications(@RequestParam(value = "disbursalStatus", defaultValue = "Disbursement is under Process") String disbursalStatus) {
+	public ResponseEntity<?> getDisbursementProcessApplications(@RequestParam(value = "disbursalStatus", defaultValue = "AMOUNT TRANSFER IN PROGRESS") String disbursalStatus) {
 		try {
 			List<Application> applications = applicationService.getDisbursementProcessApplications(disbursalStatus);
 
@@ -496,14 +510,14 @@ public class V1ApiController {
 				for (Application app : applicationList) {
 					System.out.println("Batch ID: " + app.getBatch_id());
 					if(app.getBatch_id() > 0) {
-						String xapikey = configuration.getDirect_disbursals_x_api_key();
+						String xapikey = direct_disbursals_x_api_key;
 						HttpHeaders headers = new HttpHeaders();
 						headers.set("x-api-key", xapikey);
 						headers.setContentType(MediaType.APPLICATION_JSON); // Optional, depending on your API's
 																			// requirements
 						HttpEntity<Void> entity = new HttpEntity<>(headers);
 	
-						String externalApiUrl = configuration.getCheck_disbursals_status() + app.getBatch_id();
+						String externalApiUrl = check_disbursals_status + app.getBatch_id();
 						ResponseEntity<Object> externalResponse;
 						System.out.println("----------extrenal api url " + externalApiUrl);
 						try {
@@ -596,7 +610,7 @@ public class V1ApiController {
 			} else {
 			//	return ResponseEntity.status(HttpStatus.NO_CONTENT).body("No batch Id found with status 'Disbursal Done' and 'Payment Acknowledged'");
 			}
-			
+		
 			
 			//update status with error log 
 			if (!(Disbursals_batchIds_Empty == null || Disbursals_batchIds_Empty.length() == 0)) {
@@ -633,7 +647,7 @@ public class V1ApiController {
 	}
 	
 	public ResponseEntity<?> callDisbursementProcessInternally() {
-	    String disbursalStatus = "Disbursement is under Process";
+	    String disbursalStatus = "AMOUNT TRANSFER IN PROGRESS";
 	    return getDisbursementProcessApplications(disbursalStatus);
 	}
 	

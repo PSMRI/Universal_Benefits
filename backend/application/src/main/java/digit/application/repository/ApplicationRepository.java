@@ -157,7 +157,26 @@ public class ApplicationRepository {
         String query = "SELECT * FROM eg_ubp_applicant WHERE application_id = ?";
         return jdbcTemplate.query(query, new Object[]{applicationId}, searchApplicationRowMapper.applicantRowMapper()).stream().findFirst().orElse(null);
     }
-
+    
+    
+    
+    private RowMapper<ApplicationIntegrationResponse> integrationRowMappar() {
+        return (rs, rowNum) -> {
+        	ApplicationIntegrationResponse integration = ApplicationIntegrationResponse.builder()
+                    .id(rs.getString("id"))
+                    .key(rs.getString("key"))
+                    .value(rs.getString("value"))
+                    .xapikey(rs.getString("xapikey"))
+                    .build();
+            return integration;
+        };
+    }
+    
+    public List<ApplicationIntegrationResponse> getApplicationIntegration() {
+        String query = "SELECT * FROM integration";
+        return jdbcTemplate.query(query, integrationRowMappar());
+    }
+    
 
 
     private List<Document> getDocumentsByApplicationId(String applicationId) {
