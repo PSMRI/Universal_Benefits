@@ -76,7 +76,7 @@ public class V1ApiController {
 			ApplicationResponse response = applicationService.create(application, files);
 
 			 try {
-		            Thread.sleep(4000); // Wait for 3000 milliseconds (3 seconds)
+		            Thread.sleep(2000); // Wait for 3000 milliseconds (3 seconds)
 		            
 		            for (int i = 0; i < response.getApplications().size(); i++) {
 				String applicationId = response.getApplications().get(i).getId();
@@ -173,9 +173,11 @@ public class V1ApiController {
  
 				ApplicationUpdateBatchIDResponse BatchIDresponse = null;
 				if(batchId != null) {
+					System.out.println("Inside if batchId != null");
 					ApplicationUpdateBatchIDRequest applicationRequest = new ApplicationUpdateBatchIDRequest();
 					applicationRequest.setApplicationId(body.getApplicationId());
 					applicationRequest.setBatch_id(batchId); // You can set the status as per the incoming body
+					System.out.println("batch id inside if "+batchId);
 					 BatchIDresponse = applicationService.updateApplication_BatchId(applicationRequest);
 				}
 				// update Status
