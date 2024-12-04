@@ -76,6 +76,8 @@ public class ApplicationService {
 			int index = 0;
 			List<Document> docList = new ArrayList<>();
 
+			
+			
 			if (!ObjectUtils.isEmpty(files)) {
 				for (MultipartFile file : files) {
 					Response uploadResponse = httpClient.uploadFile(file, application.getTenantId(),
@@ -152,6 +154,8 @@ public class ApplicationService {
 			throw new RuntimeException("Error while adding application - " + e.getMessage());
 		}
 	}
+	
+	
 
 	public String createJsonFromApplicationRequest(ApplicationRequest applicationRequest)
 			throws JsonProcessingException {
@@ -505,7 +509,22 @@ public class ApplicationService {
 			throw new RuntimeException("Unable to fetch application. Please try again later.", e);
 		}
 	}
+	
+	public List<ApplicationIntegrationResponse> getApplicationIntegration() {
+		try {
+			List<ApplicationIntegrationResponse> optionalApplication = applicationRepository.getApplicationIntegration();
 
+			 if (optionalApplication.isEmpty()) {
+		            throw new RuntimeException("Integration not found.");
+		        }
+			 return optionalApplication;
+		} catch (Exception e) {
+			System.err.println("Error occurred while fetching application: " + e.getMessage());
+			throw new RuntimeException("Unable to fetch application. Please try again later.", e);
+		}
+	}
+	
+	
 	// priyanka 25Nov2024
 	public Application direct_disbursals(String applicationId) {
 		try {
@@ -561,7 +580,6 @@ public class ApplicationService {
 			throw new RuntimeException("Unable to fetch application. Please try again later.", e);
 		}
 	}
-
 	public ApplicationUpdateBatchIDResponse updateStatusByBatchId(ApplicationUpdateBatchIDRequest applicationRequest) {
 		int batch_id = applicationRequest.getBatch_id();
 		boolean isSuccess = false;
