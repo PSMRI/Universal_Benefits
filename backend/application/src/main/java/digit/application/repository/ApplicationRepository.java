@@ -202,7 +202,14 @@ public class ApplicationRepository {
             return applications;
     }
 
-   
+   public List<Application> getApplicationByOrderId(String orderId) {
+       String query = "SELECT * FROM eg_ubp_application WHERE order_id = ?";
+ 
+       List<Application> applications = jdbcTemplate.query(query, 
+               new Object[]{orderId}, 
+               applicationRowMapper());
+       return applications;
+   }
     //End by priyanka
 
 }

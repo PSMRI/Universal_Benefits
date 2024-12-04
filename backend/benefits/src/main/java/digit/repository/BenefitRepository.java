@@ -31,7 +31,7 @@ public class BenefitRepository {
     }
 
     public List<Application> getApplicationsByBenefitName(String benefitName) {
-        String sql = "SELECT app.id AS application_id, app.tenant_id, app.application_number, " +
+        String sql = "SELECT app.order_id,app.id AS application_id, app.tenant_id, app.application_number, " +
                 "app.individual_id, app.program_code, app.status, app.wf_status, app.additional_details, " +
                 "app.schema, app.created_by, app.last_modified_by, app.created_time, app.last_modified_time, " +
                 "applicant.id AS applicant_id, applicant.student_name, applicant.father_name, applicant.samagra_id, " +

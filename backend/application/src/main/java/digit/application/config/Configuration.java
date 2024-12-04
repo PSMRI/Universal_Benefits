@@ -122,6 +122,9 @@ public class Configuration {
     @Value("${kafka.topic.application.updateApplicationLog}")
     private String updateApplicationLog;
     
+    @Value("${kafka.topic.application.updateApplicationOrderId}")
+    private String updateApplicationOrderId;
+    
   //Vishal
     @Value("${Auto_Approve_Applications}")
     private boolean Auto_Approve_Applications;

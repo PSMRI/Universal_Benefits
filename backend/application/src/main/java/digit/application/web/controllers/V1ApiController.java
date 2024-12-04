@@ -127,9 +127,9 @@ public class V1ApiController {
 	}
 
 	@RequestMapping(value = "/_update", method = RequestMethod.POST)
-	public ResponseEntity<ApplicationResponse> v1UpdatePost(
-			@Parameter(in = ParameterIn.DEFAULT, description = "Request object to create Application in the system", required = true, schema = @Schema()) @Valid @RequestBody ApplicationRequest body) {
-		ApplicationResponse response = applicationService.update(body);
+	public ResponseEntity<ApplicationOrderIDUpdateResponse> v1UpdatePost(
+			@Parameter(in = ParameterIn.DEFAULT, description = "Request object to create Application in the system", required = true, schema = @Schema()) @Valid @RequestBody ApplicationOrderIDUpdateRequest body) {
+		ApplicationOrderIDUpdateResponse response = applicationService.update(body);
 		return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
 	}
 
@@ -682,6 +682,19 @@ public class V1ApiController {
 			@Parameter(in = ParameterIn.DEFAULT, description = "Request to update status by batch id with error log ", required = true, schema = @Schema()) @Valid @RequestBody ApplicationUpdateBatchIDRequest body) {
 		ApplicationUpdateBatchIDResponse response = applicationService.updatestatusByBatchId_ErrorLog(body);
 		return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
+	}
+	
+	@RequestMapping(value = "/getApplicationByOrderId", method = RequestMethod.POST)
+	public ResponseEntity<Object> getApplicationByOrderId(@RequestBody OrderIdRequestBody body) {
+		System.out.println("Received req");
+		try {
+			List<Application> applications = applicationService.getApplicationByOrderId(body.getOrderId());
+			// getDisbursementProcessApplications();
+			return new ResponseEntity<>(applications, HttpStatus.ACCEPTED);
+		} catch (Exception e) {
+			System.err.println("Error while fetching application: " + e.getMessage());
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred: " + e.getMessage());
+		}
 	}
 
 	/*@Scheduled(cron = "0 0/15 * * * ?") // run every 1 mins
