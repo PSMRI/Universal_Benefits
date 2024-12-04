@@ -35,11 +35,12 @@ jobs:
         run: |
           echo "Devops@1997" | docker login --username prsm323 --password-stdin
           
-      # Step 5: Build Docker image
+      # Step 5: Build Docker image and save IMAGE_TAG to a file
       - name: Build Docker image
         run: |
           # Generate the image tag using date and time
           IMAGE_TAG="v1.0.0-$(date +'%Y%m%d-%H%M%S')"
+          echo "IMAGE_TAG=$IMAGE_TAG" > image_tag.txt  # Save the IMAGE_TAG to a file
           echo "Building Docker image with tag: $IMAGE_TAG"
           
           # Build the Docker image with the new tag
@@ -48,7 +49,7 @@ jobs:
       # Step 6: Push Docker image to Docker Hub
       - name: Push Docker image to Docker Hub
         run: |
-          IMAGE_TAG="v1.0.0-$(date +'%Y%m%d-%H%M%S')"  # Use the same tag format as in Step 5
+          IMAGE_TAG=$(cat image_tag.txt)  # Read the IMAGE_TAG from the file
           echo "Pushing Docker image with tag: $IMAGE_TAG"
           docker push prsm323/application:$IMAGE_TAG
 
@@ -78,7 +79,7 @@ jobs:
       # Step 10: Update the values.yaml file with the new tag
       - name: Update values.yaml with new tag
         run: |
-          IMAGE_TAG="v1.0.0-$(date +'%Y%m%d-%H%M%S')"  # Use the same tag format here
+          IMAGE_TAG=$(cat image_tag.txt)  # Read the IMAGE_TAG from the file
           echo "Updating values.yaml with tag $IMAGE_TAG"
           
           # Install yq (a lightweight command-line YAML processor)
@@ -90,7 +91,8 @@ jobs:
       # Step 11: Deploy to EKS using Helm
       - name: Deploy to EKS using Helm
         run: |
-          IMAGE_TAG="v1.0.0-$(date +'%Y%m%d-%H%M%S')"  # Use the same tag format here
+          IMAGE_TAG=$(cat image_tag.txt)  # Read the IMAGE_TAG from the file
+          echo "Deploying to EKS using Helm with tag $IMAGE_TAG"
           helm upgrade --install backend ./DIGIT-DevOps/deploy-as-code/charts/uba/backend/application \
             --set backend.image.repository=prsm323/application \
             --set backend.image.tag=$IMAGE_TAG \
