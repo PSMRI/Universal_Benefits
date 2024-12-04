@@ -27,6 +27,7 @@ public class ApplicationResultSetExtractor implements ResultSetExtractor<List<Ap
                 application = Application.builder()
                         .id(applicationId)
                         .tenantId(rs.getString("tenant_id"))
+                        .order_id(rs.getString("order_id"))
                         .applicationNumber(rs.getString("application_number"))
                         .individualId(rs.getString("individual_id"))
                         .programCode(rs.getString("program_code"))

@@ -37,6 +37,9 @@ public class Application {
     @Size(min = 2, max = 64)
     private String tenantId = null;
 
+    @JsonProperty("order_id")
+	private String order_id = null; 
+    
     @JsonProperty("applicationNumber")
     @Size(min = 4, max = 64)
     private String applicationNumber = null;

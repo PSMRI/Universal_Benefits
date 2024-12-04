@@ -202,17 +202,14 @@ public class ApplicationService {
 		}
 	}
 
-	public ApplicationResponse update(ApplicationRequest applicationRequest) {
-
-		Application application = applicationRequest.getApplication();
-		ApplicationResponse response = null;
+	public ApplicationOrderIDUpdateResponse update(ApplicationOrderIDUpdateRequest applicationRequest) {
+		String appId=applicationRequest.getApplicationId();
+		String NeworderId=applicationRequest.getOrderId();
+		System.out.println("appId is "+appId + "NeworderId is "+NeworderId);	
+		ApplicationOrderIDUpdateResponse  response = null;
 		// TODO: Write business logic to update the application
-		producer.push(configuration.getKafkaTopicApplicationUpdate(), applicationRequest);
-		response = ApplicationResponse.builder().applications(Arrays.asList(applicationRequest.getApplication()))
-				.responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(applicationRequest.getRequestInfo(),
-						true))
-				.build();
-
+		producer.push(configuration.getUpdateApplicationOrderId(), applicationRequest);
+		response = ApplicationOrderIDUpdateResponse.builder().responseMsg("OrderId Updated Succesfully").responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(applicationRequest.getRequestInfo(),true)).build();
 		return response;
 	}
 
@@ -617,6 +614,19 @@ public class ApplicationService {
 				.message(message).build();
 	}
 
+	public List<Application> getApplicationByOrderId(String orderId) {
+		try {
+			List<Application> optionalApplication = applicationRepository.getApplicationByOrderId(orderId);
+ 
+			if (optionalApplication.isEmpty()) {
+				throw new RuntimeException("Application not found with ID: " + orderId);
+			}
+			return optionalApplication;
+		} catch (Exception e) {
+			System.err.println("Error occurred while fetching application: " + e.getMessage());
+			throw new RuntimeException("Unable to fetch application. Please try again later.", e);
+		}
+	}
 	// End by priyanka
 
 	// Main class end
