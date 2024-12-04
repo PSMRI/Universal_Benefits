@@ -71,11 +71,28 @@ jobs:
             echo "Values file not found!"
             exit 1
           fi
+      
+      # Step 10: Update the values.yaml file with the new tag
+      - name: Update values.yaml with new tag
+        run: |
+          IMAGE_TAG=${GITHUB_SHA}
+          echo "Updating values.yaml with tag $IMAGE_TAG"
+          # Install yq (a lightweight command-line YAML processor)
+          curl -s https://raw.githubusercontent.com/mikefarah/yq/v4.15.1/install_linux_amd64.tar.gz | tar xz -C /usr/local/bin
+          # Replace the tag field in values.yaml
+          yq e '.image.tag = str(env(IMAGE_TAG))' -i ./DIGIT-DevOps/deploy-as-code/charts/uba/backend/application/values.yaml
 
-
-      # Step 10: Deploy to EKS using Helm
+      # Step 11: Deploy to EKS using Helm
       - name: Deploy to EKS using Helm
         run: |
           helm upgrade --install backend ./DIGIT-DevOps/deploy-as-code/charts/uba/backend/application \
             --set backend.image.repository=prsm323/application \
-            --set backend.image.tag=$GITHUB_SHA
+            --set backend.image.tag=$GITHUB_SHA \
+            -f ./DIGIT-DevOps/deploy-as-code/charts/uba/backend/application/values.yaml
+
+      # # Step 10: Deploy to EKS using Helm
+      # - name: Deploy to EKS using Helm
+      #   run: |
+      #     helm upgrade --install backend ./DIGIT-DevOps/deploy-as-code/charts/uba/backend/application \
+      #       --set backend.image.repository=prsm323/application \
+      #       --set backend.image.tag=$GITHUB_SHA
