@@ -1,4 +1,4 @@
-name: Build, Push Docker Image to Docker Hub and Deploy to EKS
+name: Build and Deploy to DEV EKS
 
 on:
   push:
@@ -53,9 +53,29 @@ jobs:
           curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
           helm version # Verify Helm is installed
 
-      # Step 8: Deploy to EKS using Helm
+      
+
+      # Step 8: Clone external repository containing the Helm chart and values file
+      - name: Clone the DIGIT-DevOps repository
+        run: |
+          git clone --branch DIGIT-2.9LTS https://github.com/Ramesh-Kumhar/DIGIT-DevOps.git
+
+      # Step 9: Ensure Helm chart path exists
+      - name: Ensure Helm chart path exists
+        run: |
+          if [ ! -d "./DIGIT-DevOps/deploy-as-code/charts/uba/backend/application" ]; then
+            echo "Helm chart directory not found!"
+            exit 1
+          fi
+          if [ ! -f "./DIGIT-DevOps/deploy-as-code/charts/uba/backend/application/values" ]; then
+            echo "Values file not found!"
+            exit 1
+          fi
+
+
+      # Step 10: Deploy to EKS using Helm
       - name: Deploy to EKS using Helm
         run: |
-          helm upgrade --install backend ./deploy-as-code/charts/uba/backend/application \
+          helm upgrade --install backend ./DIGIT-DevOps/deploy-as-code/charts/uba/backend/application \
             --set backend.image.repository=prsm323/application \
             --set backend.image.tag=$GITHUB_SHA
