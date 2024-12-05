@@ -72,14 +72,19 @@ jobs:
             exit 1
           fi
 
-      # Step 10: Update values.yaml with new tag for Container Configs
+      # Step 10: Install chart dependencies
+      - name: Install chart dependencies
+        run: |
+          helm dependency build ./DIGIT-DevOps/deploy-as-code/charts/uba/backend/customer
+
+      # Step 11: Update values.yaml with new tag for Container Configs
       - name: Update values.yaml with new tag for Container Configs
         run: |
           IMAGE_TAG=$(cat image_tag.txt)  # Read the IMAGE_TAG from the file
           echo "Updating values.yaml with tag $IMAGE_TAG"
           yq e ".image.tag = \"$IMAGE_TAG\"" -i ./DIGIT-DevOps/deploy-as-code/charts/uba/backend/customer/values.yaml
 
-      # Step 11: Deploy to EKS using Helm
+      # Step 12: Deploy to EKS using Helm
       - name: Deploy to EKS using Helm
         run: |
           helm upgrade --install backend ./DIGIT-DevOps/deploy-as-code/charts/uba/backend/customer \
