@@ -195,7 +195,8 @@ public class ApplicationRepository {
     
    //public Optional<Application> getDisbursementProcessApplications(Map<String, Object> requestPayload) {
    public List<Application> getDisbursementProcessApplications(String disbursalStatus) {
-            String query = "SELECT * FROM eg_ubp_application WHERE status in ('AMOUNT TRANSFER IN PROGRESS', 'PENDING FOR REVIEW') AND order_id IS NOT NULL";
+            String query = "SELECT * FROM eg_ubp_application WHERE status in ('AMOUNT TRANSFER IN PROGRESS', 'PENDING FOR REVIEW')  AND order_id IS NOT NULL
+  AND order_id <> ''";
            
             //List<Application> applications = jdbcTemplate.query(query,new Object[]{disbursalStatus},applicationRowMapper());
             
