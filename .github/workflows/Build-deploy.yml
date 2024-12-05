@@ -40,14 +40,14 @@ jobs:
         run: |
           IMAGE_TAG="v1.0.0-$(date +'%Y%m%d-%H%M%S')"
           echo $IMAGE_TAG > image_tag.txt  # Save only the tag value
-          docker build -t prsm323/application:$IMAGE_TAG ./backend/application  # Path to Dockerfile is correct
+          docker build -t prsm323/customer:$IMAGE_TAG ./backend/customer  # Path to Dockerfile is correct
 
       # Step 6: Push Docker image to Docker Hub
       - name: Push Docker image to Docker Hub
         run: |
           IMAGE_TAG=$(cat image_tag.txt)  # Read the IMAGE_TAG from the file (no '=' prefix)
           echo "Pushing Docker image with tag: $IMAGE_TAG"
-          docker push prsm323/application:$IMAGE_TAG
+          docker push prsm323/customer:$IMAGE_TAG
           
       # Step 7: Install yq
       - name: Install yq
@@ -63,11 +63,11 @@ jobs:
       # Step 9: Ensure Helm chart path exists
       - name: Ensure Helm chart path exists
         run: |
-          if [ ! -d "./DIGIT-DevOps/deploy-as-code/charts/uba/backend/application" ]; then
+          if [ ! -d "./DIGIT-DevOps/deploy-as-code/charts/uba/backend/customer" ]; then
             echo "Helm chart directory not found!"
             exit 1
           fi
-          if [ ! -f "./DIGIT-DevOps/deploy-as-code/charts/uba/backend/application/values.yaml" ]; then
+          if [ ! -f "./DIGIT-DevOps/deploy-as-code/charts/uba/backend/customer/values.yaml" ]; then
             echo "Values file not found!"
             exit 1
           fi
@@ -79,12 +79,12 @@ jobs:
           echo "Updating values.yaml with tag $IMAGE_TAG"
 
         # Replace the tag in the `image.tag` using the value of IMAGE_TAG
-          yq e ".image.tag = \"$IMAGE_TAG\"" -i ./DIGIT-DevOps/deploy-as-code/charts/uba/backend/application/values.yaml
+          yq e ".image.tag = \"$IMAGE_TAG\"" -i ./DIGIT-DevOps/deploy-as-code/charts/uba/backend/customer/values.yaml
 
       # Step 11: Deploy to EKS using Helm
       - name: Deploy to EKS using Helm
         run: |
-          helm upgrade --install backend ./DIGIT-DevOps/deploy-as-code/charts/uba/backend/application \
-            --set backend.image.repository=prsm323/application \
+          helm upgrade --install backend ./DIGIT-DevOps/deploy-as-code/charts/uba/backend/customer \
+            --set backend.image.repository=prsm323/customer \
             --set backend.image.tag=$IMAGE_TAG \
-            -f ./DIGIT-DevOps/deploy-as-code/charts/uba/backend/application/values.yaml
+            -f ./DIGIT-DevOps/deploy-as-code/charts/uba/backend/customer/values.yaml
