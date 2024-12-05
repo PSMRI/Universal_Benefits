@@ -71,8 +71,14 @@ public class Application {
 		AMOUNT_TRANSFER_IN_PROGRESS("AMOUNT TRANSFER IN PROGRESS"),
 
 		SUBMITTED_FOR_DISBURSAL("SUBMITTED FOR DISBURSAL"),
+<<<<<<< HEAD
 		SUBMITTED("SUBMITTED"),
 		 
+=======
+		
+		SUBMITTED("SUBMITTED"),
+    	
+>>>>>>> eaaec783d68f33b0e311a8b0d432930cfad5565b
     	AMOUNT_RECEIVED("AMOUNT RECEIVED");
 
         private String value;

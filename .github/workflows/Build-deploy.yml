@@ -88,8 +88,8 @@ jobs:
       - name: Deploy to EKS using Helm
         run: |
           helm upgrade --install customer ./DIGIT-DevOps/deploy-as-code/charts/uba/backend/customer \
-            --set cutomer.image.repository=prsm323/customer \
-            --set customer.image.tag=$IMAGE_TAG \
+            --set image.repository=prsm323/customer \
+            --set image.tag=$IMAGE_TAG \
             --namespace egov \
             --force \
             -f ./DIGIT-DevOps/deploy-as-code/charts/uba/backend/customer/values.yaml
