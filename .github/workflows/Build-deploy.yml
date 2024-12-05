@@ -38,25 +38,22 @@ jobs:
       # Step 5: Build Docker image
       - name: Build Docker image
         run: |
-          # Generate the image tag using date and time
           IMAGE_TAG="v1.0.0-$(date +'%Y%m%d-%H%M%S')"
-          echo "Building Docker image with tag: $IMAGE_TAG"
-          
-          # Build the Docker image with the new tag
+          echo $IMAGE_TAG > image_tag.txt  # Save only the tag value
           docker build -t prsm323/application:$IMAGE_TAG ./backend/application  # Path to Dockerfile is correct
 
       # Step 6: Push Docker image to Docker Hub
       - name: Push Docker image to Docker Hub
         run: |
-          IMAGE_TAG="v1.0.0-$(date +'%Y%m%d-%H%M%S')"  # Use the same tag format as in Step 5
+          IMAGE_TAG=$(cat image_tag.txt)  # Read the IMAGE_TAG from the file (no '=' prefix)
           echo "Pushing Docker image with tag: $IMAGE_TAG"
           docker push prsm323/application:$IMAGE_TAG
-
-      # Step 7: Install Helm
-      - name: Install Helm
+          
+      # Step 7: Install yq
+      - name: Install yq
         run: |
-          curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
-          helm version # Verify Helm is installed
+          curl -L https://github.com/mikefarah/yq/releases/download/v4.15.1/yq_linux_amd64 -o /usr/local/bin/yq
+          chmod +x /usr/local/bin/yq
 
       # Step 8: Clone external repository containing the Helm chart and values file
       - name: Clone the DIGIT-DevOps repository
@@ -75,22 +72,18 @@ jobs:
             exit 1
           fi
 
-      # Step 10: Update the values.yaml file with the new tag
-      - name: Update values.yaml with new tag
+      # Step 10: Update values.yaml with new tag for Container Configs
+      - name: Update values.yaml with new tag for Container Configs
         run: |
-          IMAGE_TAG="v1.0.0-$(date +'%Y%m%d-%H%M%S')"  # Use the same tag format here
+          IMAGE_TAG=$(cat image_tag.txt | cut -d'=' -f2)  # Extract the value after '='
           echo "Updating values.yaml with tag $IMAGE_TAG"
           
-          # Install yq (a lightweight command-line YAML processor)
-          curl -s https://raw.githubusercontent.com/mikefarah/yq/v4.15.1/install_linux_amd64.tar.gz | tar xz -C /usr/local/bin
-          
-          # Replace the tag field in values.yaml with the new image tag
-          yq e '.image.tag = str(env(IMAGE_TAG))' -i ./DIGIT-DevOps/deploy-as-code/charts/uba/backend/application/values.yaml
+          # Replace the tag in the `image.tag` inside the Container Configs section
+          yq e '.image.tag = env(IMAGE_TAG)' -i ./DIGIT-DevOps/deploy-as-code/charts/uba/backend/application/values.yaml
 
       # Step 11: Deploy to EKS using Helm
       - name: Deploy to EKS using Helm
         run: |
-          IMAGE_TAG="v1.0.0-$(date +'%Y%m%d-%H%M%S')"  # Use the same tag format here
           helm upgrade --install backend ./DIGIT-DevOps/deploy-as-code/charts/uba/backend/application \
             --set backend.image.repository=prsm323/application \
             --set backend.image.tag=$IMAGE_TAG \
