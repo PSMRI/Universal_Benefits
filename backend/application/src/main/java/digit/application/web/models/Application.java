@@ -73,7 +73,10 @@ public class Application {
 
 		SUBMITTED_FOR_DISBURSAL("SUBMITTED FOR DISBURSAL"),
     	
+		SUBMITTED("SUBMITTED"),		 
+		
     	AMOUNT_RECEIVED("AMOUNT RECEIVED");
+		
 		private String value;
 
 		StatusEnum(String value) {
@@ -157,7 +160,7 @@ public class Application {
 		AMOUNT_TRANSFER_IN_PROGRESS("AMOUNT TRANSFER IN PROGRESS"),
 
 		SUBMITTED_FOR_DISBURSAL("SUBMITTED FOR DISBURSAL"),
-    	
+		SUBMITTED("SUBMITTED"),	 
     	AMOUNT_RECEIVED("AMOUNT RECEIVED");
 		private String value;
 

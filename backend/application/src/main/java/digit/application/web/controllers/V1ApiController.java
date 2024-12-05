@@ -61,7 +61,7 @@ public class V1ApiController {
 		getApplicationIntegration();
 	}
 	
-	public String direct_disbursals_APIURL,	direct_disbursals_x_api_key ,check_disbursals_status = null;
+	public String direct_disbursals_APIURL,	direct_disbursals_x_api_key ,check_disbursals_status,check_disbursal_status_response = null;
 	public void getApplicationIntegration() {
 	    List<ApplicationIntegrationResponse> response = applicationService.getApplicationIntegration();
 	    System.out.println("Call function: " + response);
@@ -75,8 +75,10 @@ public class V1ApiController {
 	       if(item.getKey().equals("check_disbursals_status")) {
 	    	   check_disbursals_status = item.getValue();
 	       }
+	       if(item.getKey().equals("check_disbursal_status_response")) {
+	    	   check_disbursal_status_response = item.getValue();
+	       }
 	    }
-	    
 	    System.out.println("direct_disbursals_APIURL " + direct_disbursals_APIURL);
 	   // return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
 	}
@@ -84,31 +86,35 @@ public class V1ApiController {
 	
 	@RequestMapping(value = "/_create", method = RequestMethod.POST, consumes = { MediaType.MULTIPART_FORM_DATA_VALUE,
 			MediaType.APPLICATION_OCTET_STREAM_VALUE })
-	public ResponseEntity<?> v1CreatePost(
+	        public ResponseEntity<?> v1CreatePost(
 			@Parameter(in = ParameterIn.DEFAULT, description = "Request object to create Application in the system", required = true, schema = @Schema()) @Valid @RequestPart("application") ApplicationRequest application,
 			@RequestPart(value = "files", required = false) List<MultipartFile> files) {
-		try {
-			ApplicationResponse response = applicationService.create(application, files);
-			 try {
-		         Thread.sleep(2000); // Wait for 3000 milliseconds (3 seconds)
-		        for (int i = 0; i < response.getApplications().size(); i++) {
-				String applicationId = response.getApplications().get(i).getId();
-				boolean isApproved = configuration.isAuto_Approve_Applications();
-
-				ApplicationStatusUpdateRequest applicationStatusUpdateRequest = new ApplicationStatusUpdateRequest();
-
-				applicationStatusUpdateRequest.setApplicationId(applicationId);
-				applicationStatusUpdateRequest.setStatus("APPROVED");
-				if (isApproved) {
-					System.out.println("Inside Approved");
-					v1UpdatePostApplicayionStatus(applicationStatusUpdateRequest);
-				}
-			}
-		            
+		
+			try {
+				ApplicationResponse response = applicationService.create(application, files);
+				 
+				//Currently not in use
+				/*try {
+			        Thread.sleep(2000); // Wait for 3000 milliseconds (3 seconds)
+			        for (int i = 0; i < response.getApplications().size(); i++) {
+						String applicationId = response.getApplications().get(i).getId();
+						boolean isApproved = configuration.isAuto_Approve_Applications();
+		
+						ApplicationStatusUpdateRequest applicationStatusUpdateRequest = new ApplicationStatusUpdateRequest();
+		
+						applicationStatusUpdateRequest.setApplicationId(applicationId);
+						applicationStatusUpdateRequest.setStatus("APPROVED");
+						if (isApproved) {
+							System.out.println("Inside Approved");
+							v1UpdatePostApplicayionStatus(applicationStatusUpdateRequest);
+						}
+			        }
 		        } catch (InterruptedException e) {
 		            e.printStackTrace();
-		        }
+		        }*/
+				 
 			return new ResponseEntity<>(response, HttpStatus.CREATED);
+			
 		} catch (JsonProcessingException e) {
 			log.error(e.getMessage());
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -502,15 +508,163 @@ public class V1ApiController {
 
 			ObjectMapper objectMapper1 = new ObjectMapper();
 			try {
-				// Convert JSON string back to a List of Application objects
 				List<Application> applicationList = objectMapper1.readValue(jsonResponse,
 						objectMapper1.getTypeFactory().constructCollectionType(List.class, Application.class));
 				
-				System.out.println("application List : " + applicationList);
-				// Loop through the list
+				
+				boolean isApproved = configuration.isAuto_Approve_Applications();
+				
 				for (Application app : applicationList) {
-					System.out.println("Batch ID: " + app.getBatch_id());
-					if(app.getBatch_id() > 0) {
+					System.out.println("----------Status ------- : " + app.getStatus());
+					if(app.getStatus().toString().equals("PENDING FOR REVIEW")) {
+						System.out.println("----------Status ------- : " + app.getStatus());
+						if(isApproved) {
+							System.out.println("Inside if  - " + isApproved);
+							IdRequestBody idRequestBody = new IdRequestBody();
+							idRequestBody.setApplicationId(app.getId()); // Example, adjust according to actual fields
+							ResponseEntity<Object> disbursalsResponse = direct_disbursals(idRequestBody);
+							System.out.println("direct disbursal response is "+disbursalsResponse);
+							
+							String errorMsg = null;
+							Integer batchId = null;
+							if (disbursalsResponse != null && disbursalsResponse.getBody() != null) {
+								Object responseBody = disbursalsResponse.getBody();
+							
+								// Directly parse the body to Integer
+								if (responseBody instanceof Integer) {
+									batchId = (Integer) responseBody;
+								} else if (responseBody instanceof String) {
+									try {
+										batchId = Integer.parseInt((String) responseBody);
+									} catch (NumberFormatException e) {
+										   String responseBodyString = responseBody.toString();
+									        Pattern pattern = Pattern.compile("msg=([^,}]+)");
+									        Matcher matcher = pattern.matcher(responseBodyString);
+									        List<String> messages = new ArrayList<>();
+									        while (matcher.find()) {
+									            messages.add(matcher.group(1));
+									        }
+									        String result = String.join(", ", messages);
+									        System.out.println(result);
+									        errorMsg = result;
+									}
+								} else {
+									System.out.println("Unexpected response type: " + responseBody.getClass());
+								}
+							}
+							
+							System.out.println("Response batch ID 553 - " + batchId);
+			 
+							ApplicationUpdateBatchIDResponse BatchIDresponse = null;
+							if(batchId != null) {
+								System.out.println("Inside if batchId != null");
+								ApplicationUpdateBatchIDRequest applicationRequest = new ApplicationUpdateBatchIDRequest();
+								applicationRequest.setApplicationId(app.getId());
+								applicationRequest.setBatch_id(batchId); // You can set the status as per the incoming body
+								System.out.println("batch id inside if "+batchId);
+								 BatchIDresponse = applicationService.updateApplication_BatchId(applicationRequest);
+							}
+							// update Status
+							ApplicationStatusUpdateRequest applicationStatusUpdateRequest = new ApplicationStatusUpdateRequest();
+							applicationStatusUpdateRequest.setApplicationId(app.getId());
+							try {
+								
+								if (BatchIDresponse.getSuccess() != null && BatchIDresponse.getSuccess()) {
+									applicationStatusUpdateRequest.setStatus("AMOUNT TRANSFER IN PROGRESS");
+									ApplicationStatusUpdateResponse response = applicationService.updateApplicationStatus(applicationStatusUpdateRequest);
+									//return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
+								} else {
+									System.out.println("Inside else 574");
+									applicationStatusUpdateRequest.setStatus(errorMsg);
+									ApplicationStatusUpdateResponse response = applicationService.updateApplicationLog(applicationStatusUpdateRequest);
+									//return new ResponseEntity<>(response.updateResponseMsgforfailure(errorMsg),HttpStatus.BAD_REQUEST); 
+								}
+							} catch (Exception e) {
+								System.out.println("Inside else 580");
+								applicationStatusUpdateRequest.setStatus(errorMsg);
+								ApplicationStatusUpdateResponse response = applicationService.updateApplicationLog(applicationStatusUpdateRequest);
+								//return new ResponseEntity<>(response.updateResponseMsgforfailure(errorMsg),HttpStatus.BAD_REQUEST); 
+							}
+						}//isapproved if end 
+						
+					}else if(app.getStatus().toString().equals("AMOUNT TRANSFER IN PROGRESS")) {
+						System.out.println("----------Status 592 ------- : " + app.getStatus());
+						if(app.getBatch_id() > 0) {
+							String xapikey = direct_disbursals_x_api_key;
+							HttpHeaders headers = new HttpHeaders();
+							headers.set("x-api-key", xapikey);
+							headers.setContentType(MediaType.APPLICATION_JSON); // Optional, depending on your API's
+																				// requirements
+							HttpEntity<Void> entity = new HttpEntity<>(headers);
+		
+							String externalApiUrl = check_disbursals_status + app.getBatch_id();
+							ResponseEntity<Object> externalResponse;
+							System.out.println("----------extrenal api url " + externalApiUrl);
+							try {
+								externalResponse = restTemplate.exchange(externalApiUrl, HttpMethod.GET, entity, Object.class);
+								
+								System.out.println("----------externalResponse" + externalResponse);
+								String disbursal_status = null;
+		
+								if (externalResponse.getBody() instanceof Map) {
+									Map<String, Object> responseBody = (Map<String, Object>) externalResponse.getBody();
+		
+									// Check if 'data' exists and is a Map
+									if (responseBody.containsKey("data") && responseBody.get("data") instanceof Map) {
+										System.out.println("----------disbursal_status: 535 " );
+										Map<String, Object> dataMap = (Map<String, Object>) responseBody.get("data");
+		
+										// Check if 'disbursal_status' exists and is a list
+										if (dataMap.containsKey("disbursal_status")&& dataMap.get("disbursal_status") instanceof List) {
+											System.out.println("----------disbursal_status: 540 " );
+											List<Map<String, Object>> disbursalStatusList = (List<Map<String, Object>>) dataMap
+													.get("disbursal_status");
+		
+											// Check if the list is not empty and extract the first item (or process all items)
+											if (!disbursalStatusList.isEmpty()) {
+												
+												Map<String, Object> firstItem = disbursalStatusList.get(0);
+												disbursal_status = (String) firstItem.get("disbursal_status");
+												
+												if(check_disbursal_status_response != null && check_disbursal_status_response.trim().toLowerCase().equals("verified")) {
+													if (Disbursals_batchIds.length() > 0) {
+															Disbursals_batchIds.append(","); // Add a comma only if this is not the
+														}
+														Disbursals_batchIds.append(app.getBatch_id());
+													
+												}else if(check_disbursal_status_response != null && check_disbursal_status_response.trim().toLowerCase().equals("disbursaldone")) {
+													System.out.println("----------disbursal_status disbursal done");
+														if (Disbursals_batchIds.length() > 0) {
+															Disbursals_batchIds.append(","); // Add a comma only if this is not the
+														}
+														Disbursals_batchIds.append(app.getBatch_id());
+													
+												}
+											} else {
+												System.out.println("----------disbursal_status empty-----call here error log ");
+												if (Disbursals_batchIds_Empty.length() > 0) {
+													Disbursals_batchIds_Empty.append(","); // Add a comma only if this is not the
+												}
+												Disbursals_batchIds_Empty.append(app.getBatch_id());
+											}
+										} else {
+											System.out.println("'disbursal_status' field not found or is not a list");
+										}
+									} else {
+										System.out.println("'data' field not found or not in the expected format");
+									}
+								} else {
+									System.out.println("Response is not in expected Map format.");
+								}
+							} catch (Exception e) {
+								System.err.println("Error response: " + e.getMessage());
+								return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to call external API: " + e.getMessage());
+							}//check disbursals call 
+						}
+					}// status if end 
+					
+					
+					/*if(app.getBatch_id() > 0) {
 						String xapikey = direct_disbursals_x_api_key;
 						HttpHeaders headers = new HttpHeaders();
 						headers.set("x-api-key", xapikey);
@@ -546,9 +700,6 @@ public class V1ApiController {
 											
 											Map<String, Object> firstItem = disbursalStatusList.get(0);
 											disbursal_status = (String) firstItem.get("disbursal_status");
-				
-											
-											
 	
 											//verified
 											String configStatus = configuration.getDisbursal_status();
@@ -592,7 +743,7 @@ public class V1ApiController {
 							System.err.println("Error response: " + e.getMessage());
 							return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to call external API: " + e.getMessage());
 						}//check disbursals call 
-					}
+					}*/
 				} // For Loop End
 
 			} catch (Exception e) {
@@ -600,22 +751,16 @@ public class V1ApiController {
 			}
 
 			
-			
-			System.out.println("----Disbursals_batchIds  -- "+Disbursals_batchIds);
-			System.out.println("----Disbursals_batchIds_Empty  -- "+Disbursals_batchIds_Empty);
+
 			// Update status by id with success
 			if (!(Disbursals_batchIds == null || Disbursals_batchIds.length() == 0)) {
 				String[] batchIdArray = Disbursals_batchIds.toString().split(",");
-				System.out.println("----------Batch ID array " + batchIdArray);
-				// Print the array to check its content
 				for (String id : batchIdArray) {
-					System.out.println("----Batch -- "+id);
 					try {
 						ApplicationUpdateBatchIDRequest updateStatusByBatchIdReq = new ApplicationUpdateBatchIDRequest();
 						int batchID = Integer.parseInt(id);
 						updateStatusByBatchIdReq.setBatch_id(batchID);
 						updateResponse = updateStatusByBatchId(updateStatusByBatchIdReq);
-						System.out.println("----------updateResponse " + updateResponse);
 					} catch (Exception e) {
 						return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred while fetching applications: " + e.getMessage());
 					}
