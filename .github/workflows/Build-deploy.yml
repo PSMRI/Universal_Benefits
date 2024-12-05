@@ -9,7 +9,7 @@ on:
       - features.benefitcreateupdate  # Trigger on PR to the main branch
 
 jobs:
-  build-and-deploy:
+  build-and-push:
     runs-on: ubuntu-latest
 
     steps:
@@ -83,6 +83,16 @@ jobs:
           IMAGE_TAG=$(cat image_tag.txt)  # Read the IMAGE_TAG from the file
           echo "Updating values.yaml with tag $IMAGE_TAG"
           yq e ".image.tag = \"$IMAGE_TAG\"" -i ./DIGIT-DevOps/deploy-as-code/charts/uba/backend/customer/values.yaml
+
+# jobs:
+#   deploy on EKS :
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       # Step 1: Checkout the repository
+#       - name: Checkout code
+#         uses: actions/checkout@v4
+         
 
       # Step 12: Deploy to EKS using Helm
       - name: Deploy to EKS using Helm
