@@ -94,7 +94,7 @@ jobs:
 #         uses: actions/checkout@v4
          
 
-      # Step 12: Deploy to EKS using Helm
+      # Step 12: Deploy to EKS using Helm m
       - name: Deploy to EKS using Helm
         run: |
           helm upgrade --install customer ./DIGIT-DevOps/deploy-as-code/charts/uba/backend/customer \
