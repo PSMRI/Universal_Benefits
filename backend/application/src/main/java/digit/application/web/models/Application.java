@@ -75,7 +75,7 @@ public class Application {
     
 		SUBMITTED("SUBMITTED"),		 
 		
-    		AMOUNT_RECEIVED("AMOUNT RECEIVED");
+    		AMOUNT_RECEIVED("AMOUNT RECEIVED"),
 		
 		SUBMITTED("SUBMITTED");
 		
