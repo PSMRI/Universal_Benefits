@@ -90,4 +90,6 @@ jobs:
           helm upgrade --install backend ./DIGIT-DevOps/deploy-as-code/charts/uba/backend/customer \
             --set backend.image.repository=prsm323/customer \
             --set backend.image.tag=$IMAGE_TAG \
+            --namespace egov \
+            --force \
             -f ./DIGIT-DevOps/deploy-as-code/charts/uba/backend/customer/values.yaml
