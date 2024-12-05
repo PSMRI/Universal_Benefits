@@ -627,25 +627,62 @@ public class V1ApiController {
 												disbursal_status = (String) firstItem.get("disbursal_status");
 												
 												if(check_disbursal_status_response != null && check_disbursal_status_response.trim().toLowerCase().equals("verified")) {
-													if (Disbursals_batchIds.length() > 0) {
+													/*if (Disbursals_batchIds.length() > 0) {
 															Disbursals_batchIds.append(","); // Add a comma only if this is not the
 														}
-														Disbursals_batchIds.append(app.getBatch_id());
+														Disbursals_batchIds.append(app.getBatch_id());*/
+													if(disbursal_status.toLowerCase().equals("verified")) {
+														//Update status
+														try {
+															ApplicationUpdateBatchIDRequest updateStatusByBatchIdReq = new ApplicationUpdateBatchIDRequest();
+															String appLicationID = app.getId();
+															updateStatusByBatchIdReq.setApplicationId(appLicationID);
+															updateResponse = updateStatusByBatchId(updateStatusByBatchIdReq);
+														} catch (Exception e) {
+															System.out.println("Error In update status - "+ app.getId());
+															//return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred while fetching applications: " + e.getMessage());
+														}
+													}
+													
 													
 												}else if(check_disbursal_status_response != null && check_disbursal_status_response.trim().toLowerCase().equals("disbursaldone")) {
-													System.out.println("----------disbursal_status disbursal done");
-														if (Disbursals_batchIds.length() > 0) {
-															Disbursals_batchIds.append(","); // Add a comma only if this is not the
+														System.out.println("----------Inside disbursal Done 649--- ");
+															/*if (Disbursals_batchIds.length() > 0) {
+																Disbursals_batchIds.append(","); // Add a comma only if this is not the
+															}
+															Disbursals_batchIds.append(app.getBatch_id());*/
+														if(disbursal_status.toLowerCase().equals("disbursal done")) {
+															try {
+																ApplicationUpdateBatchIDRequest updateStatusByBatchIdReq = new ApplicationUpdateBatchIDRequest();
+																String appLicationID = app.getId();
+																updateStatusByBatchIdReq.setApplicationId(appLicationID);
+																updateResponse = updateStatusByBatchId(updateStatusByBatchIdReq);
+															} catch (Exception e) {
+																System.out.println("Error In update status - "+ app.getId());
+																//return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred while fetching applications: " + e.getMessage());
+															}
 														}
-														Disbursals_batchIds.append(app.getBatch_id());
-													
 												}
 											} else {
 												System.out.println("----------disbursal_status empty-----call here error log ");
-												if (Disbursals_batchIds_Empty.length() > 0) {
+												/*if (Disbursals_batchIds_Empty.length() > 0) {
 													Disbursals_batchIds_Empty.append(","); // Add a comma only if this is not the
 												}
-												Disbursals_batchIds_Empty.append(app.getBatch_id());
+												Disbursals_batchIds_Empty.append(app.getBatch_id());*/
+												
+												
+													//Update status error log
+													try {
+														ApplicationUpdateBatchIDRequest updateStatusByBatchIdReq = new ApplicationUpdateBatchIDRequest();
+														String applicationID = app.getId();
+														updateStatusByBatchIdReq.setApplicationId(applicationID);
+														updateResponse = updatestatusByBatchId_ErrorLog(updateStatusByBatchIdReq);
+														System.out.println("----------Error Log updateResponse " + updateResponse);
+													} catch (Exception e) {
+														System.out.println("Error In update status for empty response- "+ app.getId());
+														//return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred while fetching applications: " + e.getMessage());
+													}
+												
 											}
 										} else {
 											System.out.println("'disbursal_status' field not found or is not a list");
@@ -753,7 +790,7 @@ public class V1ApiController {
 			
 
 			// Update status by id with success
-			if (!(Disbursals_batchIds == null || Disbursals_batchIds.length() == 0)) {
+			/*if (!(Disbursals_batchIds == null || Disbursals_batchIds.length() == 0)) {
 				String[] batchIdArray = Disbursals_batchIds.toString().split(",");
 				for (String id : batchIdArray) {
 					try {
@@ -767,11 +804,11 @@ public class V1ApiController {
 				} // for loop
 			} else {
 			//	return ResponseEntity.status(HttpStatus.NO_CONTENT).body("No batch Id found with status 'Disbursal Done' and 'Payment Acknowledged'");
-			}
+			}*/
 		
 			
 			//update status with error log 
-			if (!(Disbursals_batchIds_Empty == null || Disbursals_batchIds_Empty.length() == 0)) {
+			/*if (!(Disbursals_batchIds_Empty == null || Disbursals_batchIds_Empty.length() == 0)) {
 				String[] batchIdArray = Disbursals_batchIds_Empty.toString().split(",");
 				System.out.println("-------Error Log Batch ID array " + batchIdArray);
 				
@@ -790,7 +827,7 @@ public class V1ApiController {
 
 			} else {
 				//return ResponseEntity.status(HttpStatus.NO_CONTENT).body("No batch Id found with status 'Disbursal Done' and 'Payment Acknowledged'");
-			}
+			}*/
 			
 			// Return the applications as JSON
 			System.out.println("\n\n-------------Status Update Response: " + updateResponse.getBody());

@@ -23,7 +23,7 @@ import lombok.Builder;
 @Builder
 
 public class ApplicationUpdateBatchIDResponse {
-	private Integer batchId;
+	private String applicationID;
 	private Boolean success;
 	private String message;
 }

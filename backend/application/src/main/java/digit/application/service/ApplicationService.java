@@ -538,8 +538,7 @@ public class ApplicationService {
 		}
 	}
 
-	public ApplicationUpdateBatchIDResponse updateApplication_BatchId(
-			ApplicationUpdateBatchIDRequest applicationRequest) {
+	public ApplicationUpdateBatchIDResponse updateApplication_BatchId(ApplicationUpdateBatchIDRequest applicationRequest) {
 		String applicationid = applicationRequest.getApplicationId();
 		System.out.println("applicationid ID " + applicationid);
 		int batch_id = applicationRequest.getBatch_id();
@@ -558,7 +557,7 @@ public class ApplicationService {
 			message = "Failed to update Batch ID.";
 		}
 
-		return ApplicationUpdateBatchIDResponse.builder().batchId(isSuccess ? batch_id : null).success(isSuccess)
+		return ApplicationUpdateBatchIDResponse.builder().applicationID(isSuccess ? applicationid : null).success(isSuccess)
 				.message(message).build();
 	}
 
@@ -578,7 +577,7 @@ public class ApplicationService {
 		}
 	}
 	public ApplicationUpdateBatchIDResponse updateStatusByBatchId(ApplicationUpdateBatchIDRequest applicationRequest) {
-		int batch_id = applicationRequest.getBatch_id();
+		String applicationID = applicationRequest.getApplicationId();
 		boolean isSuccess = false;
 		String message = "";
 		try {
@@ -591,13 +590,13 @@ public class ApplicationService {
 			message = "Failed to update Status.";
 		}
 
-		return ApplicationUpdateBatchIDResponse.builder().batchId(isSuccess ? batch_id : null).success(isSuccess)
+		return ApplicationUpdateBatchIDResponse.builder().applicationID(isSuccess ? applicationID : null).success(isSuccess)
 				.message(message).build();
 	}
 
 	public ApplicationUpdateBatchIDResponse updatestatusByBatchId_ErrorLog(
-			ApplicationUpdateBatchIDRequest applicationRequest) {
-		int batch_id = applicationRequest.getBatch_id();
+	     ApplicationUpdateBatchIDRequest applicationRequest) {
+		String applicationID = applicationRequest.getApplicationId();
 		boolean isSuccess = false;
 		String message = "";
 		try {
@@ -610,7 +609,7 @@ public class ApplicationService {
 			message = "Failed to update Status.";
 		}
 
-		return ApplicationUpdateBatchIDResponse.builder().batchId(isSuccess ? batch_id : null).success(isSuccess)
+		return ApplicationUpdateBatchIDResponse.builder().applicationID(isSuccess ? applicationID : null).success(isSuccess)
 				.message(message).build();
 	}
 
