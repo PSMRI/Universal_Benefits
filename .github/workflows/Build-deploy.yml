@@ -75,16 +75,11 @@ jobs:
       # Step 10: Update values.yaml with new tag for Container Configs
       - name: Update values.yaml with new tag for Container Configs
         run: |
-          IMAGE_TAG=$(cat image_tag.txt)  # Read the IMAGE_TAG from the file (no '=' prefix)
+          IMAGE_TAG=$(cat image_tag.txt | cut -d'=' -f2)  # Extract the value after '='
           echo "Updating values.yaml with tag $IMAGE_TAG"
-    
-      # Install yq binary if not already installed
-          curl -L https://github.com/mikefarah/yq/releases/download/v4.15.1/yq_linux_amd64 -o /usr/local/bin/yq
-          chmod +x /usr/local/bin/yq
 
-      # Use yq with the -v flag to pass IMAGE_TAG to yq
+        # Replace the tag in the `image.tag` using the value of IMAGE_TAG
           yq e ".image.tag = \"$IMAGE_TAG\"" -i ./DIGIT-DevOps/deploy-as-code/charts/uba/backend/application/values.yaml
-
 
       # Step 11: Deploy to EKS using Helm
       - name: Deploy to EKS using Helm
