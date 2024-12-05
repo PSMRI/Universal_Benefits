@@ -9,7 +9,7 @@ on:
       - features.benefitcreateupdate  # Trigger on PR to the main branch
 
 jobs:
-  Build-and Push:
+  build-and push:
     runs-on: ubuntu-latest
 
     steps:
