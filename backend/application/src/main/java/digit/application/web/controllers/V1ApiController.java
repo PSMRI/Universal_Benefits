@@ -564,7 +564,7 @@ public class V1ApiController {
 													Disbursals_batchIds.append(app.getBatch_id());
 												}
 											}else {
-												if (disbursal_status.toLowerCase().equals("disbursal done") || disbursal_status.toLowerCase().equals("payment acknowledged")) {
+												if (disbursal_status.toLowerCase().equals("disbursaldone")) {
 													System.out.println("----------disbursal_status disbursal done");
 													if (Disbursals_batchIds.length() > 0) {
 														Disbursals_batchIds.append(","); // Add a comma only if this is not the
