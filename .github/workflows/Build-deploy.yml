@@ -87,9 +87,9 @@ jobs:
       # Step 12: Deploy to EKS using Helm
       - name: Deploy to EKS using Helm
         run: |
-          helm upgrade --install backend ./DIGIT-DevOps/deploy-as-code/charts/uba/backend/customer \
-            --set backend.image.repository=prsm323/customer \
-            --set backend.image.tag=$IMAGE_TAG \
+          helm upgrade --install customer ./DIGIT-DevOps/deploy-as-code/charts/uba/backend/customer \
+            --set cutomer.image.repository=prsm323/customer \
+            --set customer.image.tag=$IMAGE_TAG \
             --namespace egov \
             --force \
             -f ./DIGIT-DevOps/deploy-as-code/charts/uba/backend/customer/values.yaml
