@@ -17,12 +17,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Step 2: Set up AWS CLI (hardcoded AWS credentials for Testing Pourpose)
+      # Step 2: Set up AWS CLI (hardcoded AWS credentials)
       - name: Set up AWS CLI
         run: |
           aws configure set aws_access_key_id 
           aws configure set aws_secret_access_key 
-          aws configure set region ap-south-1  
+          aws configure set region ap-south-1  # Change region to your region
 
       # Step 3: Set up kubectl for EKS
       - name: Set up kubectl for EKS
