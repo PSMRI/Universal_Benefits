@@ -17,7 +17,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Step 2: Set up AWS CLI (hardcoded AWS credentials)
+      # Step 2: Set up AWS CLI (hardcoded AWS credentials for testing)
       - name: Set up AWS CLI
         run: |
           aws configure set aws_access_key_id 
