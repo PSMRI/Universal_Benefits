@@ -33,7 +33,7 @@ jobs:
       # Step 4: Set up Docker Hub credentials (hardcoded Docker Hub credentials)
       - name: Set up Docker Hub credentials
         run: |
-          echo "Devops@1997" | docker login --username prsm323 --password-stdin
+          echo "xxxx" | docker login --username prsm323 --password-stdin
           
       # Step 5: Build Docker image
       - name: Build Docker image
