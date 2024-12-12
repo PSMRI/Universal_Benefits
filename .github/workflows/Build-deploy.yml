@@ -1,12 +1,12 @@
-name: Build and Deploy to DEV EKS
+name: Build and Push Docker Images
 
 on:
   push:
     branches:
-      - features.benefitcreateupdate  # Trigger on push to the main branch
+      - features.benefitcreateupdate  # Trigger on push to the feature branch
   pull_request:
     branches:
-      - features.benefitcreateupdate  # Trigger on PR to the main branch
+      - features.benefitcreateupdate  # Trigger on PR to the feature branch
 
 jobs:
   build-and-push:
@@ -17,89 +17,30 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Step 2: Set up AWS CLI (hardcoded AWS credentials for testing)
-      - name: Set up AWS CLI
-        run: |
-          aws configure set aws_access_key_id 
-          aws configure set aws_secret_access_key 
-          aws configure set region ap-south-1  # Change region to your region
-
-      # Step 3: Set up kubectl for EKS
-      - name: Set up kubectl for EKS
-        run: |
-          aws eks update-kubeconfig --region ap-south-1 --name dev-piramal
-          kubectl version --client # Verify kubectl is installed
-
-      # Step 4: Set up Docker Hub credentials (hardcoded Docker Hub credentials)
+      # Step 2: Set up Docker Hub credentials (use GitHub secrets for security)
       - name: Set up Docker Hub credentials
         run: |
-          echo "xxxx" | docker login --username prsm323 --password-stdin
-          
-      # Step 5: Build Docker image
-      - name: Build Docker image
-        run: |
-          IMAGE_TAG="v1.0.0-$(date +'%Y%m%d-%H%M%S')"
-          echo $IMAGE_TAG > image_tag.txt  # Save only the tag value
-          docker build -t prsm323/customer:$IMAGE_TAG ./backend/customer  # Path to Dockerfile is correct
+          echo ${{ secrets.DOCKER_HUB_PASSWORD }} | docker login --username prsm323 --password-stdin
 
-      # Step 6: Push Docker image to Docker Hub
-      - name: Push Docker image to Docker Hub
+      # Step 3: Detect modified directories (only the ones relevant for build)
+      - name: Detect changed folders
+        id: detect_changed_folders
         run: |
-          IMAGE_TAG=$(cat image_tag.txt)  # Read the IMAGE_TAG from the file (no '=' prefix)
-          echo "Pushing Docker image with tag: $IMAGE_TAG"
-          docker push prsm323/customer:$IMAGE_TAG
-          
-      # Step 7: Install yq
-      - name: Install yq
+          echo "Checking for modified directories..."
+          MODIFIED_DIRS=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -o '^[^/]*' | sort -u)
+          echo "Modified directories: $MODIFIED_DIRS"
+          echo "MODIFIED_DIRS=$MODIFIED_DIRS" >> $GITHUB_ENV  # Save the result to an environment variable
+
+      # Step 4: Build and push Docker images for modified directories
+      - name: Build and push Docker images
         run: |
-          curl -L https://github.com/mikefarah/yq/releases/download/v4.15.1/yq_linux_amd64 -o /usr/local/bin/yq
-          chmod +x /usr/local/bin/yq
-
-      # Step 8: Clone external repository containing the Helm chart and values file
-      - name: Clone the DIGIT-DevOps repository
-        run: |
-          git clone --branch DIGIT-2.9LTS https://github.com/Ramesh-Kumhar/DIGIT-DevOps.git
-
-      # Step 9: Ensure Helm chart path exists
-      - name: Ensure Helm chart path exists
-        run: |
-          if [ ! -d "./DIGIT-DevOps/deploy-as-code/charts/uba/backend/customer" ]; then
-            echo "Helm chart directory not found!"
-            exit 1
-          fi
-          if [ ! -f "./DIGIT-DevOps/deploy-as-code/charts/uba/backend/customer/values.yaml" ]; then
-            echo "Values file not found!"
-            exit 1
-          fi
-
-      # Step 10: Install chart dependencies
-      - name: Install chart dependencies
-        run: |
-          helm dependency build ./DIGIT-DevOps/deploy-as-code/charts/uba/backend/customer
-
-      # Step 11: Update values.yaml with new tag for Container Configs
-      - name: Update values.yaml with new tag for Container Configs
-        run: |
-          IMAGE_TAG=$(cat image_tag.txt)  # Read the IMAGE_TAG from the file
-          echo "Updating values.yaml with tag $IMAGE_TAG"
-          yq e ".image.tag = \"$IMAGE_TAG\"" -i ./DIGIT-DevOps/deploy-as-code/charts/uba/backend/customer/values.yaml
-
-# jobs:
-#   deploy on EKS :
-#     runs-on: ubuntu-latest
-
-#     steps:
-#       # Step 1: Checkout the repository
-#       - name: Checkout code
-#         uses: actions/checkout@v4
-         
-
-      # Step 12: Deploy to EKS using Helm m
-      - name: Deploy to EKS using Helm
-        run: |
-          helm upgrade --install customer ./DIGIT-DevOps/deploy-as-code/charts/uba/backend/customer \
-            --set image.repository=prsm323/customer \
-            --set image.tag=$IMAGE_TAG \
-            --namespace egov \
-            --force \
-            -f ./DIGIT-DevOps/deploy-as-code/charts/uba/backend/customer/values.yaml
+          for DIR in $MODIFIED_DIRS; do
+            # Check if the directory is one of the folders we're interested in
+            if [[ "$DIR" == "backend/customer" || "$DIR" == "backend/application" || "$DIR" == "backend/benefits" ]]; then
+              IMAGE_TAG="v1.0.0-$(date +'%Y%m%d-%H%M%S')"
+              echo "Building Docker image for $DIR with tag $IMAGE_TAG"
+              docker build -t prsm323/$DIR:$IMAGE_TAG ./$DIR  # Build image for each modified directory
+              echo "Pushing Docker image prsm323/$DIR:$IMAGE_TAG"
+              docker push prsm323/$DIR:$IMAGE_TAG
+            fi
+          done
