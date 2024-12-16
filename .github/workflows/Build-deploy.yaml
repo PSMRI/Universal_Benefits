@@ -29,7 +29,6 @@ jobs:
           echo "Checking for modified directories..."
           MODIFIED_DIRS=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -o '^[^/]*' | sort -u)
           echo "Modified directories: $MODIFIED_DIRS"
-          echo "MODIFIED_DIRS=$MODIFIED_DIRS" >> $GITHUB_ENV  # Save the result to an environment variable
 
       # Step 4: Build and push Docker images for modified directories
       - name: Build and push Docker images
@@ -43,7 +42,7 @@ jobs:
               docker build -t prsm323/$DIR:$IMAGE_TAG ./$DIR  # Build image for each modified directory
               echo "Pushing Docker image prsm323/$DIR:$IMAGE_TAG"
               docker push prsm323/$DIR:$IMAGE_TAG
-              IMAGE_TAGS="$IMAGE_TAGS prsm323/$DIR:$IMAGE_TAG"  # Store the image tag
+              IMAGE_TAGS="$IMAGE_TAGS prsm323/$DIR:$IMAGE_TAG"  # Store the image tag for final message
               echo "Successfully pushed Docker image prsm323/$DIR:$IMAGE_TAG"  # Success message for each image
             fi
           done
@@ -51,4 +50,8 @@ jobs:
       # Step 5: Final success message (with all image tags)
       - name: Final success message
         run: |
-          echo " Docker images have been successfully built and pushed! Image tags: $IMAGE_TAGS"  
+          if [[ -n "$IMAGE_TAGS" ]]; then
+            echo "Docker images have been successfully built and pushed! Image tags: $IMAGE_TAGS"
+          else
+            echo "No relevant Docker images were modified or built."
+          fi
