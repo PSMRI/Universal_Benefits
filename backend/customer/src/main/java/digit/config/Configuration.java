@@ -97,3 +97,6 @@ public class Configuration {
     @Value("${egov.sms.notification.topic}")
     private String smsNotificationTopic;
 }
+
+
+// Testing build pipline
