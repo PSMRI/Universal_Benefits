@@ -38,7 +38,6 @@ jobs:
         run: |
           IMAGE_TAGS=""
           for DIR in $MODIFIED_DIRS; do
-            echo "Processing directory: $DIR"
             if [[ "$DIR" == "backend/customer" || "$DIR" == "backend/application" || "$DIR" == "backend/benefits" ]]; then
               IMAGE_TAG="v1.0.0-$(date +'%Y%m%d-%H%M%S')"
               echo "Building Docker image for $DIR with tag $IMAGE_TAG"
