@@ -17,10 +17,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Step 2: Set up Docker Hub credentials (use GitHub secrets for security)
+      # Step 2: Set up Docker Hub credentials
       - name: Set up Docker Hub credentials
         run: |
-          echo ${{ secrets.DOCKER_HUB_PASSWORD }} | docker login --username prsm323 --password-stdin
+          echo "Devops@1997" | docker login --username prsm323 --password-stdin
 
       # Step 3: Detect modified directories (only the ones relevant for build)
       - name: Detect changed folders
@@ -33,14 +33,22 @@ jobs:
 
       # Step 4: Build and push Docker images for modified directories
       - name: Build and push Docker images
+        id: build_push_images
         run: |
+          IMAGE_TAGS=""
           for DIR in $MODIFIED_DIRS; do
-            # Check if the directory is one of the folders we're interested in
             if [[ "$DIR" == "backend/customer" || "$DIR" == "backend/application" || "$DIR" == "backend/benefits" ]]; then
               IMAGE_TAG="v1.0.0-$(date +'%Y%m%d-%H%M%S')"
               echo "Building Docker image for $DIR with tag $IMAGE_TAG"
               docker build -t prsm323/$DIR:$IMAGE_TAG ./$DIR  # Build image for each modified directory
               echo "Pushing Docker image prsm323/$DIR:$IMAGE_TAG"
               docker push prsm323/$DIR:$IMAGE_TAG
+              IMAGE_TAGS="$IMAGE_TAGS prsm323/$DIR:$IMAGE_TAG"  # Store the image tag
+              echo "Successfully pushed Docker image prsm323/$DIR:$IMAGE_TAG"  # Success message for each image
             fi
           done
+
+      # Step 5: Final success message (with all image tags)
+      - name: Final success message
+        run: |
+          echo " Docker images have been successfully built and pushed! Image tags: $IMAGE_TAGS"  
