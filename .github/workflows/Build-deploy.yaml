@@ -1,4 +1,4 @@
-name: Build and Push Docker Images
+name: Build and Push Docker Image for Backend Application
 
 on:
   push:
@@ -22,38 +22,18 @@ jobs:
         run: |
           echo "Devops@1997" | docker login --username prsm323 --password-stdin
 
-      # Step 3: Detect modified directories (only the ones relevant for build)
-      - name: Detect changed folders
-        id: detect_changed_folders
+      # Step 3: Build and push Docker image for backend/application
+      - name: Build and push Docker image for backend/application
         run: |
-          echo "Checking for modified directories..."
-          MODIFIED_DIRS=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -o '^[^/]*' | sort -u)
-          echo "Modified directories: $MODIFIED_DIRS"
-          echo "MODIFIED_DIRS=$MODIFIED_DIRS" >> $GITHUB_ENV  # Save the result to an environment variable
-          echo "MODIFIED_DIRS is $MODIFIED_DIRS"
+          IMAGE_TAG="v1.0.0-$(date +'%Y%m%d-%H%M%S')"  # Set a unique image tag based on date-time
+          echo "Building Docker image for backend/application with tag $IMAGE_TAG"
+          
+          # Build the Docker image from the backend/application folder
+          docker build -t prsm323/backend/application:$IMAGE_TAG ./backend/application || { echo 'Docker build failed'; exit 1; }
 
-      # Step 4: Build and push Docker images for modified directories
-      - name: Build and push Docker images
-        id: build_push_images
-        run: |
-          IMAGE_TAGS=""
-          for DIR in $MODIFIED_DIRS; do
-            if [[ "$DIR" == "backend/customer" || "$DIR" == "backend/application" || "$DIR" == "backend/benefits" ]]; then
-              IMAGE_TAG="v1.0.0-$(date +'%Y%m%d-%H%M%S')"
-              echo "Building Docker image for $DIR with tag $IMAGE_TAG"
-              docker build -t prsm323/$DIR:$IMAGE_TAG ./$DIR || { echo 'Docker build failed for $DIR'; exit 1; }
-              echo "Pushing Docker image prsm323/$DIR:$IMAGE_TAG"
-              docker push prsm323/$DIR:$IMAGE_TAG || { echo 'Docker push failed for $DIR'; exit 1; }
-              IMAGE_TAGS="$IMAGE_TAGS prsm323/$DIR:$IMAGE_TAG"
-              echo "Successfully pushed Docker image prsm323/$DIR:$IMAGE_TAG"
-            fi
-          done
+          echo "Pushing Docker image prsm323/backend/application:$IMAGE_TAG"
+          
+          # Push the Docker image to Docker Hub
+          docker push prsm323/backend/application:$IMAGE_TAG || { echo 'Docker push failed'; exit 1; }
 
-      # Step 5: Final success message (with all image tags)
-      - name: Final success message
-        run: |
-          if [[ -n "$IMAGE_TAGS" ]]; then
-            echo "Docker images have been successfully built and pushed! Image tags: $IMAGE_TAGS"
-          else
-            echo "No relevant Docker images were modified or built."
-          fi
+          echo "Successfully pushed Docker image prsm323/backend/application:$IMAGE_TAG"
