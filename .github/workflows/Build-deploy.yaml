@@ -22,18 +22,24 @@ jobs:
         run: |
           echo "Devops@1997" | docker login --username prsm323 --password-stdin
 
-      # Step 3: Build and push Docker image for backend/application
-      - name: Build and push Docker image for backend/application
+      # Step 3: Build the Docker image for backend/application
+      - name: Build Docker image for backend/application
         run: |
           IMAGE_TAG="v1.0.0-$(date +'%Y%m%d-%H%M%S')"  # Set a unique image tag based on date-time
-          echo "Building Docker image for backend/application with tag $IMAGE_TAG"
+          FULL_IMAGE_TAG="prsm323/application:$IMAGE_TAG"  # Full image tag with the correct path
+          
+          echo "Building Docker image for prsm323/application with tag $FULL_IMAGE_TAG"
           
           # Build the Docker image from the backend/application folder
-          docker build -t prsm323/backend/application:$IMAGE_TAG ./backend/application || { echo 'Docker build failed'; exit 1; }
+          docker build -t $FULL_IMAGE_TAG ./backend/application || { echo 'Docker build failed'; exit 1; }
 
-          echo "Pushing Docker image prsm323/application:$IMAGE_TAG"
+      # Step 4: Push the Docker image to Docker Hub
+      - name: Push Docker image to Docker Hub
+        run: |
+          echo "Pushing Docker image $FULL_IMAGE_TAG to Docker Hub"
+          docker push $FULL_IMAGE_TAG || { echo 'Docker push failed'; exit 1; }
           
-          # Push the Docker image to Docker Hub
-          docker push prsm323/application:$IMAGE_TAG || { echo 'Docker push failed'; exit 1; }
-
-          echo "Successfully pushed Docker image prsm323/application:$IMAGE_TAG"
+      # Step 5: Final success message
+      - name: Final success message
+        run: |
+          echo "Successfully built and pushed Docker image: $FULL_IMAGE_TAG"
