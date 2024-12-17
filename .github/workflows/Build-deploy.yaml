@@ -31,9 +31,9 @@ jobs:
           # Build the Docker image from the backend/application folder
           docker build -t prsm323/backend/application:$IMAGE_TAG ./backend/application || { echo 'Docker build failed'; exit 1; }
 
-          echo "Pushing Docker image prsm323/backend/application:$IMAGE_TAG"
+          echo "Pushing Docker image prsm323/application:$IMAGE_TAG"
           
           # Push the Docker image to Docker Hub
-          docker push prsm323/backend/application:$IMAGE_TAG || { echo 'Docker push failed'; exit 1; }
+          docker push prsm323/application:$IMAGE_TAG || { echo 'Docker push failed'; exit 1; }
 
-          echo "Successfully pushed Docker image prsm323/backend/application:$IMAGE_TAG"
+          echo "Successfully pushed Docker image prsm323/application:$IMAGE_TAG"
