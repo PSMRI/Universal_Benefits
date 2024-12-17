@@ -3,10 +3,10 @@ name: Build and Push Docker Image for Backend Application
 on:
   push:
     branches:
-      - features.benefitcreateupdate  # Trigger on push to the feature branch
+      - features.benefitcreateupdate
   pull_request:
     branches:
-      - features.benefitcreateupdate  # Trigger on PR to the feature branch
+      - features.benefitcreateupdate
 
 jobs:
   build-and-push-application:
@@ -17,10 +17,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Step 2: Set up Docker Hub credentials
+      # Step 2: Set up Docker Hub credentials using GitHub Secrets
       - name: Set up Docker Hub credentials
         run: |
-          echo "Devops@1997" | docker login --username prsm323 --password-stdin
+          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login --username ${{ secrets.DOCKER_USERNAME }} --password-stdin
 
       # Step 3: Build Docker image
       - name: Build Docker image for backend/application
@@ -28,9 +28,6 @@ jobs:
           IMAGE_TAG="v1.0.0-$(date +'%Y%m%d-%H%M%S')"  # Set a unique image tag based on date-time
           FULL_IMAGE_TAG="prsm323/application:$IMAGE_TAG"  # Full image tag with the correct path
           
-          # Debugging: Check the value of FULL_IMAGE_TAG
-          echo "FULL_IMAGE_TAG is: $FULL_IMAGE_TAG"
-
           echo "Building Docker image for prsm323/application with tag $FULL_IMAGE_TAG"
           
           # Build the Docker image from the backend/application folder
@@ -39,7 +36,6 @@ jobs:
       # Step 4: Push the Docker image to Docker Hub
       - name: Push Docker image to Docker Hub
         run: |
-          # Debugging: Check if FULL_IMAGE_TAG is set before pushing
           if [ -z "$FULL_IMAGE_TAG" ]; then
             echo "FULL_IMAGE_TAG is empty, exiting."
             exit 1
