@@ -1,15 +1,12 @@
-name: Build and Push Docker Image for Backend Application
+name: Build and Push Docker Image
 
 on:
   push:
     branches:
-      - features.benefitcreateupdate  # Trigger on push to the feature branch
-  pull_request:
-    branches:
-      - features.benefitcreateupdate  # Trigger on PR to the feature branch
+      - features.benefitcreateupdate
 
 jobs:
-  build-and-push-application:
+  build-and-push:
     runs-on: ubuntu-latest
 
     steps:
@@ -17,34 +14,30 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Step 2: Set up Docker Hub credentials using GitHub Secrets
+      # Step 2: Set up Docker Hub credentials
       - name: Set up Docker Hub credentials
         run: |
           echo "${{ secrets.DOCKER_PASSWORD }}" | docker login --username ${{ secrets.DOCKER_USERNAME }} --password-stdin
 
-      # Step 3: Build Docker image for backend/application
+      # Step 3: Generate Image Tag and store it in $GITHUB_ENV
+      - name: Generate Image Tag
+        run: |
+          IMAGE_TAG="v1.0.0-$(date +'%Y%m%d-%H%M%S')"  # Create a unique image tag
+          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV  # Store the IMAGE_TAG in $GITHUB_ENV
+          echo "FULL_IMAGE_TAG=prsm323/application:$IMAGE_TAG" >> $GITHUB_ENV  # Store the full image tag
+
+      # Step 4: Build Docker image using the environment variable
       - name: Build Docker image for backend/application
         run: |
-          IMAGE_TAG="v1.0.0-$(date +'%Y%m%d-%H%M%S')"  # Set a unique image tag based on date-time
-          FULL_IMAGE_TAG="prsm323/application:$IMAGE_TAG"  # Full image tag with the correct path
-          
-          echo "Building Docker image for prsm323/application with tag $FULL_IMAGE_TAG"
-          
-          # Build the Docker image from the backend/application folder
-          docker build -t $FULL_IMAGE_TAG ./backend/application || { echo 'Docker build failed'; exit 1; }
+          echo "Building Docker image with tag $FULL_IMAGE_TAG"
+          docker build -t $FULL_IMAGE_TAG ./backend/application
 
-      # Step 4: Push the Docker image to Docker Hub
+      # Step 5: Push Docker image to Docker Hub
       - name: Push Docker image to Docker Hub
         run: |
-          if [ -z "$FULL_IMAGE_TAG" ]; then
-            echo "FULL_IMAGE_TAG is empty, exiting."
-            exit 1
-          fi
-          
-          echo "Pushing Docker image $FULL_IMAGE_TAG to Docker Hub"
-          docker push $FULL_IMAGE_TAG || { echo 'Docker push failed'; exit 1; }
+          docker push $FULL_IMAGE_TAG
 
-      # Step 5: Final success message
+      # Step 6: Final success message
       - name: Final success message
         run: |
           echo "Successfully built and pushed Docker image: $FULL_IMAGE_TAG"
