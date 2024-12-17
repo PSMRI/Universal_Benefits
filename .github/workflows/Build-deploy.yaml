@@ -9,7 +9,7 @@ on:
       - features.benefitcreateupdate  # Trigger on PR to the feature branch
 
 jobs:
-  build-and-push:
+  build-and-push-application:
     runs-on: ubuntu-latest
 
     steps:
@@ -22,12 +22,15 @@ jobs:
         run: |
           echo "Devops@1997" | docker login --username prsm323 --password-stdin
 
-      # Step 3: Build the Docker image for backend/application
+      # Step 3: Build Docker image
       - name: Build Docker image for backend/application
         run: |
           IMAGE_TAG="v1.0.0-$(date +'%Y%m%d-%H%M%S')"  # Set a unique image tag based on date-time
           FULL_IMAGE_TAG="prsm323/application:$IMAGE_TAG"  # Full image tag with the correct path
           
+          # Debugging: Check the value of FULL_IMAGE_TAG
+          echo "FULL_IMAGE_TAG is: $FULL_IMAGE_TAG"
+
           echo "Building Docker image for prsm323/application with tag $FULL_IMAGE_TAG"
           
           # Build the Docker image from the backend/application folder
@@ -36,9 +39,15 @@ jobs:
       # Step 4: Push the Docker image to Docker Hub
       - name: Push Docker image to Docker Hub
         run: |
+          # Debugging: Check if FULL_IMAGE_TAG is set before pushing
+          if [ -z "$FULL_IMAGE_TAG" ]; then
+            echo "FULL_IMAGE_TAG is empty, exiting."
+            exit 1
+          fi
+          
           echo "Pushing Docker image $FULL_IMAGE_TAG to Docker Hub"
           docker push $FULL_IMAGE_TAG || { echo 'Docker push failed'; exit 1; }
-          
+
       # Step 5: Final success message
       - name: Final success message
         run: |
