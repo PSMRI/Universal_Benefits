@@ -3,10 +3,10 @@ name: Build and Push Docker Image for Backend Application
 on:
   push:
     branches:
-      - features.benefitcreateupdate  # Trigger on push to the feature branch
+      - features.benefitcreateupdate
   pull_request:
     branches:
-      - features.benefitcreateupdate  # Trigger on PR to the feature branch
+      - features.benefitcreateupdate
 
 jobs:
   build-and-push-application:
