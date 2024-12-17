@@ -20,7 +20,7 @@ jobs:
       # Step 2: Set up Docker Hub credentials using GitHub Secrets
       - name: Set up Docker Hub credentials
         run: |
-          echo ${{ secrets.DOCKER_PASSWORD }} | docker login --username ${{ secrets.DOCKER_USERNAME }} --password-stdin
+          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login --username ${{ secrets.DOCKER_USERNAME }} --password-stdin
 
       # Step 3: Build Docker image
       - name: Build Docker image for backend/application
