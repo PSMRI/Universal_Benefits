@@ -29,15 +29,15 @@ jobs:
       - name: Check for changes and build Docker image
         run: |
           CHANGED_SERVICES=""
-          # Check if there are changes in the backend/application folder
+        # Check if there are changes in the backend/application folder
           if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q "^backend/application"; then
             CHANGED_SERVICES="application"
           fi
-          # Check if there are changes in the backend/benefits folder
+        # Check if there are changes in the backend/benefits folder
           if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q "^backend/benefits"; then
             CHANGED_SERVICES="$CHANGED_SERVICES benefits"
           fi
-          # Check if there are changes in the backend/customer folder
+        # Check if there are changes in the backend/customer folder
           if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q "^backend/customer"; then
             CHANGED_SERVICES="$CHANGED_SERVICES customer"
           fi
