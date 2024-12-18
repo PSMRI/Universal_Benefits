@@ -25,7 +25,7 @@ jobs:
           git rev-parse ${{ github.sha }} || echo "Current commit hash does not exist."
 
       # Step 3: Set up Docker Hub credentials
-      - name: Docker Hub Login 
+      - name: Docker Hub Login
         run: |
           echo "${{ secrets.DOCKER_PASSWORD }}" | docker login --username ${{ secrets.DOCKER_USERNAME }} --password-stdin
 
@@ -42,7 +42,6 @@ jobs:
           git diff --name-only ${{ github.event.before }} ${{ github.sha }} || echo "Git diff failed"
           
           CHANGED_SERVICES=""
-
           echo "Checking for changes in backend/application folder"
           if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q "^backend/application"; then
             CHANGED_SERVICES="application"
@@ -66,18 +65,12 @@ jobs:
           docker build -t prsm323/application:$IMAGE_TAG ./backend/application
           docker push prsm323/application:$IMAGE_TAG
 
-          # Save the image as a tarball and upload it as an artifact
-          docker save prsm323/application:$IMAGE_TAG -o prsm323_application_$IMAGE_TAG.tar
-
       - name: Build and Push Image for Benefits
         if: contains(env.CHANGED_SERVICES, 'benefits')
         run: |
           echo "Building Docker image for benefits with tag $IMAGE_TAG"
           docker build -t prsm323/benefits:$IMAGE_TAG ./backend/benefits
           docker push prsm323/benefits:$IMAGE_TAG
-
-          # Save the image as a tarball and upload it as an artifact
-          docker save prsm323/benefits:$IMAGE_TAG -o prsm323_benefits_$IMAGE_TAG.tar
 
       - name: Build and Push Image for Customer
         if: contains(env.CHANGED_SERVICES, 'customer')
@@ -86,20 +79,14 @@ jobs:
           docker build -t prsm323/customer:$IMAGE_TAG ./backend/customer
           docker push prsm323/customer:$IMAGE_TAG
 
-          # Save the image as a tarball and upload it as an artifact
-          docker save prsm323/customer:$IMAGE_TAG -o prsm323_customer_$IMAGE_TAG.tar
-
       # Step 7: Send success or failure message to Teams
       - name: Send Success or Failure Message to Teams
         run: |
           TAG="${{ env.IMAGE_TAG }}"  # Get the image tag
-
           # Initialize an empty message
           SUCCESS_MESSAGE="Build and Push Successful: "
           FAILURE_MESSAGE="Build and Push Failed: There was an error while building or pushing the Docker images."
-
           DOCKER_REPO_NAME="prsm323"  # Set your Docker Hub username
-
           # Construct the services and their respective Docker repository names with tags
           DOCKER_IMAGES=""
           
@@ -114,98 +101,94 @@ jobs:
           if [[ "$CHANGED_SERVICES" == *"customer"* ]]; then
             DOCKER_IMAGES="${DOCKER_IMAGES} prsm323/customer:$TAG"
           fi
-
           # Determine the success or failure message based on the exit status
           if [ $? -eq 0 ]; then
             MESSAGE="$SUCCESS_MESSAGE Repository: $DOCKER_REPO_NAME, PUSHED: $DOCKER_IMAGES."
           else
             MESSAGE="$FAILURE_MESSAGE Please check the logs."
           fi
-
           # Send message to Teams
           curl -X POST -H 'Content-Type: application/json' \
             -d "{\"text\":\"$MESSAGE\"}" ${{ secrets.TEAMS_WEBHOOK_URL }}
 
   deploy-to-eks:
-  needs: build-and-push  # Ensure the deploy job runs after the build-and-push job
-  runs-on: ubuntu-latest
+    needs: build-and-push  # Ensure the deploy job runs after the build-and-push job
+    runs-on: ubuntu-latest
 
-  steps:
-    # Step 1: Checkout the Helm chart repository
-    - name: Checkout Helm Chart Repo
-      uses: actions/checkout@v4
-      with:
-        repository: Ramesh-Kumhar/DIGIT-DevOps
-        path: helm-charts
-        ref: DIGIT-2.9LTS  # Specify the branch to check out
+    steps:
+      # Step 1: Checkout the Helm chart repository
+      - name: Checkout Helm Chart Repo
+        uses: actions/checkout@v4
+        with:
+          repository: Ramesh-Kumhar/DIGIT-DevOps
+          path: helm-charts
+          ref: DIGIT-2.9LTS  # Specify the branch to check out
 
-    # Step 2: Set up Helm and kubectl
-    - name: Set up Helm and kubectl
-      run: |
-        curl -LO https://get.helm.sh/helm-v3.9.1-linux-amd64.tar.gz
-        tar -zxvf helm-v3.9.1-linux-amd64.tar.gz
-        sudo mv linux-amd64/helm /usr/local/bin/helm
-        curl -LO "https://dl.k8s.io/release/v1.24.0/bin/linux/amd64/kubectl"
-        chmod +x kubectl
-        sudo mv kubectl /usr/local/bin/kubectl
-        kubectl version --client
+      # Step 2: Set up Helm and kubectl
+      - name: Set up Helm and kubectl
+        run: |
+          curl -LO https://get.helm.sh/helm-v3.9.1-linux-amd64.tar.gz
+          tar -zxvf helm-v3.9.1-linux-amd64.tar.gz
+          sudo mv linux-amd64/helm /usr/local/bin/helm
+          curl -LO "https://dl.k8s.io/release/v1.24.0/bin/linux/amd64/kubectl"
+          chmod +x kubectl
+          sudo mv kubectl /usr/local/bin/kubectl
+          kubectl version --client
 
-    # Step 3: Update the tag in Helm chart configuration files
-    - name: Update Helm Chart Docker Image Tags
-      run: |
-        echo "Updating Helm chart Docker image tags in the repository"
-        
-        # Update image tag for the 'application' service
-        if [[ "$CHANGED_SERVICES" == *"application"* ]]; then
-          echo "Updating application image tag"
-          sed -i "s|image: prsm323/application:.*|image: prsm323/application:${{ env.IMAGE_TAG }}|g" helm-charts/deploy-as-code/charts/uba/backend/application/values.yaml
-        fi
-        
-        # Update image tag for the 'benefits' service
-        if [[ "$CHANGED_SERVICES" == *"benefits"* ]]; then
-          echo "Updating benefits image tag"
-          sed -i "s|image: prsm323/benefits:.*|image: prsm323/benefits:${{ env.IMAGE_TAG }}|g" helm-charts/deploy-as-code/charts/uba/backend/benefits/values.yaml
-        fi
-        
-        # Update image tag for the 'customer' service
-        if [[ "$CHANGED_SERVICES" == *"customer"* ]]; then
-          echo "Updating customer image tag"
-          sed -i "s|image: prsm323/customer:.*|image: prsm323/customer:${{ env.IMAGE_TAG }}|g" helm-charts/deploy-as-code/charts/uba/backend/customer/values.yaml
-        fi
+      # Step 3: Update the tag in Helm chart configuration files
+      - name: Update Helm Chart Docker Image Tags
+        run: |
+          echo "Updating Helm chart Docker image tags in the repository"
+          
+          # Update image tag for the 'application' service
+          if [[ "$CHANGED_SERVICES" == *"application"* ]]; then
+            echo "Updating application image tag"
+            sed -i "s|image: prsm323/application:.*|image: prsm323/application:${{ env.IMAGE_TAG }}|g" helm-charts/deploy-as-code/charts/uba/backend/application/values.yaml
+          fi
+          
+          # Update image tag for the 'benefits' service
+          if [[ "$CHANGED_SERVICES" == *"benefits"* ]]; then
+            echo "Updating benefits image tag"
+            sed -i "s|image: prsm323/benefits:.*|image: prsm323/benefits:${{ env.IMAGE_TAG }}|g" helm-charts/deploy-as-code/charts/uba/backend/benefits/values.yaml
+          fi
+          
+          # Update image tag for the 'customer' service
+          if [[ "$CHANGED_SERVICES" == *"customer"* ]]; then
+            echo "Updating customer image tag"
+            sed -i "s|image: prsm323/customer:.*|image: prsm323/customer:${{ env.IMAGE_TAG }}|g" helm-charts/deploy-as-code/charts/uba/backend/customer/values.yaml
+          fi
 
-    # Step 4: Deploy to EKS using Helm
-    - name: Deploy to EKS using Helm
-      run: |
-        # Set up kubectl config for your EKS cluster
-        aws eks --region ${{ secrets.AWS_REGION }} update-kubeconfig --name ${{ secrets.EKS_CLUSTER_NAME }}
-        
-        # Deploy services using Helm upgrade/install for each service based on changes
-        if [[ "$CHANGED_SERVICES" == *"application"* ]]; then
-          helm upgrade --install uba-backend-application helm-charts/deploy-as-code/charts/uba/backend/application --namespace backend --set image.tag=${{ env.IMAGE_TAG }}
-        fi
-        
-        if [[ "$CHANGED_SERVICES" == *"benefits"* ]]; then
-          helm upgrade --install uba-backend-benefits helm-charts/deploy-as-code/charts/uba/backend/benefits --namespace backend --set image.tag=${{ env.IMAGE_TAG }}
-        fi
-        
-        if [[ "$CHANGED_SERVICES" == *"customer"* ]]; then
-          helm upgrade --install uba-backend-customer helm-charts/deploy-as-code/charts/uba/backend/customer --namespace backend --set image.tag=${{ env.IMAGE_TAG }}
-        fi
+      # Step 4: Deploy to EKS using Helm
+      - name: Deploy to EKS using Helm
+        run: |
+          # Set up kubectl config for your EKS cluster
+          aws eks --region ${{ secrets.AWS_REGION }} update-kubeconfig --name ${{ secrets.EKS_CLUSTER_NAME }}
+          
+          # Deploy services using Helm upgrade/install for each service based on changes
+          if [[ "$CHANGED_SERVICES" == *"application"* ]]; then
+            helm upgrade --install uba-backend-application helm-charts/deploy-as-code/charts/uba/backend/application --egov backend --set image.tag=${{ env.IMAGE_TAG }}
+          fi
+          
+          if [[ "$CHANGED_SERVICES" == *"benefits"* ]]; then
+            helm upgrade --install uba-backend-benefits helm-charts/deploy-as-code/charts/uba/backend/benefits --egov backend --set image.tag=${{ env.IMAGE_TAG }}
+          fi
+          
+          if [[ "$CHANGED_SERVICES" == *"customer"* ]]; then
+            helm upgrade --install uba-backend-customer helm-charts/deploy-as-code/charts/uba/backend/customer --egov backend --set image.tag=${{ env.IMAGE_TAG }}
+          fi
 
-    # Step 5: Notify Success or Failure to Teams
-    - name: Send Success or Failure Message to Teams
-      run: |
-        TAG="${{ env.IMAGE_TAG }}"
-        SUCCESS_MESSAGE="EKS Deployment Successful: Service deployed with image tag $TAG."
-        FAILURE_MESSAGE="EKS Deployment Failed: Please check the Helm logs."
-
-        # Construct message
-        if [ $? -eq 0 ]; then
-          MESSAGE="$SUCCESS_MESSAGE"
-        else
-          MESSAGE="$FAILURE_MESSAGE"
-        fi
-
-        # Send message to Teams
-        curl -X POST -H 'Content-Type: application/json' \
-          -d "{\"text\":\"$MESSAGE\"}" ${{ secrets.TEAMS_WEBHOOK_URL }}
+      # Step 5: Notify Success or Failure to Teams
+      - name: Send Success or Failure Message to Teams
+        run: |
+          TAG="${{ env.IMAGE_TAG }}"
+          SUCCESS_MESSAGE="EKS Deployment Successful: Service deployed with image tag $TAG."
+          FAILURE_MESSAGE="EKS Deployment Failed: Please check the Helm logs."
+          # Construct message
+          if [ $? -eq 0 ]; then
+            MESSAGE="$SUCCESS_MESSAGE"
+          else
+            MESSAGE="$FAILURE_MESSAGE"
+          fi
+          # Send message to Teams
+          curl -X POST -H 'Content-Type: application/json' \
+            -d "{\"text\":\"$MESSAGE\"}" ${{ secrets.TEAMS_WEBHOOK_URL }}
