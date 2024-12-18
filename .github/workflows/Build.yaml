@@ -6,43 +6,33 @@ on:
       - features.benefitcreateupdate
 
 jobs:
-  build-and-push:
+  # Job 1: Checkout the code and verify commit hashes
+  checkout:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout the repository with full history
       - name: Checkout code with full history
         uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Fetch all commit history
 
-      # Step 2: Debugging commit hashes
       - name: Verify commit hashes
         run: |
           echo "Previous commit hash (before): ${{ github.event.before }}"
           echo "Current commit hash (sha): ${{ github.sha }}"
           git rev-parse ${{ github.event.before }} || echo "Previous commit hash does not exist."
           git rev-parse ${{ github.sha }} || echo "Current commit hash does not exist."
-
-      # Step 3: Set up Docker Hub credentials
-      - name: Set up Docker Hub credentials
-        run: |
-          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login --username ${{ secrets.DOCKER_USERNAME }} --password-stdin
-
-      # Step 4: Generate Image Tag and store it in $GITHUB_ENV
+          
+      # Generate the IMAGE_TAG which will be used by subsequent jobs
       - name: Generate Image Tag
         run: |
           IMAGE_TAG="v1.0.0-$(date +'%Y%m%d-%H%M%S')"  # Create a unique image tag
           echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV  # Store the IMAGE_TAG in $GITHUB_ENV
-
-      # Step 5: Debugging git diff output
-      - name: Debugging git diff
+          
+      # Step to check for changes in services
+      - name: Check for changes in services
         run: |
-          echo "Running git diff command to compare commits"
-          git diff --name-only ${{ github.event.before }} ${{ github.sha }} || echo "Git diff failed"
-          
           CHANGED_SERVICES=""
-          
           echo "Checking for changes in backend/application folder"
           if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q "^backend/application"; then
             CHANGED_SERVICES="application"
@@ -61,29 +51,63 @@ jobs:
           echo "Changed services: $CHANGED_SERVICES"
           echo "CHANGED_SERVICES=$CHANGED_SERVICES" >> $GITHUB_ENV
 
-      # Step 6: Build and push Docker images for the modified services
+  # Job 2: Build and Push Docker Image for Application
+  application:
+    needs: checkout
+    runs-on: ubuntu-latest
+    if: contains(needs.checkout.outputs.CHANGED_SERVICES, 'application')
+
+    steps:
+      - name: Set up Docker Hub credentials
+        run: |
+          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login --username ${{ secrets.DOCKER_USERNAME }} --password-stdin
+
       - name: Build and Push Docker Image for Application
-        if: contains(env.CHANGED_SERVICES, 'application')
         run: |
           echo "Building Docker image for application with tag $IMAGE_TAG"
           docker build -t prsm323/application:$IMAGE_TAG ./backend/application
           docker push prsm323/application:$IMAGE_TAG
 
+  # Job 3: Build and Push Docker Image for Benefits
+  benefits:
+    needs: checkout
+    runs-on: ubuntu-latest
+    if: contains(needs.checkout.outputs.CHANGED_SERVICES, 'benefits')
+
+    steps:
+      - name: Set up Docker Hub credentials
+        run: |
+          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login --username ${{ secrets.DOCKER_USERNAME }} --password-stdin
+
       - name: Build and Push Docker Image for Benefits
-        if: contains(env.CHANGED_SERVICES, 'benefits')
         run: |
           echo "Building Docker image for benefits with tag $IMAGE_TAG"
           docker build -t prsm323/benefits:$IMAGE_TAG ./backend/benefits
           docker push prsm323/benefits:$IMAGE_TAG
 
+  # Job 4: Build and Push Docker Image for Customer
+  customer:
+    needs: checkout
+    runs-on: ubuntu-latest
+    if: contains(needs.checkout.outputs.CHANGED_SERVICES, 'customer')
+
+    steps:
+      - name: Set up Docker Hub credentials
+        run: |
+          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login --username ${{ secrets.DOCKER_USERNAME }} --password-stdin
+
       - name: Build and Push Docker Image for Customer
-        if: contains(env.CHANGED_SERVICES, 'customer')
         run: |
           echo "Building Docker image for customer with tag $IMAGE_TAG"
           docker build -t prsm323/customer:$IMAGE_TAG ./backend/customer
           docker push prsm323/customer:$IMAGE_TAG
 
-      # Step 7: Final success message
+  # Final step to confirm success
+  success:
+    needs: [application, benefits, customer]
+    runs-on: ubuntu-latest
+    steps:
       - name: Final success message
         run: |
-          echo "Successfully built and pushed Docker images for: $CHANGED_SERVICES"
+          echo "Successfully built and pushed Docker images for: ${{ needs.application.outputs.CHANGED_SERVICES }}"
+
