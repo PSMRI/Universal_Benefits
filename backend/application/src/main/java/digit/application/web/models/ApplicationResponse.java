@@ -40,10 +40,8 @@ public class ApplicationResponse {
     @Valid
     private Pagination pagination;
 
-
     public ApplicationResponse addApplicationsItem(Application applicationsItem) {
         this.applications.add(applicationsItem);
         return this;
     }
-
 }

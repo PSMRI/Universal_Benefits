@@ -9,7 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import org.egov.common.contract.models.Address;
 import org.egov.common.contract.models.AuditDetails;
+import org.hibernate.validator.constraints.Length;
 import org.springframework.validation.annotation.Validated;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
@@ -28,90 +31,164 @@ import lombok.Builder;
 @NoArgsConstructor
 @Builder
 public class Application {
-    @JsonProperty("id")
 
-    @Valid
-    private String id = null;
+	@JsonProperty("id")
+	private String id = null;
 
-    @JsonProperty("tenantId")
-    @NotNull
+	@JsonProperty("tenantId")
+	@NotNull
+	@NotBlank
+	@Size(min = 2, max = 64)
+	private String tenantId = null;
 
-    @Size(min = 2, max = 64)
-    private String tenantId = null;
+	@JsonProperty("applicationNumber")
+	@Size(min = 4, max = 64)
+	private String applicationNumber = null;
 
-    @JsonProperty("applicationNumber")
-    @Size(min = 4, max = 64)
-    private String applicationNumber = null;
+	@JsonProperty("individualId")
+	@NotNull
+	@Size(min = 4, max = 64)
+	private String individualId = null;
 
-    @JsonProperty("individualId")
-    @NotNull
-    @Size(min = 4, max = 64)
-    private String individualId = null;
+	@JsonProperty("programCode")
+	@NotNull
+	@Size(min = 2, max = 64)
+	private String programCode = null;
 
-    @JsonProperty("programCode")
-    @NotNull
-    @Size(min = 2, max = 64)
-    private String programCode = null;
+	/**
+	 * Flag to soft delete
+	 */
+	public enum StatusEnum {
+		ACTIVE("ACTIVE"),
 
-    /**
-     * Flag to soft delete
-     */
-    public enum StatusEnum {
-        ACTIVE("ACTIVE"),
+		INACTIVE("INACTIVE"),
 
-        INACTIVE("INACTIVE"),
+		ARCHIVED("ARCHIVED"),
 
-        ARCHIVED("ARCHIVED");
+		APPROVED("APPROVED"),
 
-        private String value;
+		PENDING_FOR_REVIEW("PENDING FOR REVIEW"),
 
-        StatusEnum(String value) {
-            this.value = value;
-        }
+		AMOUNT_TRANSFER_IN_PROGRESS("AMOUNT TRANSFER IN PROGRESS"),
 
-        @Override
-        @JsonValue
-        public String toString() {
-            return String.valueOf(value);
-        }
+		SUBMITTED_FOR_DISBURSAL("SUBMITTED FOR DISBURSAL"),
+    
+		SUBMITTED("SUBMITTED"),		 
+		
+    	AMOUNT_RECEIVED("AMOUNT RECEIVED");
+		
+		
+		
+		private String value;
 
-        @JsonCreator
-        public static StatusEnum fromValue(String text) {
-            for (StatusEnum b : StatusEnum.values()) {
-                if (String.valueOf(b.value).equals(text)) {
-                    return b;
-                }
-            }
-            return null;
-        }
-    }
+		StatusEnum(String value) {
+			this.value = value;
+		}
 
-    @JsonProperty("status")
-    private StatusEnum status = null;
+		@Override
+		@JsonValue
+		public String toString() {
+			return String.valueOf(value);
+		}
 
-    @JsonProperty("wfStatus")
-    @Size(min = 2, max = 64)
-    private String wfStatus = null;
+		@JsonCreator
+		public static StatusEnum fromValue(String text) {
+			for (StatusEnum b : StatusEnum.values()) {
+				if (String.valueOf(b.value).equals(text)) {
+					return b;
+				}
+			}
+			return null;
+		}
+	}
 
-    @JsonProperty("documents")
-    @NotNull
-    @Valid
-    private List<Document> documents = new ArrayList<>();
+	@JsonProperty("status")
+	private StatusEnum status = null;
 
-    @JsonProperty("auditDetails")
+	@JsonProperty("wfStatus")
+	private WFStatusEnum wfStatus = null;
 
-    @Valid
-    private AuditDetails auditDetails = null;
+	@JsonProperty("documents")
+	@Valid
+	private List<Document> documents = new ArrayList<>();
 
-    @JsonProperty("additionalDetails")
+	@JsonProperty("auditDetails")
+	@Valid
+	private AuditDetails auditDetails = null;
 
-    private Object additionalDetails = null;
+	@JsonProperty("additionalDetails")
+	private Object additionalDetails = null;
 
+	@JsonProperty("applicant")
+	@NotNull
+	@Valid
+	private Applicant applicant;
 
-    public Application addDocumentsItem(Document documentsItem) {
-        this.documents = new ArrayList<>(this.documents);
-        this.documents.add(documentsItem);
-        return this;
-    }
+	@JsonProperty("schema")
+	public String schema;
+
+	@JsonProperty("orderId")
+	private String orderId = null;
+
+	@JsonProperty("transactionId")
+	private String transactionId = null;
+
+	@JsonProperty("submissionId")
+	private String submissionId = null;
+
+	@JsonProperty("contentId")
+	private String contentId = null;
+	// priyanka
+	@JsonProperty("batch_id")
+	private int batch_id;
+
+	public Application addDocumentsItem(Document documentsItem) {
+		this.documents = new ArrayList<>(this.documents);
+		this.documents.add(documentsItem);
+		return this;
+	}
+
+	public enum WFStatusEnum {
+		ACTIVE("ACTIVE"),
+
+		INACTIVE("INACTIVE"),
+
+		ARCHIVED("ARCHIVED"),
+
+		APPROVED("APPROVED"),
+
+		PENDING_FOR_REVIEW("PENDING FOR REVIEW"),
+
+		AMOUNT_TRANSFER_IN_PROGRESS("AMOUNT TRANSFER IN PROGRESS"),
+
+		SUBMITTED_FOR_DISBURSAL("SUBMITTED FOR DISBURSAL"),
+		
+		SUBMITTED("SUBMITTED"),
+		
+    	AMOUNT_RECEIVED("AMOUNT RECEIVED");
+		private String value;
+
+		WFStatusEnum(String value) {
+			this.value = value;
+		}
+
+		@Override
+		@JsonValue
+		public String toString() {
+			return String.valueOf(value);
+		}
+
+		@JsonCreator
+		public static WFStatusEnum fromValue(String text) {
+			for (WFStatusEnum b : WFStatusEnum.values()) {
+				if (String.valueOf(b.value).equals(text)) {
+					return b;
+				}
+			}
+			return null;
+		}
+	}
 
 }
+
+// comment for test the changes

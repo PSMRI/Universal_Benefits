@@ -1,0 +1,127 @@
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches:
+      - features.benefitcreateupdate
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repository with full history
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all commit history
+
+      # Step 2: Debugging commit hashes
+      - name: Verify commit hashes
+        run: |
+          echo "Previous commit hash (before): ${{ github.event.before }}"
+          echo "Current commit hash (sha): ${{ github.sha }}"
+          git rev-parse ${{ github.event.before }} || echo "Previous commit hash does not exist."
+          git rev-parse ${{ github.sha }} || echo "Current commit hash does not exist."
+
+      # Step 3: Set up Docker Hub credentials
+      - name: Docker Hub Login 
+        run: |
+          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login --username ${{ secrets.DOCKER_USERNAME }} --password-stdin
+
+      # Step 4: Generate Image Tag and store it in $GITHUB_ENV
+      - name: Generate Image Tag
+        run: |
+          IMAGE_TAG="v1.0.0-$(date +'%Y%m%d-%H%M%S')"  # Create a unique image tag
+          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV  # Store the IMAGE_TAG in $GITHUB_ENV
+
+      # Step 5: Debugging git diff output
+      - name: Git Diff
+        run: |
+          echo "Running git diff command to compare commits"
+          git diff --name-only ${{ github.event.before }} ${{ github.sha }} || echo "Git diff failed"
+          
+          CHANGED_SERVICES=""
+
+          echo "Checking for changes in backend/application folder"
+          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q "^backend/application"; then
+            CHANGED_SERVICES="application"
+          fi
+          echo "Checking for changes in backend/benefits folder"
+          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q "^backend/benefits"; then
+            CHANGED_SERVICES="$CHANGED_SERVICES benefits"
+          fi
+          echo "Checking for changes in backend/customer folder"
+          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q "^backend/customer"; then
+            CHANGED_SERVICES="$CHANGED_SERVICES customer"
+          fi
+          echo "Changed services: $CHANGED_SERVICES"
+          echo "CHANGED_SERVICES=$CHANGED_SERVICES" >> $GITHUB_ENV
+
+      # Step 6: Build and push Docker images for the modified services
+      - name: Build and Push Image for Application
+        if: contains(env.CHANGED_SERVICES, 'application')
+        run: |
+          echo "Building Docker image for application with tag $IMAGE_TAG"
+          docker build -t prsm323/application:$IMAGE_TAG ./backend/application
+          docker push prsm323/application:$IMAGE_TAG
+
+          # Save the image as a tarball and upload it as an artifact
+          docker save prsm323/application:$IMAGE_TAG -o prsm323_application_$IMAGE_TAG.tar
+
+      - name: Build and Push Image for Benefits
+        if: contains(env.CHANGED_SERVICES, 'benefits')
+        run: |
+          echo "Building Docker image for benefits with tag $IMAGE_TAG"
+          docker build -t prsm323/benefits:$IMAGE_TAG ./backend/benefits
+          docker push prsm323/benefits:$IMAGE_TAG
+
+          # Save the image as a tarball and upload it as an artifact
+          docker save prsm323/benefits:$IMAGE_TAG -o prsm323_benefits_$IMAGE_TAG.tar
+
+      - name: Build and Push Image for Customer
+        if: contains(env.CHANGED_SERVICES, 'customer')
+        run: |
+          echo "Building Docker image for customer with tag $IMAGE_TAG"
+          docker build -t prsm323/customer:$IMAGE_TAG ./backend/customer
+          docker push prsm323/customer:$IMAGE_TAG
+
+          # Save the image as a tarball and upload it as an artifact
+          docker save prsm323/customer:$IMAGE_TAG -o prsm323_customer_$IMAGE_TAG.tar
+
+      # Step 7: Send success or failure message to Teams
+      - name: Send Success or Failure Message to Teams
+        run: |
+          TAG="${{ env.IMAGE_TAG }}"  # Get the image tag
+
+          # Initialize an empty message
+          SUCCESS_MESSAGE="Build and Push Successful: "
+          FAILURE_MESSAGE="Build and Push Failed: There was an error while building or pushing the Docker images."
+
+          DOCKER_REPO_NAME="prsm323"  # Set your Docker Hub username
+
+          # Construct the services and their respective Docker repository names with tags
+          DOCKER_IMAGES=""
+          
+          if [[ "$CHANGED_SERVICES" == *"application"* ]]; then
+            DOCKER_IMAGES="${DOCKER_IMAGES} prsm323/application:$TAG"
+          fi
+          
+          if [[ "$CHANGED_SERVICES" == *"benefits"* ]]; then
+            DOCKER_IMAGES="${DOCKER_IMAGES} prsm323/benefits:$TAG"
+          fi
+          
+          if [[ "$CHANGED_SERVICES" == *"customer"* ]]; then
+            DOCKER_IMAGES="${DOCKER_IMAGES} prsm323/customer:$TAG"
+          fi
+
+          # Determine the success or failure message based on the exit status
+          if [ $? -eq 0 ]; then
+            MESSAGE="$SUCCESS_MESSAGE Repository: $DOCKER_REPO_NAME, PUSHED: $DOCKER_IMAGES."
+          else
+            MESSAGE="$FAILURE_MESSAGE Please check the logs."
+          fi
+
+          # Send message to Teams
+          curl -X POST -H 'Content-Type: application/json' \
+            -d "{\"text\":\"$MESSAGE\"}" ${{ secrets.TEAMS_WEBHOOK_URL }}

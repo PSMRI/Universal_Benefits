@@ -22,8 +22,6 @@ import java.util.TimeZone;
 @Setter
 @Getter
 public class Configuration {
-
-
     //Idgen Config
     @Value("${egov.idgen.host}")
     private String idGenHost;
@@ -31,8 +29,17 @@ public class Configuration {
     @Value("${egov.idgen.path}")
     private String idGenPath;
 
+    @Value("${egov.fileStore.host}")
+    private String fileStoreHost;
+
+    @Value("${egov.fileStore.path}")
+    private String fileStorePath;
+
     @Value("${egov.idgen.application.format}")
     private String idGenApplicationFormat;
+
+    @Value("${moduleName}")
+    private String moduleName;
 
 
     //Workflow Config
@@ -83,7 +90,10 @@ public class Configuration {
     @Value("${kafka.topic.application.update}")
     private String kafkaTopicApplicationUpdate;
 
-    // application search configs
+     @Value("${kafka.topic.application.updatestatus}")
+    private String kafkaTopicApplicationUpdateStatus;
+    
+     // application search configs
     @Value("${application.search.default.limit}")
     private Integer defaultLimit;
 
@@ -92,4 +102,32 @@ public class Configuration {
 
     @Value("${application.search.max.limit}")
     private Integer maxSearchLimit;
+    
+  //Priyanka 26Nov2024 direct disbursals
+    @Value("${kafka.topic.application.updateBatchID}")
+    private String kafkaTopicApplicationUpdateBatchID;
+    
+    @Value("${kafka.topic.application.updateStatusOnDisbursals}")
+    private String kafkaTopicApplicationUpdateStatusOnDisbursals;
+    
+    @Value("${kafka.topic.application.updateStatusByBatchId}")
+    private String kafkaTopicApplicationupdateStatusByBatchId;
+    
+    @Value("${kafka.topic.application.updateStatusByBatchIdErrorLog}")
+    private String kafkaTopicApplicationupdateStatusByBatchIdErrorLog;
+    
+    @Value("${disbursal_status}")
+    private String disbursal_status;
+   
+    @Value("${kafka.topic.application.updateApplicationLog}")
+    private String updateApplicationLog;
+    
+    @Value("${kafka.topic.application.updateApplicationOrderId}")
+    private String updateApplicationOrderId;
+    
+  //Vishal
+    @Value("${Auto_Approve_Applications}")
+    private boolean Auto_Approve_Applications;
+    
+    //End by priyanka
 }

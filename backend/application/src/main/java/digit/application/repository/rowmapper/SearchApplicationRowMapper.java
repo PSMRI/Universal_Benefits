@@ -3,6 +3,7 @@ package digit.application.repository.rowmapper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
+import digit.application.web.models.Applicant;
 import digit.application.web.models.Application;
 import digit.application.web.models.Document;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +11,7 @@ import org.egov.common.contract.models.AuditDetails;
 import org.egov.tracer.model.CustomException;
 import org.postgresql.util.PGobject;
 import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -48,7 +50,7 @@ public class SearchApplicationRowMapper implements ResultSetExtractor<List<Appli
 
                 application = Application.builder()
                         .status(Application.StatusEnum.fromValue(rs.getString("a_status")))
-                        .wfStatus(rs.getString("a_wf_status"))
+                        .wfStatus(Application.WFStatusEnum.fromValue(rs.getString("a_wf_status")))
                         .additionalDetails(getadditionalDetail(rs, "a_additional_details"))
                         .programCode(rs.getString("a_program_code"))
                         .applicationNumber(rs.getString("a_application_number"))
@@ -102,7 +104,7 @@ public class SearchApplicationRowMapper implements ResultSetExtractor<List<Appli
 
         return Document.builder()
                 .status(Document.StatusEnum.fromValue(rs.getString("d_status")))
-                .fileStore(rs.getString("d_filestore_id"))
+                .fileStoreId(rs.getString("d_filestore_id"))
                 .documentType(rs.getString("d_document_type"))
                 .documentUid(rs.getString("d_document_uid"))
                 .additionalDetails(getadditionalDetail(rs, "d_additional_details"))
@@ -139,6 +141,40 @@ public class SearchApplicationRowMapper implements ResultSetExtractor<List<Appli
         return additionalDetails;
 
     }
+
+    public RowMapper<Document> documentRowMapper() {
+        return (rs, rowNum) -> Document.builder()
+                .id(rs.getString("id"))
+                .documentType(rs.getString("document_type"))
+                .fileStoreId(rs.getString("filestore_id"))
+                .documentUid(rs.getString("document_uid"))
+                .additionalDetails(rs.getString("additional_details"))
+                .status(Document.StatusEnum.fromValue(rs.getString("status")))
+                .build();
+    }
+
+    public RowMapper<Applicant> applicantRowMapper() {
+        return (rs, rowNum) -> Applicant.builder()
+                .id(rs.getString("id"))
+                .applicationId(rs.getString("application_id"))
+                .studentName(rs.getString("student_name"))
+                .fatherName(rs.getString("father_name"))
+                .samagraId(rs.getString("samagra_id"))
+                .currentSchoolName(rs.getString("school_name"))
+                .currentSchoolAddress(rs.getString("school_address"))
+                .currentSchoolAddressDistrict(rs.getString("school_address_district"))
+                .currentClass(rs.getString("current_class"))
+                .previousYearMarks(rs.getString("previous_year_marks"))
+                .studentType(rs.getString("student_type"))
+                .aadharLast4Digits(rs.getString("aadhar_last_4_digits"))
+                .caste(rs.getString("caste"))
+                .income(rs.getString("income"))
+                .gender(rs.getString("gender"))
+                .age(rs.getInt("age"))
+                .disability(rs.getBoolean("disability"))
+                .build();
+    }
+
 
 
 }

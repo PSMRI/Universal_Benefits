@@ -26,15 +26,14 @@ import lombok.Builder;
 @Builder
 public class Document {
     @JsonProperty("id")
-
     @Size(max = 64)
     private String id = null;
 
     @JsonProperty("documentType")
     private String documentType = null;
 
-    @JsonProperty("fileStore")
-    private String fileStore = null;
+    @JsonProperty("fileStoreId")
+    private String fileStoreId = null;
 
     @JsonProperty("documentUid")
     @Size(max = 64)
