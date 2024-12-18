@@ -83,11 +83,9 @@ jobs:
       - name: Send Success or Failure Message to Teams
         run: |
           TAG="${{ env.IMAGE_TAG }}"  # Get the image tag
-          # Initialize an empty message
           SUCCESS_MESSAGE="Build and Push Successful: "
           FAILURE_MESSAGE="Build and Push Failed: There was an error while building or pushing the Docker images."
           DOCKER_REPO_NAME="prsm323"  # Set your Docker Hub username
-          # Construct the services and their respective Docker repository names with tags
           DOCKER_IMAGES=""
           
           if [[ "$CHANGED_SERVICES" == *"application"* ]]; then
@@ -101,82 +99,79 @@ jobs:
           if [[ "$CHANGED_SERVICES" == *"customer"* ]]; then
             DOCKER_IMAGES="${DOCKER_IMAGES} prsm323/customer:$TAG"
           fi
-          # Determine the success or failure message based on the exit status
-          if [ $? -eq 0 ]; then
-            MESSAGE="$SUCCESS_MESSAGE Repository: $DOCKER_REPO_NAME, PUSHED: $DOCKER_IMAGES."
-          else
-            MESSAGE="$FAILURE_MESSAGE Please check the logs."
-          fi
+          
           # Send message to Teams
+          MESSAGE="$SUCCESS_MESSAGE Repository: $DOCKER_REPO_NAME, PUSHED: $DOCKER_IMAGES."
           curl -X POST -H 'Content-Type: application/json' \
             -d "{\"text\":\"$MESSAGE\"}" ${{ secrets.TEAMS_WEBHOOK_URL }}
 
+  # Deploy to EKS Job
   deploy-to-eks:
-  needs: build-and-push  # Ensure the deploy job runs after the build-and-push job
-  runs-on: ubuntu-latest
+    needs: build-and-push  # Ensure the deploy job runs after the build-and-push job
+    runs-on: ubuntu-latest
 
-  steps:
-    # Step 1: Checkout the Helm chart repository
-    - name: Checkout Helm Chart Repo
-      uses: actions/checkout@v4
-      with:
-        repository: Ramesh-Kumhar/DIGIT-DevOps
-        path: helm-charts
-        ref: DIGIT-2.9LTS  # Specify the branch to check out
+    steps:
+      # Step 1: Checkout the Helm chart repository
+      - name: Checkout Helm Chart Repo
+        uses: actions/checkout@v4
+        with:
+          repository: Ramesh-Kumhar/DIGIT-DevOps
+          path: helm-charts
+          ref: DIGIT-2.9LTS  # Specify the branch to check out
 
-    # Step 2: Set up Helm and kubectl
-    - name: Set up Helm and kubectl
-      run: |
-        curl -LO https://get.helm.sh/helm-v3.9.1-linux-amd64.tar.gz
-        tar -zxvf helm-v3.9.1-linux-amd64.tar.gz
-        sudo mv linux-amd64/helm /usr/local/bin/helm
-        curl -LO "https://dl.k8s.io/release/v1.24.0/bin/linux/amd64/kubectl"
-        chmod +x kubectl
-        sudo mv kubectl /usr/local/bin/kubectl
-        kubectl version --client
+      # Step 2: Set up Helm and kubectl
+      - name: Set up Helm and kubectl
+        run: |
+          curl -LO https://get.helm.sh/helm-v3.9.1-linux-amd64.tar.gz
+          tar -zxvf helm-v3.9.1-linux-amd64.tar.gz
+          sudo mv linux-amd64/helm /usr/local/bin/helm
+          curl -LO "https://dl.k8s.io/release/v1.24.0/bin/linux/amd64/kubectl"
+          chmod +x kubectl
+          sudo mv kubectl /usr/local/bin/kubectl
+          kubectl version --client
 
-    # Step 3: Set up kubectl config for your EKS cluster using AWS credentials
-    - name: Set up kubectl config for EKS
-      run: |
-        aws eks --region ${{ secrets.AWS_REGION }} update-kubeconfig --name ${{ secrets.EKS_CLUSTER_NAME }}
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      # Step 3: Set up kubectl config for your EKS cluster using AWS credentials
+      - name: Set up kubectl config for EKS
+        run: |
+          aws eks --region ${{ secrets.AWS_REGION }} update-kubeconfig --name ${{ secrets.EKS_CLUSTER_NAME }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-    # Step 4: Update the tag in Helm chart configuration files
-    - name: Update Helm Chart Docker Image Tags
-      run: |
-        echo "Updating Helm chart Docker image tags in the repository"
-        
-        # Update image tag for the 'application' service
-        if [[ "$CHANGED_SERVICES" == *"application"* ]]; then
-          echo "Updating application image tag"
-          sed -i "s|image: prsm323/application:.*|image: prsm323/application:${{ env.IMAGE_TAG }}|g" helm-charts/deploy-as-code/charts/uba/backend/application/values.yaml
-        fi
-        
-        # Update image tag for the 'benefits' service
-        if [[ "$CHANGED_SERVICES" == *"benefits"* ]]; then
-          echo "Updating benefits image tag"
-          sed -i "s|image: prsm323/benefits:.*|image: prsm323/benefits:${{ env.IMAGE_TAG }}|g" helm-charts/deploy-as-code/charts/uba/backend/benefits/values.yaml
-        fi
-        
-        # Update image tag for the 'customer' service
-        if [[ "$CHANGED_SERVICES" == *"customer"* ]]; then
-          echo "Updating customer image tag"
-          sed -i "s|image: prsm323/customer:.*|image: prsm323/customer:${{ env.IMAGE_TAG }}|g" helm-charts/deploy-as-code/charts/uba/backend/customer/values.yaml
-        fi
+      # Step 4: Update the tag in Helm chart configuration files
+      - name: Update Helm Chart Docker Image Tags
+        run: |
+          echo "Updating Helm chart Docker image tags in the repository"
+          
+          # Update image tag for the 'application' service
+          if [[ "$CHANGED_SERVICES" == *"application"* ]]; then
+            echo "Updating application image tag"
+            sed -i "s|image: prsm323/application:.*|image: prsm323/application:${{ env.IMAGE_TAG }}|g" helm-charts/deploy-as-code/charts/uba/backend/application/values.yaml
+          fi
+          
+          # Update image tag for the 'benefits' service
+          if [[ "$CHANGED_SERVICES" == *"benefits"* ]]; then
+            echo "Updating benefits image tag"
+            sed -i "s|image: prsm323/benefits:.*|image: prsm323/benefits:${{ env.IMAGE_TAG }}|g" helm-charts/deploy-as-code/charts/uba/backend/benefits/values.yaml
+          fi
+          
+          # Update image tag for the 'customer' service
+          if [[ "$CHANGED_SERVICES" == *"customer"* ]]; then
+            echo "Updating customer image tag"
+            sed -i "s|image: prsm323/customer:.*|image: prsm323/customer:${{ env.IMAGE_TAG }}|g" helm-charts/deploy-as-code/charts/uba/backend/customer/values.yaml
+          fi
 
-    # Step 5: Deploy services using Helm upgrade/install for each service based on changes
-    - name: Deploy services using Helm
-      run: |
-        if [[ "$CHANGED_SERVICES" == *"application"* ]]; then
-          helm upgrade --install uba-backend-application helm-charts/deploy-as-code/charts/uba/backend/application --egov backend --set image.tag=${{ env.IMAGE_TAG }}
-        fi
-        
-        if [[ "$CHANGED_SERVICES" == *"benefits"* ]]; then
-          helm upgrade --install uba-backend-benefits helm-charts/deploy-as-code/charts/uba/backend/benefits --egov backend --set image.tag=${{ env.IMAGE_TAG }}
-        fi
-        
-        if [[ "$CHANGED_SERVICES" == *"customer"* ]]; then
-          helm upgrade --install uba-backend-customer helm-charts/deploy-as-code/charts/uba/backend/customer --egov backend --set image.tag=${{ env.IMAGE_TAG }}
-        fi
+      # Step 5: Deploy services using Helm upgrade/install for each service based on changes
+      - name: Deploy services using Helm
+        run: |
+          if [[ "$CHANGED_SERVICES" == *"application"* ]]; then
+            helm upgrade --install uba-backend-application helm-charts/deploy-as-code/charts/uba/backend/application --egov backend --set image.tag=${{ env.IMAGE_TAG }}
+          fi
+          
+          if [[ "$CHANGED_SERVICES" == *"benefits"* ]]; then
+            helm upgrade --install uba-backend-benefits helm-charts/deploy-as-code/charts/uba/backend/benefits --egov backend --set image.tag=${{ env.IMAGE_TAG }}
+          fi
+          
+          if [[ "$CHANGED_SERVICES" == *"customer"* ]]; then
+            helm upgrade --install uba-backend-customer helm-charts/deploy-as-code/charts/uba/backend/customer --egov backend --set image.tag=${{ env.IMAGE_TAG }}
+          fi
