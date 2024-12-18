@@ -9,8 +9,6 @@ jobs:
   # Job 1: Checkout the code and verify commit hashes
   checkout:
     runs-on: ubuntu-latest
-    outputs:
-      CHANGED_SERVICES: ${{ steps.check_changes.outputs.changed_services }}
 
     steps:
       - name: Checkout code with full history
@@ -25,16 +23,16 @@ jobs:
           git rev-parse ${{ github.event.before }} || echo "Previous commit hash does not exist."
           git rev-parse ${{ github.sha }} || echo "Current commit hash does not exist."
           
+      # Generate the IMAGE_TAG which will be used by subsequent jobs
       - name: Generate Image Tag
         run: |
           IMAGE_TAG="v1.0.0-$(date +'%Y%m%d-%H%M%S')"  # Create a unique image tag
           echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV  # Store the IMAGE_TAG in $GITHUB_ENV
-
+          
+      # Step to check for changes in services
       - name: Check for changes in services
-        id: check_changes
         run: |
           CHANGED_SERVICES=""
-
           echo "Checking for changes in backend/application folder"
           if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q "^backend/application"; then
             CHANGED_SERVICES="application"
@@ -51,18 +49,22 @@ jobs:
           fi
 
           echo "Changed services: $CHANGED_SERVICES"
-          echo "::set-output name=changed_services::${CHANGED_SERVICES}"
+          echo "CHANGED_SERVICES=$CHANGED_SERVICES" >> $GITHUB_ENV
 
   # Job 2: Build and Push Docker Image for Application
   application:
     needs: checkout
     runs-on: ubuntu-latest
-    if: contains(needs.checkout.outputs.changed_services, 'application')
+    if: contains(needs.checkout.outputs.CHANGED_SERVICES, 'application')
 
     steps:
       - name: Set up Docker Hub credentials
         run: |
           echo "${{ secrets.DOCKER_PASSWORD }}" | docker login --username ${{ secrets.DOCKER_USERNAME }} --password-stdin
+
+      - name: Debugging IMAGE_TAG value for application
+        run: |
+          echo "IMAGE_TAG for application: $IMAGE_TAG"  # Print IMAGE_TAG to ensure it is not empty
 
       - name: Build and Push Docker Image for Application
         run: |
@@ -74,12 +76,16 @@ jobs:
   benefits:
     needs: checkout
     runs-on: ubuntu-latest
-    if: contains(needs.checkout.outputs.changed_services, 'benefits')
+    if: contains(needs.checkout.outputs.CHANGED_SERVICES, 'benefits')
 
     steps:
       - name: Set up Docker Hub credentials
         run: |
           echo "${{ secrets.DOCKER_PASSWORD }}" | docker login --username ${{ secrets.DOCKER_USERNAME }} --password-stdin
+
+      - name: Debugging IMAGE_TAG value for benefits
+        run: |
+          echo "IMAGE_TAG for benefits: $IMAGE_TAG"  # Print IMAGE_TAG to ensure it is not empty
 
       - name: Build and Push Docker Image for Benefits
         run: |
@@ -91,12 +97,16 @@ jobs:
   customer:
     needs: checkout
     runs-on: ubuntu-latest
-    if: contains(needs.checkout.outputs.changed_services, 'customer')
+    if: contains(needs.checkout.outputs.CHANGED_SERVICES, 'customer')
 
     steps:
       - name: Set up Docker Hub credentials
         run: |
           echo "${{ secrets.DOCKER_PASSWORD }}" | docker login --username ${{ secrets.DOCKER_USERNAME }} --password-stdin
+
+      - name: Debugging IMAGE_TAG value for customer
+        run: |
+          echo "IMAGE_TAG for customer: $IMAGE_TAG"  # Print IMAGE_TAG to ensure it is not empty
 
       - name: Build and Push Docker Image for Customer
         run: |
@@ -111,4 +121,4 @@ jobs:
     steps:
       - name: Final success message
         run: |
-          echo "Successfully built and pushed Docker images for: ${{ needs.application.outputs.changed_services }} ${needs.benefits.outputs.changed_services} ${needs.customer.outputs.changed_services}"
+          echo "Successfully built and pushed Docker images for: ${{ needs.application.outputs.CHANGED_SERVICES }}"
