@@ -31,6 +31,7 @@ jobs:
           
       # Step to check for changes in services
       - name: Check for changes in services
+        id: check_changes
         run: |
           CHANGED_SERVICES=""
           echo "Checking for changes in backend/application folder"
@@ -55,7 +56,7 @@ jobs:
   application:
     needs: checkout
     runs-on: ubuntu-latest
-    if: contains(needs.checkout.outputs.CHANGED_SERVICES, 'application')
+    if: contains(env.CHANGED_SERVICES, 'application')  # Check if 'application' is in the changed services
 
     steps:
       - name: Set up Docker Hub credentials
@@ -76,7 +77,7 @@ jobs:
   benefits:
     needs: checkout
     runs-on: ubuntu-latest
-    if: contains(needs.checkout.outputs.CHANGED_SERVICES, 'benefits')
+    if: contains(env.CHANGED_SERVICES, 'benefits')  # Check if 'benefits' is in the changed services
 
     steps:
       - name: Set up Docker Hub credentials
@@ -97,7 +98,7 @@ jobs:
   customer:
     needs: checkout
     runs-on: ubuntu-latest
-    if: contains(needs.checkout.outputs.CHANGED_SERVICES, 'customer')
+    if: contains(env.CHANGED_SERVICES, 'customer')  # Check if 'customer' is in the changed services
 
     steps:
       - name: Set up Docker Hub credentials
