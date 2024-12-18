@@ -135,7 +135,12 @@ jobs:
           sudo mv kubectl /usr/local/bin/kubectl
           kubectl version --client
 
-      # Step 3: Update the tag in Helm chart configuration files
+      # Step 3: Set up kubectl config for your EKS cluster
+      - name: Set up kubectl config
+        run: |
+          aws eks --region ${{ secrets.AWS_REGION }} update-kubeconfig --name ${{ secrets.EKS_CLUSTER_NAME }}
+
+      # Step 4: Update the tag in Helm chart configuration files
       - name: Update Helm Chart Docker Image Tags
         run: |
           echo "Updating Helm chart Docker image tags in the repository"
@@ -158,13 +163,9 @@ jobs:
             sed -i "s|image: prsm323/customer:.*|image: prsm323/customer:${{ env.IMAGE_TAG }}|g" helm-charts/deploy-as-code/charts/uba/backend/customer/values.yaml
           fi
 
-      # Step 4: Deploy to EKS using Helm
-      - name: Deploy to EKS using Helm
+      # Step 5: Deploy services using Helm upgrade/install for each service based on changes
+      - name: Deploy services using Helm
         run: |
-          # Set up kubectl config for your EKS cluster
-          aws eks --region ${{ secrets.AWS_REGION }} update-kubeconfig --name ${{ secrets.EKS_CLUSTER_NAME }}
-          
-          # Deploy services using Helm upgrade/install for each service based on changes
           if [[ "$CHANGED_SERVICES" == *"application"* ]]; then
             helm upgrade --install uba-backend-application helm-charts/deploy-as-code/charts/uba/backend/application --egov backend --set image.tag=${{ env.IMAGE_TAG }}
           fi
@@ -176,19 +177,3 @@ jobs:
           if [[ "$CHANGED_SERVICES" == *"customer"* ]]; then
             helm upgrade --install uba-backend-customer helm-charts/deploy-as-code/charts/uba/backend/customer --egov backend --set image.tag=${{ env.IMAGE_TAG }}
           fi
-
-      # Step 5: Notify Success or Failure to Teams
-      - name: Send Success or Failure Message to Teams
-        run: |
-          TAG="${{ env.IMAGE_TAG }}"
-          SUCCESS_MESSAGE="EKS Deployment Successful: Service deployed with image tag $TAG."
-          FAILURE_MESSAGE="EKS Deployment Failed: Please check the Helm logs."
-          # Construct message
-          if [ $? -eq 0 ]; then
-            MESSAGE="$SUCCESS_MESSAGE"
-          else
-            MESSAGE="$FAILURE_MESSAGE"
-          fi
-          # Send message to Teams
-          curl -X POST -H 'Content-Type: application/json' \
-            -d "{\"text\":\"$MESSAGE\"}" ${{ secrets.TEAMS_WEBHOOK_URL }}
