@@ -25,22 +25,35 @@ jobs:
           IMAGE_TAG="v1.0.0-$(date +'%Y%m%d-%H%M%S')"  # Create a unique image tag
           echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV  # Store the IMAGE_TAG in $GITHUB_ENV
 
-      # Step 4: Check which services have changed and build those Docker images
-      - name: Check for changes and build Docker image
+      # Step 4: Check for changes and build Docker image
+      - name: Debugging git diff and changes detection
         run: |
+          echo "Previous commit hash (before): ${{ github.event.before }}"
+          echo "Current commit hash (sha): ${{ github.sha }}"
+          
+          # Run the git diff command and output the result to debug
+          echo "Running git diff command to compare commits"
+          git diff --name-only ${{ github.event.before }} ${{ github.sha }} || echo "Git diff failed"
+          
+          # Debugging: Check which files are changed
           CHANGED_SERVICES=""
-          # Check if there are changes in the backend/application folder
+          
+          echo "Checking for changes in backend/application folder"
           if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q "^backend/application"; then
             CHANGED_SERVICES="application"
           fi
-          # Check if there are changes in the backend/benefits folder
+
+          echo "Checking for changes in backend/benefits folder"
           if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q "^backend/benefits"; then
             CHANGED_SERVICES="$CHANGED_SERVICES benefits"
           fi
-          # Check if there are changes in the backend/customer folder
+
+          echo "Checking for changes in backend/customer folder"
           if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q "^backend/customer"; then
             CHANGED_SERVICES="$CHANGED_SERVICES customer"
           fi
+
+          # Debugging output
           echo "Changed services: $CHANGED_SERVICES"
           echo "CHANGED_SERVICES=$CHANGED_SERVICES" >> $GITHUB_ENV
 
