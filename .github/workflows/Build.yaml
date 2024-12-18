@@ -92,22 +92,39 @@ jobs:
       # Step 7: Send success or failure message to Teams
       - name: Send Success or Failure Message to Teams
         run: |
-          REPO_NAME="${{ github.repository }}"  # Get the repository name
           TAG="${{ env.IMAGE_TAG }}"  # Get the image tag
-    
-          if [ $? -eq 0 ]; then
-            # If the build and push was successful
-            curl -X POST -H 'Content-Type: application/json' \
-            -d '{
-              "text": "Build and Push Successful: Repository: '$REPO_NAME', PUSHED: '$CHANGED_SERVICES' with tag: '$TAG'."
-            }' ${{ secrets.TEAMS_WEBHOOK_URL }}
-          else
-            # If there was a failure
-            curl -X POST -H 'Content-Type: application/json' \
-            -d '{
-              "text": "Build and Push Failed: There was an error while building or pushing the Docker images in repository: '$REPO_NAME'. Please check the logs."
-            }' ${{ secrets.TEAMS_WEBHOOK_URL }}
+
+          # Initialize an empty message
+          SUCCESS_MESSAGE="Build and Push Successful: "
+          FAILURE_MESSAGE="Build and Push Failed: There was an error while building or pushing the Docker images."
+
+          DOCKER_REPO_NAME="prsm323"  # Set your Docker Hub username
+
+          # Construct the services and their respective Docker repository names with tags
+          DOCKER_IMAGES=""
+          
+          if [[ "$CHANGED_SERVICES" == *"application"* ]]; then
+            DOCKER_IMAGES="${DOCKER_IMAGES} prsm323/application:$TAG"
           fi
+          
+          if [[ "$CHANGED_SERVICES" == *"benefits"* ]]; then
+            DOCKER_IMAGES="${DOCKER_IMAGES} prsm323/benefits:$TAG"
+          fi
+          
+          if [[ "$CHANGED_SERVICES" == *"customer"* ]]; then
+            DOCKER_IMAGES="${DOCKER_IMAGES} prsm323/customer:$TAG"
+          fi
+
+          # Determine the success or failure message based on the exit status
+          if [ $? -eq 0 ]; then
+            MESSAGE="$SUCCESS_MESSAGE Repository: $DOCKER_REPO_NAME, PUSHED: $DOCKER_IMAGES."
+          else
+            MESSAGE="$FAILURE_MESSAGE Please check the logs."
+          fi
+
+          # Send message to Teams
+          curl -X POST -H 'Content-Type: application/json' \
+            -d "{\"text\":\"$MESSAGE\"}" ${{ secrets.TEAMS_WEBHOOK_URL }}
 
       # Step 8: Upload Docker images as artifacts
       - name: Upload Docker Image Tarballs as Artifacts
