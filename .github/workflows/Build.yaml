@@ -3,7 +3,7 @@ name: Build and Push Docker Image
 on:
   push:
     branches:
-      - features.benefitcreateupdate
+      - eks-depoy-test
 
 jobs:
   build-and-push:
