@@ -1,0 +1,324 @@
+{
+  "en": {
+    "basicDetails": {
+      "title": "Pre- Matric Scholarships Scheme for Scheduled Castes & Others",
+      "category": "education-and-learning",
+      "subCategory": "scholarship",
+      "tags": ["SC", "Financial Assistance", "Scholarship", "Student"],
+      "applicationOpenDate": "2024-10-31",
+      "applicationCloseDate": "2024-12-31"
+    },
+    "benefitContent": {
+      "imageUrl": "https://fastly.picsum.photos/id/24/200/200.jpg?hmac=Tw5b43UPAehS5e4JyB0qMQysvfLBmu_GZ_iafWou3m8",
+      "shortDescription": "This program provides financial aid to parents of children from Scheduled Castes and other disadvantaged groups to help them afford their children's education at the Pre-Matric level.",
+      "shortDescription_md": "",
+      "longDescription": "This program provides financial aid to parents of children from Scheduled Castes and other disadvantaged groups to help them afford their children's education at the Pre-Matric level. The goal is to increase the participation of these children in education, reduce the dropout rate, especially during the transition from primary to secondary school, improve their academic performance, and increase their chances of continuing their education beyond the Pre-Matric stage.",
+      "longDescription_md": "",
+      "benefits": [
+        {
+          "type": "financial",
+          "title": "Financial Assistance",
+          "description": "This scholarship provides financial assistance to students. <br />Day Scholar<br />Boys - 3500<br />Girls - 3500<br />Disabled - 3850<br /><br />Hosteller<br />Boys - 7000<br />Girls - 7000<br />Disabled - 7700",
+          "description_md": ""
+        }
+      ],
+      "exclusions": [
+        {
+          "description": "Duplicate Government Scholarship: Students who are already availing of another government scholarship or financial aid for the same purpose will not be eligible.",
+          "description_md": ""
+        }
+      ],
+      "references": [
+        {
+          "link": "https://scholarships.gov.in/public/schemeGuidelines/Assam_PRE_Matric_Scholarship_Guideline.pdf",
+          "title": "Guidelines"
+        },
+        {
+          "link": "https://scholarships.gov.in/public/FAQ/FAQ_ASSAM.pdf",
+          "title": "FAQs"
+        }
+      ]
+    },
+    "providingEntity": {
+      "type": "government",
+      "name": "Ministry of Social Justice",
+      "address": {
+        "street": "123 Central Avenue",
+        "city": "New Delhi",
+        "state": "Delhi",
+        "postalCode": "110001"
+      },
+      "department": "Department of Social Justice and Empowerment",
+      "contactInfo": {
+        "phoneNumber": "011-12345678",
+        "email": "contact@socialjustice.gov.in"
+      }
+    },
+    "sponsoringEntities": [
+      {
+        "type": "government",
+        "name": "Ministry of Social Justice Department",
+        "address": {
+          "street": "123 Central Avenue",
+          "city": "New Delhi",
+          "state": "Delhi",
+          "postalCode": "110001"
+        },
+        "department": "Department of Social Justice",
+        "contactInfo": {
+          "phoneNumber": "011-12345678",
+          "email": "contact@socialjustice.gov.in"
+        },
+        "sponsorShare": "60"
+      },
+      {
+        "type": "government",
+        "name": "Tribal Welfare Department, Madhya Pradesh",
+        "address": {
+          "street": "456 State Highway",
+          "city": "Bhopal",
+          "state": "Madhya Pradesh",
+          "postalCode": "462001"
+        },
+        "department": "Department of Tribal Welfare",
+        "contactInfo": {
+          "phoneNumber": "0755-2345678",
+          "email": "contact@tribalwelfare.mp.gov.in"
+        },
+        "sponsorShare": "40"
+      }
+    ],
+    "eligibility": [
+      {
+        "type": "educational",
+        "description": "The applicant must be a student studying in Class 9th or Class 10th",
+        "evidence": "class",
+        "criteria": {
+          "name": "class",
+          "condition": "in",
+          "conditionValues": ["9", "10"]
+        },
+        "allowedProofs": [
+          "academicCertificate",
+          "bonafideCertificate",
+          "enrollmentCertificate"
+        ]
+      },
+      {
+        "type": "personal",
+        "description": "The applicant must be from Scheduled Caste",
+        "evidence": "caste",
+        "criteria": {
+          "name": "caste",
+          "condition": "equals",
+          "conditionValues": "sc"
+        },
+        "allowedProofs": ["casteCertificate"]
+      },
+      {
+        "type": "economical",
+        "description": "The Total Annual income of parents/guardians of the applicant (from all sources) must not exceed ₹ 2.50 Lakh per Annum",
+        "evidence": "annualIncome",
+        "criteria": {
+          "name": "annualIncome",
+          "condition": "max",
+          "conditionValues": "250000"
+        },
+        "allowedProofs": ["incomeCertificate"]
+      },
+      {
+        "type": "geographical",
+        "description": "The applicant must be from Madhya Pradesh state",
+        "evidence": "state",
+        "criteria": {
+          "name": "state",
+          "condition": "equals",
+          "conditionValues": "madhyaPradesh"
+        },
+        "allowedProofs": ["domicileCertificate"]
+      }
+    ],
+    "documents": [
+      {
+        "documentType": "identityProof",
+        "isRequired": true,
+        "allowedProofs": ["aadhaar"]
+      },
+      {
+        "documentType": "disablityProof",
+        "isRequired": false,
+        "allowedProofs": ["disablityCertificate"]
+      },
+      {
+        "documentType": "hostelerProof",
+        "isRequired": false,
+        "allowedProofs": ["hostelAccommodationCertificate"]
+      }
+    ],
+    "applicationProcess": {
+      "mode": "online",
+      "description": "<div>The applications are invited on the National Scholarship Portal (NSP) (<a href=\"https://scholarships.gov.in/\" target=\"_blank\" rel=\"noreferrer noopener\">https://scholarships.gov.in/</a>) in the month of April every year.</div><div>Registration for New Applicant</div><ol type=\"1\"><li>Open the official <a href=\"https://scholarships.gov.in/\" target=\"_blank\" rel=\"noreferrer noopener\">NSP website</a> and click on <a href=\"https://scholarships.gov.in/registrations/#/\" target=\"_blank\" rel=\"noreferrer noopener\">New Registration</a> under Applicant Corner.</li><li>Read the Instruction /Guidelines, provide the under taking by click on Check box and click on Continue.</li><li>Start the registration by Mobile OTP.</li><li>Required document (Aadhaar Details and Bank Account Details)</li></ol><div>Registered Applicant</div><ol type=\"1\"><li>Open the official <a href=\"https://scholarships.gov.in/\" target=\"_blank\" rel=\"noreferrer noopener\">NSP website </a>and click on <a href=\"https://scholarships.gov.in/fresh/loginPage\" target=\"_blank\" rel=\"noreferrer noopener\">Fresh Application</a> under Applicant Corner</li><li>Login with application ID &amp; password.</li><li>Select the Scholarship.</li><li>Fill out the applicant form.</li><li>Upload the required documents.</li><li>Submit.</li></ol>",
+      "description_md": ""
+    },
+    "applicationForm": [
+      {
+        "type": "text",
+        "name": "firstName",
+        "label": "Enter your First Name",
+        "required": true
+      },
+      {
+        "type": "text",
+        "name": "middleName",
+        "label": "Enter your Middle Name",
+        "required": true
+      },
+      {
+        "type": "text",
+        "name": "lastName",
+        "label": "Enter your Last Name",
+        "required": true
+      },
+      {
+        "type": "radio",
+        "name": "gender",
+        "label": "Choose your Gender",
+        "required": true,
+        "options": [
+          {
+            "value": "male",
+            "label": "Male"
+          },
+          {
+            "value": "female",
+            "label": "Female"
+          }
+        ]
+      },
+      {
+        "type": "select",
+        "name": "class",
+        "label": "Enter your Class",
+        "required": true,
+        "multiple": false,
+        "options": [
+          {
+            "value": "9",
+            "label": "9"
+          },
+          {
+            "value": "10",
+            "label": "10"
+          }
+        ]
+      },
+      {
+        "type": "select",
+        "name": "annualIncome",
+        "label": "Choose your parent's Annual Income",
+        "required": true,
+        "multiple": false,
+        "options": [
+          {
+            "value": "99999",
+            "label": "Below ₹1,00,000"
+          },
+          {
+            "value": "250000",
+            "label": "₹1,00,001 - ₹2,50,000"
+          },
+          {
+            "value": "500000",
+            "label": "₹2,50,001 - ₹5,00,000"
+          },
+          {
+            "value": "750000",
+            "label": "₹5,00,001 - ₹7,50,000"
+          },
+          {
+            "value": "other",
+            "label": "other"
+          }
+        ]
+      },
+      {
+        "type": "select",
+        "name": "caste",
+        "label": "Choose your Caste",
+        "required": true,
+        "multiple": false,
+        "options": [
+          {
+            "value": "general",
+            "label": "General"
+          },
+          {
+            "value": "sc",
+            "label": "SC"
+          },
+          {
+            "value": "st",
+            "label": "ST"
+          },
+          {
+            "value": "obc",
+            "label": "OBC"
+          },
+          {
+            "value": "na",
+            "label": "NA"
+          }
+        ]
+      },
+      {
+        "type": "radio",
+        "name": "disabled",
+        "label": "Are you differently abled person?",
+        "required": true,
+        "options": [
+          {
+            "value": "yes",
+            "label": "Yes"
+          },
+          {
+            "value": "no",
+            "label": "No"
+          }
+        ]
+      },
+      {
+        "type": "select",
+        "name": "disabled",
+        "label": "Choose your Domicile State?",
+        "required": true,
+        "multiple": false,
+        "options": [
+          {
+            "value": "madhya-pradesh",
+            "label": "Madhya Pradesh"
+          },
+          {
+            "value": "other",
+            "label": "Other"
+          }
+        ]
+      },
+      {
+        "type": "radio",
+        "name": "disabled",
+        "label": "Are you Day Scholar/ Hostler?",
+        "required": true,
+        "options": [
+          {
+            "value": "dayScholar",
+            "label": "Day Scholar"
+          },
+          {
+            "value": "hostler",
+            "label": "Hostler"
+          }
+        ]
+      }
+    ]
+  }
+}

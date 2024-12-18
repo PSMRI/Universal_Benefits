@@ -1,0 +1,184 @@
+{
+  "en": {
+    "basicDetails": {
+      "title": "Pre-matric Scholarship-SC",
+      "category": "scholarship",
+      "subCategory": "pre-matric",
+      "tags": ["scholarship", "sc"],
+      "openDate": "31st July",
+      "closeDate": "31st October"
+    },
+    "benefitContent": {
+      "shortDescription": "This scholarship is provided by the Ministry of Social Justice for students in classes 9 and 10.",
+      "longDescription": "The Pre-matric Scholarship for SC students is intended to provide financial aid to students of Scheduled Caste (SC) studying in classes 9 and 10. It aims to assist in covering school fees and maintenance for students in both day-scholar and hosteller categories.",
+      "benefits": [
+        {
+          "type": "financial",
+          "description": "This scholarship provides financial assistance to students."
+        }
+      ],
+      "exclusions": [
+        {
+          "description": "This scholarship will only be available for one year if the student fails any class."
+        },
+        {
+          "description": "Cannot avail this scholarship if another government scholarship is availed in the same academic year."
+        }
+      ]
+    },
+    "providingEntity": {
+      "type": "Central Government",
+      "name": "Ministry of Social Justice",
+      "address": {
+        "street": "123 Central Avenue",
+        "city": "New Delhi",
+        "state": "Delhi",
+        "postalCode": "110001"
+      },
+      "department": "Department of Social Justice and Empowerment",
+      "contactInfo": {
+        "phoneNumber": "011-12345678",
+        "email": "contact@socialjustice.gov.in"
+      }
+    },
+    "sponsoringEntity": [
+      {
+        "type": "Central Govt.",
+        "sponsorName": "Ministry of Social Justice Department",
+        "address": {
+          "street": "123 Central Avenue",
+          "city": "New Delhi",
+          "state": "Delhi",
+          "postalCode": "110001"
+        },
+        "department": "Department of Social Justice",
+        "contactInfo": {
+          "phoneNumber": "011-12345678",
+          "email": "contact@socialjustice.gov.in"
+        },
+        "sponsorShare": 60
+      },
+      {
+        "type": "State Govt.",
+        "sponsorName": "Tribal Welfare Department, Madhya Pradesh",
+        "address": {
+          "street": "456 State Highway",
+          "city": "Bhopal",
+          "state": "Madhya Pradesh",
+          "postalCode": "462001"
+        },
+        "department": "Department of Tribal Welfare",
+        "contactInfo": {
+          "phoneNumber": "0755-2345678",
+          "email": "contact@tribalwelfare.mp.gov.in"
+        },
+        "sponsorShare": 40
+      }
+    ],
+    "applicationProcess": {
+      "mode": "Online",
+      "description": "The application process for the Pre-matric Scholarship requires submission of an online form, supported by necessary documents such as caste certificate, income certificate, and academic records.",
+      "description_md": "The application process for the *Pre-matric Scholarship* requires submission of an online form, supported by necessary documents such as caste certificate, income certificate, and academic records."
+    },
+    "eligibilityCriteria": {
+      "eligibilityDescription_md": "To be eligible for the Pre-matric Scholarship, the applicant must:\n- Belong to the SC community\n- Have an annual family income below ₹2,50,000\n- Be studying in class 9 or 10\n- Be a resident of Madhya Pradesh",
+      "eligibilityDescription": [
+        {
+          "type": "Caste",
+          "children": [
+            {
+              "type": "Scheduled Caste (SC)"
+            }
+          ]
+        },
+        {
+          "type": "Annual Income",
+          "children": [
+            {
+              "type": "Below ₹1,00,000"
+            },
+            {
+              "type": "₹1,00,001 - ₹2,50,000"
+            }
+          ]
+        },
+        {
+          "type": "Class",
+          "children": [
+            {
+              "type": "9"
+            },
+            {
+              "type": "10"
+            }
+          ]
+        },
+        {
+          "type": "Domicile",
+          "children": [
+            {
+              "type": "Madhya Pradesh"
+            }
+          ]
+        },
+        {
+          "type": "Day Scholar",
+          "description": "Eligibility criteria for day scholars.",
+          "children": [
+            {
+              "type": "Boys",
+              "description": "₹3500"
+            },
+            {
+              "type": "Girls",
+              "description": "₹3500"
+            },
+            {
+              "type": "Disabled",
+              "description": "₹3850"
+            }
+          ]
+        },
+        {
+          "type": "Hosteller",
+          "description": "Eligibility criteria for hostellers.",
+          "children": [
+            {
+              "type": "Boys",
+              "description": "₹7000"
+            },
+            {
+              "type": "Girls",
+              "description": "₹7000"
+            },
+            {
+              "type": "Disabled",
+              "description": "₹7700"
+            }
+          ]
+        }
+      ]
+    },
+    "applicationForm": [
+      {
+        "type": "Online Form",
+        "name": "Pre-matric Scholarship Application Form",
+        "required": [
+          "Caste Certificate",
+          "Income Certificate",
+          "Academic Records"
+        ]
+      }
+    ],
+    "benefitDocuments": [
+      {
+        "documentType": "Proof of Identity",
+        "documentURL": "https://example.com/documents/proof_of_identity.pdf"
+      },
+      {
+        "documentType": "Caste Certificate",
+        "documentURL": "https://example.com/documents/caste_certificate.pdf"
+      }
+    ]
+  }
+}

@@ -1,0 +1,163 @@
+{
+  "en": {
+    "basicDetails": {
+      "title": "Pre-matric Scholarship-ST",
+      "category": "scholarship",
+      "subCategory": "education",
+      "tags": ["scholarship", "st"],
+      "openDate": "31st July",
+      "closeDate": "31st October"
+    },
+    "benefitContent": {
+      "shortDescription": "Scholarship for ST students in classes 9 and 10.",
+      "shortDescription_md": "Scholarship for ST students in classes 9 and 10.",
+      "longDescription": "This scholarship supports ST students from Madhya Pradesh in continuing their education.",
+      "longDescription_md": "This scholarship supports ST students from Madhya Pradesh in continuing their education.",
+      "benefits": [
+        {
+          "type": "financial",
+          "description": "This scholarship provides financial assistance to students."
+        }
+      ],
+      "exclusions": [
+        {
+          "description": "Cannot avail if already receiving another government scholarship."
+        },
+        {
+          "description": "If the student fails, the scholarship is only available for one year."
+        }
+      ]
+    },
+    "providingEntity": {
+      "type": "Ministry",
+      "name": "Ministry of Tribal Welfare",
+      "address": {
+        "street": "Some Street",
+        "city": "New Delhi",
+        "state": "Delhi",
+        "postalCode": "110001"
+      },
+      "department": "Tribal Welfare Department",
+      "contactInfo": {
+        "phoneNumber": "1234567890",
+        "email": "contact@mtw.gov.in"
+      }
+    },
+    "sponsoringEntity": [
+      {
+        "type": "Government",
+        "sponsorName": "Ministry of Tribal Welfare",
+        "address": {
+          "street": "Some Street",
+          "city": "New Delhi",
+          "state": "Delhi",
+          "postalCode": "110001"
+        },
+        "department": "Ministry of Tribal Welfare Department",
+        "contactInfo": {
+          "phoneNumber": "1234567890",
+          "email": "contact@mtw.gov.in"
+        },
+        "sponsorShare": 75
+      },
+      {
+        "type": "Government",
+        "sponsorName": "Tribal Welfare Department, Madhya Pradesh",
+        "address": {
+          "street": "Some Street",
+          "city": "Bhopal",
+          "state": "Madhya Pradesh",
+          "postalCode": "462001"
+        },
+        "department": "Tribal Welfare",
+        "contactInfo": {
+          "phoneNumber": "9876543210",
+          "email": "contact@twd.mp.gov.in"
+        },
+        "sponsorShare": 25
+      }
+    ],
+    "applicationProcess": {
+      "mode": "Online",
+      "description": "Students can apply online through the official portal.",
+      "description_md": "Students can apply online through the official portal."
+    },
+    "applicationForm": [
+      {
+        "type": "Online Form",
+        "name": "Pre-matric Scholarship Application",
+        "required": ["Name", "Caste", "Income Certificate"]
+      }
+    ],
+    "eligibilityCriteria": {
+      "eligibilityDescription": [
+        {
+          "type": "Income",
+          "children": [
+            { "type": "Below ₹1,00,000" },
+            { "type": "₹1,00,001 - ₹2,50,000" }
+          ]
+        },
+        {
+          "type": "Caste",
+          "children": [{ "type": "ST" }]
+        },
+        {
+          "type": "Class",
+          "children": [{ "type": "9" }, { "type": "10" }]
+        },
+        {
+          "type": "Gender",
+          "children": [{ "type": "Both" }]
+        },
+        {
+          "type": "Day Scholar",
+          "description": "Eligibility criteria for day scholars.",
+          "children": [
+            {
+              "type": "Boys",
+              "description": "₹3500"
+            },
+            {
+              "type": "Girls",
+              "description": "₹3500"
+            },
+            {
+              "type": "Disabled",
+              "description": "₹3850"
+            }
+          ]
+        },
+        {
+          "type": "Hosteller",
+          "description": "Eligibility criteria for hostellers.",
+          "children": [
+            {
+              "type": "Boys",
+              "description": "₹7000"
+            },
+            {
+              "type": "Girls",
+              "description": "₹7000"
+            },
+            {
+              "type": "Disabled",
+              "description": "₹7700"
+            }
+          ]
+        }
+      ],
+      "eligibilityDescription_md": "Eligibility includes ST students from classes 9 and 10, with annual income below ₹2,50,000."
+    },
+    "benefitDocuments": [
+      {
+        "documentType": "Proof of Caste",
+        "documentURL": "http://example.com/caste_certificate.pdf"
+      },
+      {
+        "documentType": "Proof of Income",
+        "documentURL": "http://example.com/income_certificate.pdf"
+      }
+    ]
+  }
+}

@@ -628,5 +628,4 @@ public class ApplicationService {
 	}
 	// End by priyanka
 
-	// Main class end
 }

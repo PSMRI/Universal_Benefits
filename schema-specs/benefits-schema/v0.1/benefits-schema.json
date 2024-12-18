@@ -1,0 +1,412 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Benefit",
+  "description": "Schema for capturing benefit form information",
+  "type": "object",
+  "version": "0.1",
+  "required": ["en"],
+  "properties": {
+    "en": {
+      "type": "object",
+      "properties": {
+        "basicDetails": {
+          "type": "object",
+          "title": "Basic Benefit Information",
+          "required": ["title", "category", "subCategory"],
+          "properties": {
+            "title": {
+              "type": "string",
+              "title": "Benefit Title"
+            },
+            "category": {
+              "type": "string",
+              "title": "Benefit Category"
+            },
+            "subCategory": {
+              "type": "string",
+              "title": "Benefit SubCategory"
+            },
+            "openDate": {
+              "type": "string",
+              "title": "Benefit Open Date"
+            },
+            "closeDate": {
+              "type": "string",
+              "title": "Benefit Close Date"
+            },
+            "tags": {
+              "type": "array",
+              "title": "Tags",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "benefitContent": {
+          "type": "object",
+          "title": "Benefit Content",
+          "required": ["longDescription"],
+          "properties": {
+            "imageUrl": {
+              "type": "string",
+              "title": "Benefit URL"
+            },
+            "shortDescription": {
+              "type": "string",
+              "title": "Brief Description"
+            },
+            "shortDescription_md": {
+              "type": "string",
+              "title": "Brief Description (Markdown)"
+            },
+            "longDescription": {
+              "type": "string",
+              "title": "Long Description"
+            },
+            "longDescription_md": {
+              "type": "string",
+              "title": "Long Description (Markdown)"
+            },
+            "references": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["link", "title"],
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "title": "Benefit Reference Link"
+                  },
+                  "description": {
+                    "type": "string",
+                    "title": "Benefit Reference Link Title"
+                  }
+                }
+              },
+              "benefits": {
+                "type": "array",
+                "title": "Benefit Details",
+                "items": {
+                  "type": "object",
+                  "required": ["type", "title", "description"],
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "title": "Benefit Type"
+                    },
+                    "title": {
+                      "type": "string",
+                      "title": "Benefit Title"
+                    },
+                    "description": {
+                      "type": "string",
+                      "title": "Benefit Description"
+                    }
+                  }
+                },
+                "minItems": 1
+              },
+              "exclusions": {
+                "type": "array",
+                "title": "Exclusions",
+                "description": "Conditions or scenarios where the benefit does not apply.",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "description": {
+                      "type": "string",
+                      "title": "Exclusion Description",
+                      "description": "Details about specific exclusions from the benefit."
+                    }
+                  },
+                  "required": ["description"]
+                },
+                "minItems": 1
+              }
+            }
+          },
+          "providingEntity": {
+            "type": "object",
+            "title": "Offering Entity",
+            "description": "Information about the entity providing the benefit.",
+            "required": [
+              "type",
+              "name",
+              "address",
+              "department",
+              "contactInfo"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "title": "Entity Type",
+                "description": "The type or category of the offering entity."
+              },
+              "name": {
+                "type": "string",
+                "title": "Entity Name",
+                "description": "The name of the organization or entity offering the benefit."
+              },
+              "address": {
+                "type": "object",
+                "title": "Address",
+                "description": "The address of the offering entity.",
+                "properties": {
+                  "street": {
+                    "type": "string",
+                    "title": "Street",
+                    "description": "Street address of the entity."
+                  },
+                  "city": {
+                    "type": "string",
+                    "title": "City",
+                    "description": "City where the entity is located."
+                  },
+                  "state": {
+                    "type": "string",
+                    "title": "State/Region",
+                    "description": "State or region where the entity is located."
+                  },
+                  "postalCode": {
+                    "type": "string",
+                    "title": "Postal Code",
+                    "description": "Postal or ZIP code of the entity."
+                  }
+                },
+                "required": ["street", "city", "state", "postalCode"]
+              },
+              "department": {
+                "type": "string",
+                "title": "Department",
+                "description": "The department within the entity responsible for the benefit."
+              },
+              "contactInfo": {
+                "type": "object",
+                "title": "Contact Information",
+                "description": "Contact details for the offering entity.",
+                "properties": {
+                  "phoneNumber": {
+                    "type": "string",
+                    "title": "Phone Number",
+                    "description": "The entity's contact phone number."
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "title": "Email Address",
+                    "description": "The entity's contact email address."
+                  }
+                },
+                "required": ["phoneNumber", "email"]
+              }
+            }
+          },
+          "sponsoringEntity": {
+            "type": "array",
+            "title": "Sponsors",
+            "description": "List of organizations or individuals sponsoring the benefit.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "title": "Sponsor Type",
+                  "description": "The type or category of sponsor."
+                },
+                "sponsorName": {
+                  "type": "string",
+                  "title": "Sponsor Name",
+                  "description": "The name of the sponsoring entity."
+                },
+                "address": {
+                  "type": "object",
+                  "title": "Sponsor Address",
+                  "description": "Address of the sponsoring entity.",
+                  "properties": {
+                    "street": {
+                      "type": "string",
+                      "title": "Street",
+                      "description": "Street address of the sponsor."
+                    },
+                    "city": {
+                      "type": "string",
+                      "title": "City",
+                      "description": "City where the sponsor is located."
+                    },
+                    "state": {
+                      "type": "string",
+                      "title": "State/Region",
+                      "description": "State or region where the sponsor is located."
+                    },
+                    "postalCode": {
+                      "type": "string",
+                      "title": "Postal Code",
+                      "description": "Postal or ZIP code of the sponsor."
+                    }
+                  },
+                  "required": ["street", "city", "state", "postalCode"]
+                },
+                "department": {
+                  "type": "string",
+                  "title": "Sponsor Department",
+                  "description": "The department within the sponsor organization handling the sponsorship."
+                },
+                "contactInfo": {
+                  "type": "object",
+                  "title": "Sponsor Contact Information",
+                  "description": "Contact details for the sponsor.",
+                  "properties": {
+                    "phoneNumber": {
+                      "type": "string",
+                      "title": "Phone Number",
+                      "description": "The sponsor's contact phone number."
+                    },
+                    "email": {
+                      "type": "string",
+                      "format": "email",
+                      "title": "Email Address",
+                      "description": "The sponsor's contact email address."
+                    }
+                  },
+                  "required": ["phoneNumber", "email"]
+                },
+                "sponsorShare": {
+                  "type": "number",
+                  "title": "Sponsor Contribution",
+                  "description": "The percentage contribution of the sponsor towards the benefit."
+                }
+              },
+              "required": [
+                "sponsorName",
+                "address",
+                "department",
+                "contactInfo",
+                "sponsorShare"
+              ]
+            },
+            "minItems": 1
+          },
+          "applicationProcess": {
+            "type": "object",
+            "title": "Application Process",
+            "description": "Details about the process of applying for the benefit.",
+            "required": ["mode", "description", "description_md"],
+            "properties": {
+              "mode": {
+                "type": "string",
+                "title": "Application Mode",
+                "description": "The method or mode of applying for the benefit."
+              },
+              "description": {
+                "type": "string",
+                "title": "Process Description",
+                "description": "A detailed description of the application process."
+              },
+              "description_md": {
+                "type": "string",
+                "title": "Process Description (Markdown)",
+                "description": "A detailed description of the application process, in Markdown format."
+              }
+            }
+          },
+          "applicationForm": {
+            "type": "array",
+            "title": "Application Forms",
+            "description": "Details about the application forms required to apply for the benefit.",
+            "items": {
+              "type": "object",
+              "required": ["type", "name", "required"],
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "title": "Form Type",
+                  "description": "The type of application form."
+                },
+                "name": {
+                  "type": "string",
+                  "title": "Form Name",
+                  "description": "The name of the application form."
+                },
+                "required": {
+                  "type": "array",
+                  "title": "Required Fields",
+                  "description": "List of required fields in the application form.",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "minItems": 1
+          },
+          "eligibilityCriteria": {
+            "type": "object",
+            "title": "Eligibility Criteria",
+            "description": "Criteria for determining eligibility for the benefit.",
+            "properties": {
+              "eligibilityDescription_md": {
+                "type": "string",
+                "title": "Eligibility Description (Markdown)",
+                "description": "A detailed description of the eligibility criteria, in Markdown format."
+              },
+              "eligibilityDescription": {
+                "type": "array",
+                "title": "Eligibility Description",
+                "description": "A nested description of the eligibility criteria with structured text.",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "title": "Criteria Type",
+                      "description": "The type of eligibility criteria (e.g., 'Age', 'Income')."
+                    },
+                    "children": {
+                      "type": "array",
+                      "title": "Sub-Criteria",
+                      "description": "Nested criteria or conditions.",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "type": {
+                            "type": "string",
+                            "title": "Sub-Criteria Type",
+                            "description": "The type of sub-criteria."
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "required": ["type", "children"]
+                }
+              }
+            }
+          },
+          "benefitDocuments": {
+            "type": "array",
+            "title": "Benefit Documents",
+            "description": "Documents related to the benefit.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "documentType": {
+                  "type": "string",
+                  "title": "Document Type",
+                  "description": "Type of the  document (e.g., Proof of Identity)."
+                },
+                "documentURL": {
+                  "type": "string",
+                  "title": "Document URL",
+                  "description": "URL where the document can be accessed."
+                }
+              },
+              "required": ["documentType", "documentURL"]
+            },
+            "minItems": 1
+          }
+        }
+      }
+    }
+  }
+}

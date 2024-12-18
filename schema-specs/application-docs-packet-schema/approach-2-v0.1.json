@@ -1,0 +1,26 @@
+{
+    "seeker_id": "SEEKER12345",
+    "eligibilities": [
+      {
+        "eligibility_type": "10th_board_marks",
+        "documents": [
+          {
+            "document_type": "10th_board_marksheet",
+            "document_format": "json",
+            "document_content": "{\n  \"@context\": [\n    \"https://www.w3.org/2018/credentials/v1\",\n    \"https://example.org/educational-credential-schema/v1\"\n  ],\n  \"type\": [\n    \"VerifiableCredential\",\n    \"EducationalCredential\"\n  ],\n  \"id\": \"urn:uuid:1234abcd-5678-ef90-1234-56789abcdef0\",\n  \"issuer\": {\n    \"id\": \"https://university.example.edu\",\n    \"name\": \"University of Example\"\n  },\n  \"issuanceDate\": \"2024-07-01T00:00:00Z\",\n  \"expirationDate\": \"2026-07-01T00:00:00Z\",\n  \"credentialSubject\": {\n    \"id\": \"did:example:seeker12345\",\n    \"givenName\": \"John\",\n    \"familyName\": \"Doe\",\n    \"dateOfBirth\": \"2002-05-12\",\n    \"degree\": {\n      \"type\": \"BachelorDegree\",\n      \"name\": \"Bachelor of Science in Computer Science\"\n    },\n    \"gpa\": {\n      \"type\": \"GPA\",\n      \"value\": \"3.8\"\n    },\n    \"completionDate\": \"2024-06-15\"\n  },\n  \"proof\": {\n    \"type\": \"Ed25519Signature2020\",\n    \"created\": \"2024-07-01T10:00:00Z\",\n    \"proofPurpose\": \"assertionMethod\",\n    \"verificationMethod\": \"https://university.example.edu/keys/123\",\n    \"jws\": \"eyJhbGciOiJFZERTQSJ9..ABC123abc456\"\n  }\n}"
+          }
+        ]
+      },
+      {
+        "eligibility_type": "annual_income",
+        "documents": [
+          {
+            "document_type": "income_proof",
+            "document_format": "json",
+            "document_content": "{\n    \"@context\": [\n      \"https://www.w3.org/2018/credentials/v1\",\n      \"https://example.org/income-credential-schema/v1\"\n    ],\n    \"type\": [\"VerifiableCredential\", \"IncomeCredential\"],\n    \"id\": \"urn:uuid:5678ef90-abcd-1234-5678-9abcdef01234\",\n    \"issuer\": {\n      \"id\": \"https://gov.example.org\",\n      \"name\": \"Government of Example\"\n    },\n    \"issuanceDate\": \"2024-06-01T00:00:00Z\",\n    \"expirationDate\": \"2025-06-01T00:00:00Z\",\n    \"credentialSubject\": {\n      \"id\": \"did:example:seeker12345\",\n      \"givenName\": \"John\",\n      \"familyName\": \"Doe\",\n      \"annualIncome\": {\n        \"currency\": \"USD\",\n        \"value\": \"45000\"\n      },\n      \"incomeYear\": \"2023\"\n    },\n    \"proof\": {\n      \"type\": \"Ed25519Signature2020\",\n      \"created\": \"2024-06-01T10:00:00Z\",\n      \"proofPurpose\": \"assertionMethod\",\n      \"verificationMethod\": \"https://gov.example.org/keys/987\",\n      \"jws\": \"eyJhbGciOiJFZERTQSJ9..DEF456def789\"\n    }\n  }\n  "
+          }
+        ]
+      }
+    ]
+  }
+  
