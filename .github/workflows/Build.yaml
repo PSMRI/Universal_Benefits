@@ -125,14 +125,3 @@ jobs:
           # Send message to Teams
           curl -X POST -H 'Content-Type: application/json' \
             -d "{\"text\":\"$MESSAGE\"}" ${{ secrets.TEAMS_WEBHOOK_URL }}
-
-      # Step 8: Upload Docker images as artifacts
-      - name: Upload Docker Image Tarballs as Artifacts
-        if: success()  # Only upload if the build and push were successful
-        uses: actions/upload-artifact@v3
-        with:
-          name: docker-images
-          path: |
-            prsm323_application_$IMAGE_TAG.tar
-            prsm323_benefits_$IMAGE_TAG.tar
-            prsm323_customer_$IMAGE_TAG.tar
