@@ -10,32 +10,37 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout the repository
-      - name: Checkout code
+      # Step 1: Checkout the repository with full history
+      - name: Checkout code with full history
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all commit history
 
-      # Step 2: Set up Docker Hub credentials
+      # Step 2: Debugging commit hashes
+      - name: Verify commit hashes
+        run: |
+          echo "Previous commit hash (before): ${{ github.event.before }}"
+          echo "Current commit hash (sha): ${{ github.sha }}"
+          git rev-parse ${{ github.event.before }} || echo "Previous commit hash does not exist."
+          git rev-parse ${{ github.sha }} || echo "Current commit hash does not exist."
+
+      # Step 3: Set up Docker Hub credentials
       - name: Set up Docker Hub credentials
         run: |
           echo "${{ secrets.DOCKER_PASSWORD }}" | docker login --username ${{ secrets.DOCKER_USERNAME }} --password-stdin
 
-      # Step 3: Generate Image Tag and store it in $GITHUB_ENV
+      # Step 4: Generate Image Tag and store it in $GITHUB_ENV
       - name: Generate Image Tag
         run: |
           IMAGE_TAG="v1.0.0-$(date +'%Y%m%d-%H%M%S')"  # Create a unique image tag
           echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV  # Store the IMAGE_TAG in $GITHUB_ENV
 
-      # Step 4: Check for changes and build Docker image
-      - name: Debugging git diff and changes detection
+      # Step 5: Debugging git diff output
+      - name: Debugging git diff
         run: |
-          echo "Previous commit hash (before): ${{ github.event.before }}"
-          echo "Current commit hash (sha): ${{ github.sha }}"
-          
-          # Run the git diff command and output the result to debug
           echo "Running git diff command to compare commits"
           git diff --name-only ${{ github.event.before }} ${{ github.sha }} || echo "Git diff failed"
           
-          # Debugging: Check which files are changed
           CHANGED_SERVICES=""
           
           echo "Checking for changes in backend/application folder"
@@ -53,11 +58,10 @@ jobs:
             CHANGED_SERVICES="$CHANGED_SERVICES customer"
           fi
 
-          # Debugging output
           echo "Changed services: $CHANGED_SERVICES"
           echo "CHANGED_SERVICES=$CHANGED_SERVICES" >> $GITHUB_ENV
 
-      # Step 5: Build and push Docker images for the modified services
+      # Step 6: Build and push Docker images for the modified services
       - name: Build and Push Docker Image for Application
         if: contains(env.CHANGED_SERVICES, 'application')
         run: |
@@ -79,7 +83,7 @@ jobs:
           docker build -t prsm323/customer:$IMAGE_TAG ./backend/customer
           docker push prsm323/customer:$IMAGE_TAG
 
-      # Step 6: Final success message
+      # Step 7: Final success message
       - name: Final success message
         run: |
           echo "Successfully built and pushed Docker images for: $CHANGED_SERVICES"
